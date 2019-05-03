@@ -3,3 +3,5 @@ Panama/obj/
 .vs/
 Panama.Security/obj/
 Panama.Security/bin/
+Panama.IoC.Autofac/bin/
+Panama.IoC.Autofac/obj/
