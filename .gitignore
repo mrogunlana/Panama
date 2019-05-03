@@ -7,3 +7,5 @@ Panama.IoC.Autofac/bin/
 Panama.IoC.Autofac/obj/
 Panama.IoC.Ninject/bin/
 Panama.IoC.Ninject/obj/
+Panama.Jobs.Quartz/bin/
+Panama.Jobs.Quartz/obj/
