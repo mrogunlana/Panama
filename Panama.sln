@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.IoC.Ninject", "Panam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Jobs.Quartz", "Panama.Jobs.Quartz\Panama.Jobs.Quartz.csproj", "{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Sql.Dapper", "Panama.Sql.Dapper\Panama.Sql.Dapper.csproj", "{9AE9CE0A-1180-4240-87B1-F295648108D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AE9CE0A-1180-4240-87B1-F295648108D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE9CE0A-1180-4240-87B1-F295648108D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE9CE0A-1180-4240-87B1-F295648108D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE9CE0A-1180-4240-87B1-F295648108D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
