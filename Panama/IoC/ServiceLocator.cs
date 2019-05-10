@@ -5,7 +5,7 @@ namespace Panama.IoC
     public static class ServiceLocator
     {
         private static IServiceLocator _serviceLocator;
-        private static object _syncLock = new Object();
+        private static readonly object _syncLock = new Object();
 
         public static IServiceLocator Current
         {

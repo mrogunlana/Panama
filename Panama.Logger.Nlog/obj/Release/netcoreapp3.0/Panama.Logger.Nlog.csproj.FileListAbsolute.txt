@@ -1,0 +1,12 @@
+C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.Logger.Nlog.deps.json
+C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.Logger.Nlog.dll
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.csprojAssemblyReference.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.csproj.CoreCompileInputs.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.AssemblyInfoInputs.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.AssemblyInfo.cs
+C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.Logger.Nlog.pdb
+C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.dll
+C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.pdb
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.csproj.CopyComplete
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.dll
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Logger.Nlog.pdb

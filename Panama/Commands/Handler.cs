@@ -10,7 +10,7 @@ namespace Panama.Commands
 {
     public class Handler : IHandler
     {
-        private ILog _log;
+        private readonly ILog _log;
         private Guid _id = Guid.NewGuid();
         private readonly IServiceLocator _serviceLocator;
 
@@ -110,9 +110,7 @@ namespace Panama.Commands
 
         public IResult Invoke()
         {
-            IResult result = new Result();
-
-            result = Validate();
+            IResult result = Validate();
             if (!result.Success)
                 return result;
 
