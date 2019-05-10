@@ -9,11 +9,8 @@
     <PackageReference Include="Dapper.Contrib" Version="1.60.1" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Panama.Core" Version="1.0.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 
 </Project>

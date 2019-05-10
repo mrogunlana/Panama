@@ -21,13 +21,12 @@
         }
       },
       "Panama.Core/1.0.1": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v3.0",
+        "type": "package",
         "compile": {
-          "bin/placeholder/Panama.Core.dll": {}
+          "lib/netcoreapp3.0/Panama.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Panama.Core.dll": {}
+          "lib/netcoreapp3.0/Panama.dll": {}
         }
       }
     }
@@ -84,9 +83,17 @@
       ]
     },
     "Panama.Core/1.0.1": {
-      "type": "project",
-      "path": "../Panama/Panama.csproj",
-      "msbuildProject": "../Panama/Panama.csproj"
+      "sha512": "dIqDYgKdOv388zvtKTFJCpvQVz2fPiGrFOfQLPHtr/NZE8/J0ck4jSoy9J0nej0VZHrn3SyKywCL6PewSU1NSQ==",
+      "type": "package",
+      "path": "panama.core/1.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "lib/netcoreapp3.0/Panama.dll",
+        "panama.core.1.0.1.nupkg.sha512",
+        "panama.core.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -134,11 +141,7 @@
       },
       "frameworks": {
         "netcoreapp3.0": {
-          "projectReferences": {
-            "C:\\Projects\\panama-core\\Panama\\Panama.csproj": {
-              "projectPath": "C:\\Projects\\panama-core\\Panama\\Panama.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -159,6 +162,10 @@
           "NLog": {
             "target": "Package",
             "version": "[4.6.3, )"
+          },
+          "Panama.Core": {
+            "target": "Package",
+            "version": "[1.0.1, )"
           }
         },
         "imports": [

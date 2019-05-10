@@ -6,10 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Panama\Panama.csproj" />
+    <PackageReference Include="Panama.Core" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

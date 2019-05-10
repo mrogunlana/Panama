@@ -5,11 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Panama.Core" Version="1.0.1" />
     <PackageReference Include="Quartz" Version="3.0.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 
 </Project>

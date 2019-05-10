@@ -10,7 +10,7 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.0.0-preview4.19212.13",
           "NLog": "4.6.3",
-          "Panama": "1.0.0"
+          "Panama.Core": "1.0.1"
         },
         "runtime": {
           "Panama.Logger.Nlog.dll": {}
@@ -25,9 +25,12 @@
           }
         }
       },
-      "Panama/1.0.0": {
+      "Panama.Core/1.0.1": {
         "runtime": {
-          "Panama.dll": {}
+          "lib/netcoreapp3.0/Panama.dll": {
+            "assemblyVersion": "1.0.1.0",
+            "fileVersion": "1.0.1.0"
+          }
         }
       }
     }
@@ -52,10 +55,12 @@
       "path": "nlog/4.6.3",
       "hashPath": "nlog.4.6.3.nupkg.sha512"
     },
-    "Panama/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
+    "Panama.Core/1.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dIqDYgKdOv388zvtKTFJCpvQVz2fPiGrFOfQLPHtr/NZE8/J0ck4jSoy9J0nej0VZHrn3SyKywCL6PewSU1NSQ==",
+      "path": "panama.core/1.0.1",
+      "hashPath": "panama.core.1.0.1.nupkg.sha512"
     }
   }
 }
