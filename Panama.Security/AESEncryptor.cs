@@ -1,11 +1,11 @@
-﻿using Panama.Security.Interfaces;
+﻿using Panama.Core.Security.Interfaces;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Panama.Security
+namespace Panama.Core.Security
 {
     public class AESEncryptor : IStringEncryptor
     {

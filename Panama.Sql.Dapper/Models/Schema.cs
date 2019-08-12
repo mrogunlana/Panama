@@ -1,7 +1,7 @@
-﻿using Panama.Entities;
+﻿using Panama.Core.Entities;
 using System;
 
-namespace Panama.Sql.Dapper.Models
+namespace Panama.Core.Sql.Dapper.Models
 {
     public class Schema : IModel
     {

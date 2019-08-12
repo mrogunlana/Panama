@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using Autofac.Features.AttributeFilters;
-using Panama.Commands;
+using Panama.Core.Commands;
 using System;
 using System.Linq;
 
-namespace Panama.IoC.Autofac
+namespace Panama.Core.IoC.Autofac
 {
     public class DefaultAutofacConfiguration
     {

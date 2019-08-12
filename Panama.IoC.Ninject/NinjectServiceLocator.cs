@@ -1,6 +1,6 @@
 ﻿using Ninject;
 
-namespace Panama.IoC.Ninject
+namespace Panama.Core.IoC.Ninject
 {
     public class NinjectServiceLocator : IServiceLocator
     {

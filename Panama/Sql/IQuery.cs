@@ -1,7 +1,7 @@
-﻿using Panama.Entities;
+﻿using Panama.Core.Entities;
 using System.Collections.Generic;
 
-namespace Panama.Sql
+namespace Panama.Core.Sql
 {
     public interface IQuery
     {

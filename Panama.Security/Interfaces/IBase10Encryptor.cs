@@ -1,4 +1,4 @@
-﻿namespace Panama.Security.Interfaces
+﻿namespace Panama.Core.Security.Interfaces
 {
     public interface IBase10Encryptor
     {

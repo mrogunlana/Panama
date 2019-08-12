@@ -1,12 +1,12 @@
-﻿using Panama.Entities;
-using Panama.IoC;
-using Panama.Logger;
+﻿using Panama.Core.Entities;
+using Panama.Core.IoC;
+using Panama.Core.Logger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
-namespace Panama.Commands
+namespace Panama.Core.Commands
 {
     public class Handler : IHandler
     {

@@ -1,10 +1,10 @@
-﻿using Panama.Logger;
+﻿using Panama.Core.Logger;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
 using External = Quartz;
 
-namespace Panama.Jobs.Quartz
+namespace Panama.Core.Jobs.Quartz
 {
     public class Scheduler : IScheduler
     {

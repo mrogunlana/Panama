@@ -2,7 +2,13 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.0": {
-      "Microsoft.NETCore.Platforms/3.0.0-preview4.19212.13": {
+      "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "3.0.0-preview7.19362.9"
+        }
+      },
+      "Microsoft.NETCore.Platforms/3.0.0-preview7.19362.9": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -20,29 +26,42 @@
           "lib/netstandard2.0/NLog.dll": {}
         }
       },
-      "Panama.Core/1.0.1": {
+      "Panama.Core/1.0.2": {
         "type": "package",
         "compile": {
-          "lib/netcoreapp3.0/Panama.dll": {}
+          "lib/netcoreapp3.0/Panama.Core.dll": {}
         },
         "runtime": {
-          "lib/netcoreapp3.0/Panama.dll": {}
+          "lib/netcoreapp3.0/Panama.Core.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "Microsoft.NETCore.Platforms/3.0.0-preview4.19212.13": {
-      "sha512": "cBcFp3iIi/c6AK9F/aZxbZaNhWGOLSJD071L9tO8JbyODp38NDKsJ38Xq/KJUCt1EUIlqnyF6PdqOngFuCvD1Q==",
+    "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
+      "sha512": "TNDdHAcfUqEaWXXJoCMUGZnsIP53jlShQV4Ccw8Nqbl8SWkkz1llq4ckfoRl7QrHoq328JhEyCSnPaaYHAB5Xg==",
       "type": "package",
-      "path": "microsoft.netcore.platforms/3.0.0-preview4.19212.13",
+      "path": "microsoft.netcore.app/3.0.0-preview7-27912-14",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "microsoft.netcore.app.3.0.0-preview7-27912-14.nupkg.sha512",
+        "microsoft.netcore.app.nuspec"
+      ]
+    },
+    "Microsoft.NETCore.Platforms/3.0.0-preview7.19362.9": {
+      "sha512": "gc5/X1m73JO8ETxOHC3IbgM7JRa7LPsSY+/lVs88YGwKn0QYuU568EmpC8yPk9UKaAOq+82PWG61vFcXdNfsvQ==",
+      "type": "package",
+      "path": "microsoft.netcore.platforms/3.0.0-preview7.19362.9",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.platforms.3.0.0-preview4.19212.13.nupkg.sha512",
+        "microsoft.netcore.platforms.3.0.0-preview7.19362.9.nupkg.sha512",
         "microsoft.netcore.platforms.nuspec",
         "runtime.json",
         "useSharedDesignerContext.txt",
@@ -82,43 +101,43 @@
         "nlog.nuspec"
       ]
     },
-    "Panama.Core/1.0.1": {
-      "sha512": "dIqDYgKdOv388zvtKTFJCpvQVz2fPiGrFOfQLPHtr/NZE8/J0ck4jSoy9J0nej0VZHrn3SyKywCL6PewSU1NSQ==",
+    "Panama.Core/1.0.2": {
+      "sha512": "ZyCTPIBGB04hOdI6WtGuhRiyQ9XTWWuK+IS7iYGu1gITsUA/m8qSvG3YWdxiNZPi/cvRdlsILw/cThG5GU60QQ==",
       "type": "package",
-      "path": "panama.core/1.0.1",
+      "path": "panama.core/1.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.md",
-        "lib/netcoreapp3.0/Panama.dll",
-        "panama.core.1.0.1.nupkg.sha512",
+        "lib/netcoreapp3.0/Panama.Core.dll",
+        "panama.core.1.0.2.nupkg.sha512",
         "panama.core.nuspec"
       ]
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.0": [
-      "Microsoft.NETCore.Platforms >= 3.0.0-preview4.19212.13",
+      "Microsoft.NETCore.App >= 3.0.0-preview7-27912-14",
       "NLog >= 4.6.3",
-      "Panama.Core >= 1.0.1"
+      "Panama.Core >= 1.0.2"
     ]
   },
   "packageFolders": {
     "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\": {},
-    "C:\\ProgramData\\Xamarin\\NuGet\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj",
-      "projectName": "Panama.Logger.Nlog",
-      "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj",
+      "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
+      "projectName": "Panama.Core.Logger.Nlog",
+      "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
       "packagesPath": "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\",
       "outputPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\ProgramData\\Xamarin\\NuGet\\",
+        "C:\\Microsoft\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
@@ -131,13 +150,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/aspnet-entityframeworkcore/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/aspnet-extensions/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json": {},
-        "https://dotnetfeed.blob.core.windows.net/dotnet-windowsdesktop/index.json": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.0": {
@@ -153,10 +166,11 @@
     "frameworks": {
       "netcoreapp3.0": {
         "dependencies": {
-          "Microsoft.NETCore.Platforms": {
+          "Microsoft.NETCore.App": {
+            "include": "None",
             "suppressParent": "All",
             "target": "Package",
-            "version": "[3.0.0-preview4.19212.13, )",
+            "version": "[3.0.0-preview7-27912-14, )",
             "autoReferenced": true
           },
           "NLog": {
@@ -165,14 +179,22 @@
           },
           "Panama.Core": {
             "target": "Package",
-            "version": "[1.0.1, )"
+            "version": "[1.0.2, )"
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "frameworkReferences": [
+          "Microsoft.NETCore.App"
+        ]
       }
     }
   }

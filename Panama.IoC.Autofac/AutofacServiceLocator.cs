@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace Panama.IoC.Autofac
+namespace Panama.Core.IoC.Autofac
 {
     public class AutofacServiceLocator : IServiceLocator
     {

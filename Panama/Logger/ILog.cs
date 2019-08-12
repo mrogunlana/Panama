@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Panama.Logger
+namespace Panama.Core.Logger
 {
     public interface ILog
     {

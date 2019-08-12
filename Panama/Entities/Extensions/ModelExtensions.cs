@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Panama.Entities
+namespace Panama.Core.Entities
 {
     public static class ModelExtensions
     {

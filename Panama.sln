@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama", "Panama\Panama.csproj", "{005CE007-CFD8-4D57-BEA6-E94CC05474A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core", "Panama\Panama.Core.csproj", "{005CE007-CFD8-4D57-BEA6-E94CC05474A4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Security", "Panama.Security\Panama.Security.csproj", "{7FD635D4-9C1D-438A-8C05-614C2A66F50D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Security", "Panama.Security\Panama.Core.Security.csproj", "{7FD635D4-9C1D-438A-8C05-614C2A66F50D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.IoC.Autofac", "Panama.IoC.Autofac\Panama.IoC.Autofac.csproj", "{8676834F-8565-4189-8AEF-BD5B83D411BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.IoC.Autofac", "Panama.IoC.Autofac\Panama.Core.IoC.Autofac.csproj", "{8676834F-8565-4189-8AEF-BD5B83D411BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.IoC.Ninject", "Panama.IoC.Ninject\Panama.IoC.Ninject.csproj", "{3D96ED36-8E08-4BFD-AD07-A7AA1EE612B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.IoC.Ninject", "Panama.IoC.Ninject\Panama.Core.IoC.Ninject.csproj", "{3D96ED36-8E08-4BFD-AD07-A7AA1EE612B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Jobs.Quartz", "Panama.Jobs.Quartz\Panama.Jobs.Quartz.csproj", "{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Jobs.Quartz", "Panama.Jobs.Quartz\Panama.Core.Jobs.Quartz.csproj", "{556AB4A7-FE14-45AE-B8DD-4DE8413B996B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Sql.Dapper", "Panama.Sql.Dapper\Panama.Sql.Dapper.csproj", "{9AE9CE0A-1180-4240-87B1-F295648108D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Sql.Dapper", "Panama.Sql.Dapper\Panama.Core.Sql.Dapper.csproj", "{9AE9CE0A-1180-4240-87B1-F295648108D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Logger.Nlog", "Panama.Logger.Nlog\Panama.Logger.Nlog.csproj", "{FC0226BE-F46B-4704-B4CC-FF525CBE7147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Logger.Nlog", "Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj", "{FC0226BE-F46B-4704-B4CC-FF525CBE7147}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

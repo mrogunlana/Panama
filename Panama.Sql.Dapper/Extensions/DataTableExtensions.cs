@@ -1,11 +1,11 @@
-﻿using Panama.Entities;
-using Panama.IoC;
+﻿using Panama.Core.Entities;
+using Panama.Core.IoC;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
 
-namespace Panama.Sql.Dapper
+namespace Panama.Core.Sql.Dapper
 {
     public static class DataTableExtensions
     {

@@ -1,4 +1,4 @@
-﻿namespace Panama.IoC
+﻿namespace Panama.Core.IoC
 {
     public interface IServiceLocator
     {

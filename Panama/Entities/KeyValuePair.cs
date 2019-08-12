@@ -1,4 +1,4 @@
-﻿namespace Panama.Entities
+﻿namespace Panama.Core.Entities
 {
     public class KeyValuePair : IModel
     {

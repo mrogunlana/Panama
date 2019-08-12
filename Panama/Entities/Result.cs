@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Panama.Entities
+namespace Panama.Core.Entities
 {
     public class Result : IResult
     {

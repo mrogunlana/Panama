@@ -1,9 +1,9 @@
-﻿using Panama.Security.Interfaces;
+﻿using Panama.Core.Security.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Panama.Security
+namespace Panama.Core.Security
 {
     public class Base10Encryptor : IBase10Encryptor
     {

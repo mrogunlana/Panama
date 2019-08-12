@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj": {}
+    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj": {
+    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj",
-        "projectName": "Panama.Logger.Nlog",
-        "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Logger.Nlog.csproj",
+        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
+        "projectName": "Panama.Core.Logger.Nlog",
+        "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
         "packagesPath": "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\",
         "outputPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\obj\\",
         "projectStyle": "PackageReference",
@@ -56,7 +56,7 @@
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.1, )"
+              "version": "[1.0.2, )"
             }
           },
           "imports": [

@@ -1,7 +1,7 @@
 ﻿using System;
 using NLogger = NLog;
 
-namespace Panama.Logger
+namespace Panama.Core.Logger
 {
     public class NLog : ILog
     {

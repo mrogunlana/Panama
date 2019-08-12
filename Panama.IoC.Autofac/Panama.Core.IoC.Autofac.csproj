@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>Panama.Core.IoC.Autofac</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.2" />
-    <PackageReference Include="Panama.Core" Version="1.0.1" />
+    <PackageReference Include="Panama.Core" Version="1.0.2" />
   </ItemGroup>
 
 </Project>

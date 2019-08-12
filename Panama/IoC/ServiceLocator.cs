@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Panama.IoC
+namespace Panama.Core.IoC
 {
     public static class ServiceLocator
     {

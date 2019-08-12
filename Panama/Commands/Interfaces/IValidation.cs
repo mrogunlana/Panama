@@ -1,7 +1,7 @@
-﻿using Panama.Entities;
+﻿using Panama.Core.Entities;
 using System.Collections.Generic;
 
-namespace Panama.Commands
+namespace Panama.Core.Commands
 {
     public interface IValidation
     {

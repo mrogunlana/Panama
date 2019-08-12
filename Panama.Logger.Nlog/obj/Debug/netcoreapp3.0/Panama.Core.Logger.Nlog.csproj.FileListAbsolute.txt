@@ -1,0 +1,4 @@
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Debug\netcoreapp3.0\Panama.Core.Logger.Nlog.csprojAssemblyReference.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Debug\netcoreapp3.0\Panama.Core.Logger.Nlog.csproj.CoreCompileInputs.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Debug\netcoreapp3.0\Panama.Core.Logger.Nlog.AssemblyInfoInputs.cache
+C:\Projects\panama-core\Panama.Logger.Nlog\obj\Debug\netcoreapp3.0\Panama.Core.Logger.Nlog.AssemblyInfo.cs

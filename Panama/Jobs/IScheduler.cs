@@ -1,4 +1,4 @@
-﻿namespace Panama.Jobs
+﻿namespace Panama.Core.Jobs
 {
     public interface IScheduler
     {

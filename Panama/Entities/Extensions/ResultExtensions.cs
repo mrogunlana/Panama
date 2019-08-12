@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Panama.Entities
+namespace Panama.Core.Entities
 {
     public static class ResultExtensions
     {

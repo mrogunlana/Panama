@@ -3,8 +3,8 @@ using Dapper.Contrib.Extensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 using Newtonsoft.Json;
-using Panama.Entities;
-using Panama.Logger;
+using Panama.Core.Entities;
+using Panama.Core.Logger;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,7 +13,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Panama.Sql.Dapper
+namespace Panama.Core.Sql.Dapper
 {
     public class SqlQuery : IQuery
     {
