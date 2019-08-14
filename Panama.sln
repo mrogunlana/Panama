@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Sql.Dapper", "P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Logger.Nlog", "Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj", "{FC0226BE-F46B-4704-B4CC-FF525CBE7147}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.MySql.Dapper", "Panama.MySql.Dapper\Panama.MySql.Dapper.csproj", "{2312D4C9-06F8-49EF-83EB-2AC81336CE92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FC0226BE-F46B-4704-B4CC-FF525CBE7147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC0226BE-F46B-4704-B4CC-FF525CBE7147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC0226BE-F46B-4704-B4CC-FF525CBE7147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2312D4C9-06F8-49EF-83EB-2AC81336CE92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2312D4C9-06F8-49EF-83EB-2AC81336CE92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2312D4C9-06F8-49EF-83EB-2AC81336CE92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2312D4C9-06F8-49EF-83EB-2AC81336CE92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

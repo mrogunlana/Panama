@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.60.6" />
+    <PackageReference Include="Dapper.Contrib" Version="1.60.1" />
+    <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.17" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Panama.Core" Version="1.0.2" />
+  </ItemGroup>
+
+</Project>
