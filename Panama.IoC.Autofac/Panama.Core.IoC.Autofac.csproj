@@ -3,6 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>Panama.Core.IoC.Autofac</AssemblyName>
+    <Version>1.0.1</Version>
+    <Authors>Diran Ogunlana</Authors>
+    <Product>Panama.Core.IoC.Autofac</Product>
+    <Description>Implementation of Autofac IoC container with Service Locator</Description>
+    <Copyright>2019</Copyright>
+    <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
+    <PackageReleaseNotes>initial stable release</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

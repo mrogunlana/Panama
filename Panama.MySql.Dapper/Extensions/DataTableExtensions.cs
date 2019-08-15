@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
-namespace Panama.MySql.Dapper
+namespace Panama.Core.MySql.Dapper
 {
     public static class DataTableExtensions
     {

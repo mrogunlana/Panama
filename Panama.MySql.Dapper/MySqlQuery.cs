@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Panama.Core.Entities;
 using Panama.Core.Logger;
 using Panama.Core.Sql;
-using Panama.MySql.Dapper.Models;
+using Panama.Core.MySql.Dapper.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Text;
 using MySqlData = MySql.Data;
 
-namespace Panama.MySql.Dapper
+namespace Panama.Core.MySql.Dapper
 {
     public class MySqlQuery : IQuery
     {

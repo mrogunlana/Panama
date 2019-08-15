@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+    <Authors>Diran Ogunlana</Authors>
+    <Description>Custom security encryptors for the Panama.Core framework using IStringEncryptor</Description>
+    <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
+    <Copyright>2019</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

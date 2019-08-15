@@ -38,8 +38,8 @@
               "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {
                 "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj"
               },
-              "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj": {
-                "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj"
+              "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
+                "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj"
               }
             }
           }
@@ -106,7 +106,7 @@
       }
     },
     "C:\\Projects\\panama-core\\Panama.IoC.Autofac\\Panama.Core.IoC.Autofac.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "restore": {
         "projectUniqueName": "C:\\Projects\\panama-core\\Panama.IoC.Autofac\\Panama.Core.IoC.Autofac.csproj",
         "projectName": "Panama.Core.IoC.Autofac",
@@ -177,7 +177,7 @@
       }
     },
     "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "restore": {
         "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
         "projectName": "Panama.Core.Logger.Nlog",
@@ -247,12 +247,12 @@
         }
       }
     },
-    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj": {
-      "version": "1.0.0",
+    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
+      "version": "1.0.1",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj",
-        "projectName": "Panama.MySql.Dapper",
-        "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj",
+        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
+        "projectName": "Panama.Core.MySql.Dapper",
+        "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
         "packagesPath": "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\",
         "outputPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\obj\\",
         "projectStyle": "PackageReference",

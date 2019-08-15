@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.0": {
-      "Panama.MySql.Dapper/1.0.1": {
+      "Panama.Core.MySql.Dapper/1.0.1": {
         "dependencies": {
           "Dapper": "1.60.6",
           "Dapper.Contrib": "1.60.1",
@@ -18,7 +18,7 @@
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
-          "Panama.MySql.Dapper.dll": {}
+          "Panama.Core.MySql.Dapper.dll": {}
         }
       },
       "BouncyCastle.NetCore/1.8.3": {
@@ -1182,7 +1182,7 @@
     }
   },
   "libraries": {
-    "Panama.MySql.Dapper/1.0.1": {
+    "Panama.Core.MySql.Dapper/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

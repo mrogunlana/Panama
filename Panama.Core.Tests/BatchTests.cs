@@ -8,7 +8,7 @@ using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.Sql;
 using Panama.Core.Tests.Models;
-using Panama.MySql.Dapper;
+using Panama.Core.MySql.Dapper;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

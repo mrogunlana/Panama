@@ -19,12 +19,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Panama.IoC.Autofac\Panama.Core.IoC.Autofac.csproj" />
     <ProjectReference Include="..\Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj" />
-    <ProjectReference Include="..\Panama.MySql.Dapper\Panama.MySql.Dapper.csproj" />
+    <ProjectReference Include="..\Panama.MySql.Dapper\Panama.Core.MySql.Dapper.csproj" />
   </ItemGroup>
 
   <Target Name="CopyAppConfig" AfterTargets="Build" DependsOnTargets="Build">
     <CreateItem Include="$(OutputPath)$(AssemblyName).dll.config">
-      <Output TaskParameter="Include" ItemName="FilesToCopy"/>
+      <Output TaskParameter="Include" ItemName="FilesToCopy" />
     </CreateItem>
     <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutputPath)testhost.dll.config" />
   </Target>

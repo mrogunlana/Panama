@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj": {}
+    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj": {
+    "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
       "version": "1.0.1",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj",
-        "projectName": "Panama.MySql.Dapper",
-        "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.MySql.Dapper.csproj",
+        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
+        "projectName": "Panama.Core.MySql.Dapper",
+        "projectPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
         "packagesPath": "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\",
         "outputPath": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\obj\\",
         "projectStyle": "PackageReference",

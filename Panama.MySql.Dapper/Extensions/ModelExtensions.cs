@@ -1,14 +1,14 @@
 ﻿using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 using Panama.Core.Entities;
-using Panama.MySql.Dapper.Models;
+using Panama.Core.MySql.Dapper.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
 
-namespace Panama.MySql.Dapper
+namespace Panama.Core.MySql.Dapper
 {
     public static class ModelExtensions
     {

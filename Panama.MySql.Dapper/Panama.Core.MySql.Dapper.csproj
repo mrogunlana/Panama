@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Version>1.0.1</Version>
+    <Authors>Diran Ogunlana</Authors>
+    <Company />
+    <Product>Panama.Core.MySql.Dapper</Product>
+    <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
+    <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
+    <PackageReleaseNotes>BulkInsert (stable) using docker MySql instance via docker-compose up --build in .\Panama.Database.MySql directory</PackageReleaseNotes>
+    <Copyright>2019</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Panama.Core.MySql.Dapper</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.60.6" />
+    <PackageReference Include="Dapper.Contrib" Version="1.60.1" />
+    <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.17" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Panama.Core" Version="1.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
+  </ItemGroup>
+
+</Project>
