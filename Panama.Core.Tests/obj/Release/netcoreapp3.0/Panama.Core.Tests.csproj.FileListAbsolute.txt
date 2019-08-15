@@ -115,3 +115,9 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.MySql.Dapper.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.pdb
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.MySql.Dapper.pdb
+C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.dll.config
+C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.pdb
+C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.IoC.Autofac.dll
+C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.IoC.Autofac.pdb
+C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.dll
+C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.pdb

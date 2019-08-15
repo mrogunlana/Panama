@@ -11,6 +11,7 @@
     <PackageReference Include="MySql.Data" Version="8.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Panama.Core" Version="1.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
   </ItemGroup>
 
 </Project>

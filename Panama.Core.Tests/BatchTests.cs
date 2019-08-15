@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
@@ -10,8 +7,11 @@ using Panama.Core.IoC;
 using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.Sql;
-using Panama.MySql.Dapper;
 using Panama.Core.Tests.Models;
+using Panama.MySql.Dapper;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace Panama.Core.Tests
 {
@@ -38,7 +38,7 @@ namespace Panama.Core.Tests
         {
             var sql = ServiceLocator.Current.Resolve<IQuery>();
 
-            sql.Execute("delete from [User]", null);
+            sql.Execute("delete from User", null);
         }
 
         [TestMethod]
@@ -47,15 +47,15 @@ namespace Panama.Core.Tests
             var sql = ServiceLocator.Current.Resolve<IQuery>();
             var users = new List<User>();
 
-            for (int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 10; i++)
                 users.Add(new User() {
                     ID = Guid.NewGuid(),
-                    UserName = $"User{i}"
+                    Email = $"User{i}@test.com"
                 });
 
             sql.InsertBatch(users);
 
-            var results = sql.ExecuteScalar<int>($"select count(*) from [User]", null);
+            var results = sql.ExecuteScalar<int>($"select count(*) from User", null);
 
             Assert.AreEqual(users.Count, results);
         }

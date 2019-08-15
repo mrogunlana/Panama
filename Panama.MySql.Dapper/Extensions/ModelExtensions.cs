@@ -1,4 +1,5 @@
-﻿using DapperExtensions.Sql;
+﻿using DapperExtensions.Mapper;
+using DapperExtensions.Sql;
 using Panama.Core.Entities;
 using Panama.MySql.Dapper.Models;
 using System;
@@ -26,16 +27,20 @@ namespace Panama.MySql.Dapper
             if (map == null)
                 throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
             
-            var schema = new List<Schema>();
             var properties = TypeDescriptor.GetProperties(typeof(T)).Cast<PropertyDescriptor>();
+            var parameters = map.Properties
+                            .Where(x => x.Ignored == false)
+                            .Where(x => x.IsReadOnly == false)
+                            .Where(x => x.KeyType == KeyType.NotAKey);
 
-            foreach (var property in properties)
-                schema.Add(new Schema() {
-                    Name = property.Name,
-                    ColumnName = map.Properties.FirstOrDefault(x => x.Name == property.Name)?.ColumnName,
-                    Type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType
-                });
-            
+            var schema = (from p in properties
+                          join o in parameters on p.Name equals o.ColumnName
+                          select new Schema() {
+                              Name = p.Name,
+                              ColumnName = o.ColumnName,
+                              Type = Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType
+                          }).ToList();
+
             DataTable table = new DataTable();
             foreach (var property in schema)
                 table.Columns.Add(property.Name, property.Type);

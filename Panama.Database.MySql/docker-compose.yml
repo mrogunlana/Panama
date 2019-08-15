@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  database:
+      container_name: Panama.Database.MySql
+      build: 
+        context: .
+        dockerfile: Dockerfile.development
+      command: --default-authentication-plugin=mysql_native_password
+      ports: 
+        - "3309:3306"
+      volumes:
+        - dbdata:/var/lib/mysql/
+        - ./conf/custom.cnf:/etc/mysql/custom.cnf
+      environment:
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+ 
+
+#volumes   
+volumes:
+  dbdata:
+    driver: local      

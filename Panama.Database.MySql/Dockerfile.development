@@ -1,0 +1,6 @@
+FROM mysql:5.7
+
+COPY ./scripts/* /docker-entrypoint-initdb.d/
+COPY ./conf/* /etc/mysql/
+
+CMD ["mysqld"]
