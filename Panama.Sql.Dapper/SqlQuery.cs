@@ -19,17 +19,22 @@ namespace Panama.Core.Sql.Dapper
     {
         private readonly ILog _log;
         private readonly ISqlGenerator _sql;
+        private readonly string _connection;
 
         public SqlQuery(ILog log)
         {
             _log = log;
             _sql = new SqlGeneratorImpl(new DapperExtensions.DapperExtensionsConfiguration());
+            _connection = ConfigurationManager.AppSettings["Database"];
+            
+            if (string.IsNullOrEmpty(_connection))
+                _connection = $"Server={Environment.GetEnvironmentVariable("ASPNETCORE_MSSQL_SERVER")};Database={Environment.GetEnvironmentVariable("ASPNETCORE_MSSQL_DATABASE")};User Id={Environment.GetEnvironmentVariable("ASPNETCORE_MSSQL_USER")};Password={Environment.GetEnvironmentVariable("ASPNETCORE_MSSQL_PASSWORD")};";
         }
         public List<T> Get<T>(string sql, object parameters)
         {
             var result = new List<T>();
 
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -50,7 +55,7 @@ namespace Panama.Core.Sql.Dapper
 
         public void Insert<T>(T obj) where T : class
         {
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 connection.Open();
                 connection.Insert(obj);
@@ -60,7 +65,7 @@ namespace Panama.Core.Sql.Dapper
 
         public void Update<T>(T obj) where T : class
         {
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 connection.Open();
                 connection.Update(obj);
@@ -89,7 +94,7 @@ namespace Panama.Core.Sql.Dapper
 
         public void Delete<T>(T obj) where T : class, IModel
         {
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 connection.Open();
                 connection.Delete(obj);
@@ -99,7 +104,7 @@ namespace Panama.Core.Sql.Dapper
 
         public void Execute(string sql, object parameters)
         {
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -113,7 +118,7 @@ namespace Panama.Core.Sql.Dapper
         {
             T result = default;
 
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -129,7 +134,7 @@ namespace Panama.Core.Sql.Dapper
 
         public void InsertBatch<T>(List<T> models, int batch = 0) where T : class, IModel
         {
-            using (var connection = new SqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new SqlConnection(_connection))
             {
                 connection.Open();
 

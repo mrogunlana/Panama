@@ -22,18 +22,23 @@ namespace Panama.Core.MySql.Dapper
     {
         private readonly ILog _log;
         private readonly ISqlGenerator _sql;
+        private readonly string _connection;
 
         public MySqlQuery(ILog log)
         {
             _log = log;
             _sql = new SqlGeneratorImpl(new DapperExtensions.DapperExtensionsConfiguration());
+            _connection = ConfigurationManager.AppSettings["Database"];
+
+            if (string.IsNullOrEmpty(_connection))
+                _connection = $"Server={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_SERVER")};Port={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_PORT")};Database={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_DATABASE")};Uid={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_USER")};Pwd={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_PASSWORD")};";
         }
         public List<T> Get<T>(string sql, object parameters)
         {
             var result = new List<T>();
             
             //var test = new MySql.Data.MySqlClient()
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -54,7 +59,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Insert<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 connection.Open();
                 connection.Insert(obj);
@@ -64,7 +69,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Update<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 connection.Open();
                 connection.Update(obj);
@@ -93,7 +98,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Delete<T>(T obj) where T : class, IModel
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 connection.Open();
                 connection.Delete(obj);
@@ -103,7 +108,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Execute(string sql, object parameters)
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -117,7 +122,7 @@ namespace Panama.Core.MySql.Dapper
         {
             T result = default;
 
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -133,7 +138,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void InsertBatch<T>(List<T> models, int batch = 0) where T : class, IModel
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(ConfigurationManager.AppSettings["Database"]))
+            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
                 connection.Open();
 

@@ -15,9 +15,9 @@
           "Microsoft.NET.Test.Sdk": "16.0.1",
           "Microsoft.NETCore.App": "3.0.0-preview7-27912-14",
           "Panama.Core": "1.0.2",
-          "Panama.Core.IoC.Autofac": "1.0.0",
-          "Panama.Core.Logger.Nlog": "1.0.0",
-          "Panama.MySql.Dapper": "1.0.0",
+          "Panama.Core.IoC.Autofac": "1.0.1",
+          "Panama.Core.Logger.Nlog": "1.0.1",
+          "Panama.Core.MySql.Dapper": "1.0.1",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -1718,7 +1718,7 @@
           }
         }
       },
-      "Panama.Core.IoC.Autofac/1.0.0": {
+      "Panama.Core.IoC.Autofac/1.0.1": {
         "dependencies": {
           "Autofac": "4.9.3",
           "Panama.Core": "1.0.2"
@@ -1727,7 +1727,7 @@
           "Panama.Core.IoC.Autofac.dll": {}
         }
       },
-      "Panama.Core.Logger.Nlog/1.0.0": {
+      "Panama.Core.Logger.Nlog/1.0.1": {
         "dependencies": {
           "NLog": "4.6.3",
           "Panama.Core": "1.0.2"
@@ -1736,7 +1736,7 @@
           "Panama.Core.Logger.Nlog.dll": {}
         }
       },
-      "Panama.MySql.Dapper/1.0.0": {
+      "Panama.Core.MySql.Dapper/1.0.1": {
         "dependencies": {
           "Dapper": "1.60.6",
           "Dapper.Contrib": "1.60.1",
@@ -1747,7 +1747,7 @@
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
-          "Panama.MySql.Dapper.dll": {}
+          "Panama.Core.MySql.Dapper.dll": {}
         }
       }
     }
@@ -2689,17 +2689,17 @@
       "path": "system.xml.xpath.xmldocument/4.0.1",
       "hashPath": "system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
     },
-    "Panama.Core.IoC.Autofac/1.0.0": {
+    "Panama.Core.IoC.Autofac/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Panama.Core.Logger.Nlog/1.0.0": {
+    "Panama.Core.Logger.Nlog/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Panama.MySql.Dapper/1.0.0": {
+    "Panama.Core.MySql.Dapper/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
