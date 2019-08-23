@@ -26,7 +26,6 @@
     <CreateItem Include="$(OutputPath)$(AssemblyName).dll.config">
       <Output TaskParameter="Include" ItemName="FilesToCopy" />
     </CreateItem>
-    <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutputPath)testhost.dll.config" />
   </Target>
   
 </Project>

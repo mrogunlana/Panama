@@ -1,7 +1,6 @@
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.Tests.dll.config
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.Tests.deps.json
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.Tests.runtimeconfig.json
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.Tests.runtimeconfig.dev.json
