@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.0": {
-      "Panama.Core.MySql.Dapper/1.0.3": {
+      "Panama.Core.MySql.Dapper/1.0.4": {
         "dependencies": {
           "Dapper": "1.60.6",
           "DapperExtensions.DotnetCore": "1.0.1",
@@ -1168,7 +1168,7 @@
     }
   },
   "libraries": {
-    "Panama.Core.MySql.Dapper/1.0.3": {
+    "Panama.Core.MySql.Dapper/1.0.4": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

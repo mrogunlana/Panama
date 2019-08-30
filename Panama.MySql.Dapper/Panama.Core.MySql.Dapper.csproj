@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company />
     <Product>Panama.Core.MySql.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Removed Dapper.Contrib dependency to allower DapperExtensions.ClassMap to work</PackageReleaseNotes>
+    <PackageReleaseNotes>Replaced [] with `` (MySql does not support brackets)</PackageReleaseNotes>
     <Copyright>2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Panama.Core.MySql.Dapper</PackageId>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

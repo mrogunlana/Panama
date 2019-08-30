@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Panama.Core.MySql.Dapper</id>
+    <version>1.0.4</version>
+    <authors>Diran Ogunlana</authors>
+    <owners>Diran Ogunlana</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/mrogunlana/Panama.Core</projectUrl>
+    <description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</description>
+    <releaseNotes>Replaced [] with `` (MySql does not support brackets)</releaseNotes>
+    <copyright>2019</copyright>
+    <repository url="https://github.com/mrogunlana/Panama.Core" />
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.0">
+        <dependency id="Dapper" version="1.60.6" exclude="Build,Analyzers" />
+        <dependency id="DapperExtensions.DotnetCore" version="1.0.1" exclude="Build,Analyzers" />
+        <dependency id="MySql.Data" version="8.0.17" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="12.0.2" exclude="Build,Analyzers" />
+        <dependency id="Panama.Core" version="1.0.2" exclude="Build,Analyzers" />
+        <dependency id="System.Configuration.ConfigurationManager" version="4.6.0-preview8.19405.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Projects\panama-core\Panama.MySql.Dapper\bin\Release\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" target="lib\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" />
+  </files>
+</package>

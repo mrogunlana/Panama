@@ -80,7 +80,7 @@ namespace Panama.Core.MySql.Dapper
         public void Save<T>(T obj, object parameters) where T : class, IModel
         {
             var properties = string.Join(" AND ", parameters.GetType().GetProperties().Select(x => $"{x.Name} = @{x.Name}"));
-            var exist = Get<T>($"select * from [{ _sql.Configuration.GetMap<T>().TableName }] where {properties}", parameters);
+            var exist = Get<T>($"select * from `{ _sql.Configuration.GetMap<T>().TableName }` where {properties}", parameters);
             if (exist.Count == 0)
                 Insert(obj);
             else

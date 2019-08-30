@@ -2467,7 +2467,7 @@
           "Microsoft.NETCore.App"
         ]
       },
-      "Panama.Core.MySql.Dapper/1.0.3": {
+      "Panama.Core.MySql.Dapper/1.0.4": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
@@ -8003,7 +8003,7 @@
       "path": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj",
       "msbuildProject": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj"
     },
-    "Panama.Core.MySql.Dapper/1.0.3": {
+    "Panama.Core.MySql.Dapper/1.0.4": {
       "type": "project",
       "path": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj",
       "msbuildProject": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj"
@@ -8020,7 +8020,7 @@
       "Panama.Core >= 1.0.2",
       "Panama.Core.IoC.Autofac >= 1.0.1",
       "Panama.Core.Logger.Nlog >= 1.0.1",
-      "Panama.Core.MySql.Dapper >= 1.0.3",
+      "Panama.Core.MySql.Dapper >= 1.0.4",
       "System.Configuration.ConfigurationManager >= 4.6.0-preview8.19405.3"
     ]
   },
