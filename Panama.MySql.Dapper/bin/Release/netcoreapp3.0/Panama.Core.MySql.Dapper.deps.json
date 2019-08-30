@@ -6,10 +6,9 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.0": {
-      "Panama.Core.MySql.Dapper/1.0.2": {
+      "Panama.Core.MySql.Dapper/1.0.3": {
         "dependencies": {
           "Dapper": "1.60.6",
-          "Dapper.Contrib": "1.60.1",
           "DapperExtensions.DotnetCore": "1.0.1",
           "Microsoft.NETCore.App": "3.0.0-preview7-27912-14",
           "MySql.Data": "8.0.17",
@@ -44,19 +43,6 @@
           "lib/netstandard2.0/Dapper.dll": {
             "assemblyVersion": "1.60.0.0",
             "fileVersion": "1.60.6.27094"
-          }
-        }
-      },
-      "Dapper.Contrib/1.60.1": {
-        "dependencies": {
-          "Dapper": "1.60.6",
-          "Microsoft.CSharp": "4.3.0",
-          "System.Reflection.Emit": "4.3.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Dapper.Contrib.dll": {
-            "assemblyVersion": "1.60.0.0",
-            "fileVersion": "1.60.1.8373"
           }
         }
       },
@@ -1182,7 +1168,7 @@
     }
   },
   "libraries": {
-    "Panama.Core.MySql.Dapper/1.0.2": {
+    "Panama.Core.MySql.Dapper/1.0.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -1200,13 +1186,6 @@
       "sha512": "sha512-mmnJNhKMeF2KhvVXDoVQlFxre8aJAo71YBJrKqFlvuqzYC2QiXUq94/GCDBJzU7paq4GqpkV2glw3308TcGibw==",
       "path": "dapper/1.60.6",
       "hashPath": "dapper.1.60.6.nupkg.sha512"
-    },
-    "Dapper.Contrib/1.60.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-TNx/9nblWcia6Ibl9xzJEkt4D6cpTKY4qCBfPIYDvTTLA3M0FSK4xIZJifxZpxxZsEEFyi8FTx8jSfwx13dh1g==",
-      "path": "dapper.contrib/1.60.1",
-      "hashPath": "dapper.contrib.1.60.1.nupkg.sha512"
     },
     "DapperExtensions.DotnetCore/1.0.1": {
       "type": "package",

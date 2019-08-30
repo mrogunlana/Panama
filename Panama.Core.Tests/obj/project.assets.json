@@ -39,20 +39,6 @@
           "lib/netstandard2.0/Dapper.dll": {}
         }
       },
-      "Dapper.Contrib/1.60.1": {
-        "type": "package",
-        "dependencies": {
-          "Dapper": "1.60.1",
-          "Microsoft.CSharp": "4.3.0",
-          "System.Reflection.Emit": "4.3.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/Dapper.Contrib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/Dapper.Contrib.dll": {}
-        }
-      },
       "DapperExtensions.DotnetCore/1.0.1": {
         "type": "package",
         "dependencies": {
@@ -1644,7 +1630,7 @@
           "System.Runtime": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.1/System.Reflection.Emit.dll": {}
+          "ref/netstandard1.1/_._": {}
         },
         "runtime": {
           "lib/netstandard1.3/System.Reflection.Emit.dll": {}
@@ -2481,12 +2467,11 @@
           "Microsoft.NETCore.App"
         ]
       },
-      "Panama.Core.MySql.Dapper/1.0.2": {
+      "Panama.Core.MySql.Dapper/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
           "Dapper": "1.60.6",
-          "Dapper.Contrib": "1.60.1",
           "DapperExtensions.DotnetCore": "1.0.1",
           "MySql.Data": "8.0.17",
           "Newtonsoft.Json": "12.0.2",
@@ -2568,23 +2553,6 @@
         "lib/netstandard1.3/Dapper.xml",
         "lib/netstandard2.0/Dapper.dll",
         "lib/netstandard2.0/Dapper.xml"
-      ]
-    },
-    "Dapper.Contrib/1.60.1": {
-      "sha512": "TNx/9nblWcia6Ibl9xzJEkt4D6cpTKY4qCBfPIYDvTTLA3M0FSK4xIZJifxZpxxZsEEFyi8FTx8jSfwx13dh1g==",
-      "type": "package",
-      "path": "dapper.contrib/1.60.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "dapper.contrib.1.60.1.nupkg.sha512",
-        "dapper.contrib.nuspec",
-        "lib/net451/Dapper.Contrib.dll",
-        "lib/net451/Dapper.Contrib.xml",
-        "lib/netstandard1.3/Dapper.Contrib.dll",
-        "lib/netstandard1.3/Dapper.Contrib.xml",
-        "lib/netstandard2.0/Dapper.Contrib.dll",
-        "lib/netstandard2.0/Dapper.Contrib.xml"
       ]
     },
     "DapperExtensions.DotnetCore/1.0.1": {
@@ -8035,7 +8003,7 @@
       "path": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj",
       "msbuildProject": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj"
     },
-    "Panama.Core.MySql.Dapper/1.0.2": {
+    "Panama.Core.MySql.Dapper/1.0.3": {
       "type": "project",
       "path": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj",
       "msbuildProject": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj"
@@ -8052,7 +8020,7 @@
       "Panama.Core >= 1.0.2",
       "Panama.Core.IoC.Autofac >= 1.0.1",
       "Panama.Core.Logger.Nlog >= 1.0.1",
-      "Panama.Core.MySql.Dapper >= 1.0.2",
+      "Panama.Core.MySql.Dapper >= 1.0.3",
       "System.Configuration.ConfigurationManager >= 4.6.0-preview8.19405.3"
     ]
   },

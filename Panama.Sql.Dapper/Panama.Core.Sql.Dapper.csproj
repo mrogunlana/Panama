@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Diran Ogunlana</Authors>
     <Company>Diran Ogunlana</Company>
@@ -10,19 +10,14 @@
     <Copyright>2019</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Added environment variable alternative to ConfigurationManager.AppSettings["Database"]:
-- ASPNETCORE_MSSQL_SERVER
-- ASPNETCORE_MSSQL_PORT
-- ASPNETCORE_MSSQL_DATABASE
-- ASPNETCORE_MSSQL_USER
-- ASPNETCORE_MSSQL_PASSWORD
-</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed Dapper.Contrib dependency to allower DapperExtensions.ClassMap to work</PackageReleaseNotes>
     <Description>Basic Panama Core SqlQuery Implmentation with Dapper</Description>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.6" />
-    <PackageReference Include="Dapper.Contrib" Version="1.60.1" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Panama.Core" Version="1.0.2" />

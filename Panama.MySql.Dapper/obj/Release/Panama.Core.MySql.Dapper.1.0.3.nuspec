@@ -2,18 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Panama.Core.MySql.Dapper</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <authors>Diran Ogunlana</authors>
     <owners>Diran Ogunlana</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://github.com/mrogunlana/Panama.Core</projectUrl>
     <description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</description>
-    <releaseNotes>Added environment variable alternative to ConfigurationManager.AppSettings["Database"]:
-- ASPNETCORE_MYSQL_SERVER
-- ASPNETCORE_MYSQL_PORT
-- ASPNETCORE_MYSQL_DATABASE
-- ASPNETCORE_MYSQL_USER
-- ASPNETCORE_MYSQL_PASSWORD</releaseNotes>
+    <releaseNotes>Removed Dapper.Contrib dependency to allower DapperExtensions.ClassMap to work</releaseNotes>
     <copyright>2019</copyright>
     <repository url="https://github.com/mrogunlana/Panama.Core" />
     <dependencies>
@@ -28,6 +23,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="C:\Projects\panama-core\Panama.MySql.Dapper\bin\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" target="lib\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" />
+    <file src="C:\Projects\panama-core\Panama.MySql.Dapper\bin\Release\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" target="lib\netcoreapp3.0\Panama.Core.MySql.Dapper.dll" />
   </files>
 </package>

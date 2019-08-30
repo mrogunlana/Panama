@@ -6,3 +6,4 @@ C:\Projects\panama-core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.AssemblyInfo.cs
 C:\Projects\panama-core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.dll
 C:\Projects\panama-core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.pdb
+C:\Projects\panama-core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.csprojAssemblyReference.cache

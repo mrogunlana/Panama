@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
+using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 using Newtonsoft.Json;

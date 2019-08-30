@@ -1,7 +1,6 @@
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.dll.config
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.deps.json
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.runtimeconfig.json
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Tests.runtimeconfig.dev.json
@@ -10,7 +9,6 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Autofac.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\BouncyCastle.Crypto.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Dapper.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Dapper.Contrib.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\DapperExtensions.DotnetCore.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Google.Protobuf.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
