@@ -13,9 +13,9 @@ namespace Panama.Core.Security
 
         public AESSaltGenerator()
         {
-            _secret = ConfigurationManager.AppSettings["Secret"];
-            _salt = ConfigurationManager.AppSettings["Salt"];
-            _vector = ConfigurationManager.AppSettings["Vector"];
+            _secret = ConfigurationManager.AppSettings["Secret"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET");
+            _salt = ConfigurationManager.AppSettings["Salt"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT");
+            _vector = ConfigurationManager.AppSettings["Vector"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR");
         }
 
         public string Salt()
