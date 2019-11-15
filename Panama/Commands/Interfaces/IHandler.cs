@@ -1,5 +1,6 @@
 ﻿using Panama.Core.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Panama.Core.Commands
 {
@@ -12,5 +13,6 @@ namespace Panama.Core.Commands
         IHandler Validate<Validator>() where Validator : IValidation;
         IHandler Add(IModel data);
         IResult Invoke();
+        Task<IResult> InvokeAsync();
     }
 }

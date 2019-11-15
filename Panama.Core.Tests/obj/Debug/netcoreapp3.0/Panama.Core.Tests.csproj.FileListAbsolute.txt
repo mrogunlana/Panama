@@ -9,7 +9,6 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.Te
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Autofac.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\BouncyCastle.Crypto.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Dapper.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Dapper.Contrib.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\DapperExtensions.DotnetCore.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Google.Protobuf.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
@@ -132,3 +131,4 @@ C:\Projects\panama-core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Te
 C:\Projects\panama-core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.csproj.CopyComplete
 C:\Projects\panama-core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.dll
 C:\Projects\panama-core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.pdb
+C:\Projects\panama-core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.pdb

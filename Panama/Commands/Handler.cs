@@ -5,14 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Panama.Core.Commands
 {
     public class Handler : IHandler
     {
-        private readonly ILog _log;
-        private Guid _id = Guid.NewGuid();
-        private readonly IServiceLocator _serviceLocator;
+        protected readonly ILog _log;
+        protected Guid _id = Guid.NewGuid();
+        protected readonly IServiceLocator _serviceLocator;
 
         public List<IModel> Data { get; set; }
         public List<ICommand> Commands { get; set; }
@@ -87,6 +88,54 @@ namespace Panama.Core.Commands
             return new Result() { Success = true, Data = Data };
         }
 
+        private async Task<IResult> RunAsync()
+        {
+            var handler = new Stopwatch();
+            var rule = new Stopwatch();
+
+            try
+            {
+                handler.Start();
+
+                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
+
+                //perform serial execution of commands using unblocking await task in foreach
+
+                foreach (var command in Commands)
+                    await Task.Run(() => {
+
+                        rule.Reset();
+                        rule.Start();
+
+                        command.Execute(Data);
+
+                        rule.Stop();
+
+                        _log?.LogTrace(command, $"HID:{_id.ToString()}, Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+
+                    });
+            }
+            catch (Exception ex)
+            {
+                _log?.LogException<Handler>(ex);
+
+                var result = new Result()
+                {
+                    Success = false
+                };
+                result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                return result;
+            }
+            finally
+            {
+                handler.Stop();
+
+                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+            }
+
+            return new Result() { Success = true, Data = Data };
+        }
+
         public IHandler Add(IModel data)
         {
             Data.Add(data);
@@ -108,6 +157,29 @@ namespace Panama.Core.Commands
             return this;
         }
 
+        private async Task<IResult> ValidateAsync()
+        {
+            var result = new Result();
+            var messages = new List<string>();
+
+            foreach (var validator in Validators)
+                messages.Add(await Task.Run(() => {
+
+                    if (!validator.IsValid(Data))
+                        result.AddMessage(validator.Message());
+
+                    return validator.Message();
+
+                }));
+
+            foreach (var message in messages)
+                result.AddMessage(message);
+
+            result.Success = !result.Messages.Any();
+
+            return result;
+        }
+
         public IResult Invoke()
         {
             IResult result = Validate();
@@ -116,6 +188,20 @@ namespace Panama.Core.Commands
 
             //todo: add rollback command
             result = Run();
+            if (!result.Success)
+                return result;
+
+            return result;
+        }
+
+        public async Task<IResult> InvokeAsync()
+        {
+            IResult result = await ValidateAsync();
+            if (!result.Success)
+                return result;
+
+            //todo: add rollback command
+            result = await RunAsync();
             if (!result.Success)
                 return result;
 

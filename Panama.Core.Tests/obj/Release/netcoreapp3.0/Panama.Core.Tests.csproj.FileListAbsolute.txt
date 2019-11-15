@@ -28,7 +28,6 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Microsoft.Vi
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\MySql.Data.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Newtonsoft.Json.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\NLog.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Renci.SshNet.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\SshNet.Security.Cryptography.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Configuration.ConfigurationManager.dll
@@ -131,3 +130,4 @@ C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csproj.CopyComplete
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.dll
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.pdb
+C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.dll

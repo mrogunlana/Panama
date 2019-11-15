@@ -592,7 +592,7 @@
           "lib/netstandard2.0/NLog.dll": {}
         }
       },
-      "Panama.Core/1.0.2": {
+      "Panama.Core/1.0.3": {
         "type": "package",
         "compile": {
           "lib/netcoreapp3.0/Panama.Core.dll": {}
@@ -3349,16 +3349,16 @@
         "nlog.nuspec"
       ]
     },
-    "Panama.Core/1.0.2": {
-      "sha512": "ZyCTPIBGB04hOdI6WtGuhRiyQ9XTWWuK+IS7iYGu1gITsUA/m8qSvG3YWdxiNZPi/cvRdlsILw/cThG5GU60QQ==",
+    "Panama.Core/1.0.3": {
+      "sha512": "F4jSR96Vv4kyOXcH21zsrdvWg2GPGtqcwNnLUDBUzSUrObMAugDQxKJfXLAFyTNBAsWas8wA4ZcaOzzGBKs/NA==",
       "type": "package",
-      "path": "panama.core/1.0.2",
+      "path": "panama.core/1.0.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.md",
         "lib/netcoreapp3.0/Panama.Core.dll",
-        "panama.core.1.0.2.nupkg.sha512",
+        "panama.core.1.0.3.nupkg.sha512",
         "panama.core.nuspec"
       ]
     },
@@ -8017,7 +8017,7 @@
       "MSTest.TestFramework >= 1.4.0",
       "Microsoft.NET.Test.Sdk >= 16.0.1",
       "Microsoft.NETCore.App >= 3.0.0-preview7-27912-14",
-      "Panama.Core >= 1.0.2",
+      "Panama.Core >= 1.0.3",
       "Panama.Core.IoC.Autofac >= 1.0.1",
       "Panama.Core.Logger.Nlog >= 1.0.1",
       "Panama.Core.MySql.Dapper >= 1.0.4",
@@ -8107,7 +8107,7 @@
           },
           "Panama.Core": {
             "target": "Package",
-            "version": "[1.0.2, )"
+            "version": "[1.0.3, )"
           },
           "System.Configuration.ConfigurationManager": {
             "target": "Package",
