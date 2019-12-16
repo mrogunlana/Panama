@@ -163,14 +163,10 @@ namespace Panama.Core.Commands
             var messages = new List<string>();
 
             foreach (var validator in Validators)
-                messages.Add(await Task.Run(() => {
-
+                await Task.Run(() => {
                     if (!validator.IsValid(Data))
                         result.AddMessage(validator.Message());
-
-                    return validator.Message();
-
-                }));
+                });
 
             foreach (var message in messages)
                 result.AddMessage(message);
