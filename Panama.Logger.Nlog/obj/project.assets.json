@@ -26,7 +26,7 @@
           "lib/netstandard2.0/NLog.dll": {}
         }
       },
-      "Panama.Core/1.0.2": {
+      "Panama.Core/1.0.4": {
         "type": "package",
         "compile": {
           "lib/netcoreapp3.0/Panama.Core.dll": {}
@@ -101,16 +101,16 @@
         "nlog.nuspec"
       ]
     },
-    "Panama.Core/1.0.2": {
-      "sha512": "ZyCTPIBGB04hOdI6WtGuhRiyQ9XTWWuK+IS7iYGu1gITsUA/m8qSvG3YWdxiNZPi/cvRdlsILw/cThG5GU60QQ==",
+    "Panama.Core/1.0.4": {
+      "sha512": "Zdwbayt87di7KqD0BWEtR8d49fLly9MSXh1gcHGpeTr8QIZdnOVsh1ccUVuUZdVNSHp/MFXyFIYqHqWc8J/DqQ==",
       "type": "package",
-      "path": "panama.core/1.0.2",
+      "path": "panama.core/1.0.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.md",
         "lib/netcoreapp3.0/Panama.Core.dll",
-        "panama.core.1.0.2.nupkg.sha512",
+        "panama.core.1.0.4.nupkg.sha512",
         "panama.core.nuspec"
       ]
     }
@@ -119,7 +119,7 @@
     ".NETCoreApp,Version=v3.0": [
       "Microsoft.NETCore.App >= 3.0.0-preview7-27912-14",
       "NLog >= 4.6.3",
-      "Panama.Core >= 1.0.2"
+      "Panama.Core >= 1.0.4"
     ]
   },
   "packageFolders": {
@@ -179,7 +179,7 @@
           },
           "Panama.Core": {
             "target": "Package",
-            "version": "[1.0.2, )"
+            "version": "[1.0.4, )"
           }
         },
         "imports": [

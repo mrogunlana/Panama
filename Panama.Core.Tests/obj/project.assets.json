@@ -592,7 +592,7 @@
           "lib/netstandard2.0/NLog.dll": {}
         }
       },
-      "Panama.Core/1.0.3": {
+      "Panama.Core/1.0.4": {
         "type": "package",
         "compile": {
           "lib/netcoreapp3.0/Panama.Core.dll": {}
@@ -2438,7 +2438,7 @@
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
           "Autofac": "4.9.2",
-          "Panama.Core": "1.0.2"
+          "Panama.Core": "1.0.4"
         },
         "compile": {
           "bin/placeholder/Panama.Core.IoC.Autofac.dll": {}
@@ -2455,7 +2455,7 @@
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
           "NLog": "4.6.3",
-          "Panama.Core": "1.0.2"
+          "Panama.Core": "1.0.4"
         },
         "compile": {
           "bin/placeholder/Panama.Core.Logger.Nlog.dll": {}
@@ -2475,7 +2475,7 @@
           "DapperExtensions.DotnetCore": "1.0.1",
           "MySql.Data": "8.0.17",
           "Newtonsoft.Json": "12.0.2",
-          "Panama.Core": "1.0.2",
+          "Panama.Core": "1.0.4",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "compile": {
@@ -3349,16 +3349,16 @@
         "nlog.nuspec"
       ]
     },
-    "Panama.Core/1.0.3": {
-      "sha512": "F4jSR96Vv4kyOXcH21zsrdvWg2GPGtqcwNnLUDBUzSUrObMAugDQxKJfXLAFyTNBAsWas8wA4ZcaOzzGBKs/NA==",
+    "Panama.Core/1.0.4": {
+      "sha512": "Zdwbayt87di7KqD0BWEtR8d49fLly9MSXh1gcHGpeTr8QIZdnOVsh1ccUVuUZdVNSHp/MFXyFIYqHqWc8J/DqQ==",
       "type": "package",
-      "path": "panama.core/1.0.3",
+      "path": "panama.core/1.0.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.md",
         "lib/netcoreapp3.0/Panama.Core.dll",
-        "panama.core.1.0.3.nupkg.sha512",
+        "panama.core.1.0.4.nupkg.sha512",
         "panama.core.nuspec"
       ]
     },
@@ -8017,7 +8017,7 @@
       "MSTest.TestFramework >= 1.4.0",
       "Microsoft.NET.Test.Sdk >= 16.0.1",
       "Microsoft.NETCore.App >= 3.0.0-preview7-27912-14",
-      "Panama.Core >= 1.0.3",
+      "Panama.Core >= 1.0.4",
       "Panama.Core.IoC.Autofac >= 1.0.1",
       "Panama.Core.Logger.Nlog >= 1.0.1",
       "Panama.Core.MySql.Dapper >= 1.0.4",
@@ -8107,7 +8107,7 @@
           },
           "Panama.Core": {
             "target": "Package",
-            "version": "[1.0.3, )"
+            "version": "[1.0.4, )"
           },
           "System.Configuration.ConfigurationManager": {
             "target": "Package",

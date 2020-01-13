@@ -9,5 +9,7 @@ Panama.IoC.Ninject/bin/
 Panama.IoC.Ninject/obj/
 Panama.Jobs.Quartz/bin/
 Panama.Jobs.Quartz/obj/
-/Panama.Sql.Dapper/bin/
-/Panama.Sql.Dapper/obj/
+Panama.Sql.Dapper/bin/
+Panama.Sql.Dapper/obj/
+Panama.Core.Tests/bin
+Panama.Core.Tests/obj/
