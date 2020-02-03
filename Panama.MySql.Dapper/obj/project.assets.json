@@ -89,12 +89,6 @@
           "lib/netstandard1.3/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "3.0.0-preview7.19362.9"
-        }
-      },
       "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {
         "type": "package",
         "compile": {
@@ -1904,19 +1898,6 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
-      ]
-    },
-    "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-      "sha512": "TNDdHAcfUqEaWXXJoCMUGZnsIP53jlShQV4Ccw8Nqbl8SWkkz1llq4ckfoRl7QrHoq328JhEyCSnPaaYHAB5Xg==",
-      "type": "package",
-      "path": "microsoft.netcore.app/3.0.0-preview7-27912-14",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.TXT",
-        "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.app.3.0.0-preview7-27912-14.nupkg.sha512",
-        "microsoft.netcore.app.nuspec"
       ]
     },
     "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {
@@ -6096,7 +6077,6 @@
     ".NETCoreApp,Version=v3.0": [
       "Dapper >= 1.60.6",
       "DapperExtensions.DotnetCore >= 1.0.1",
-      "Microsoft.NETCore.App >= 3.0.0-preview7-27912-14",
       "MySql.Data >= 8.0.17",
       "Newtonsoft.Json >= 12.0.2",
       "Panama.Core >= 1.0.4",
@@ -6155,13 +6135,6 @@
             "target": "Package",
             "version": "[1.0.1, )"
           },
-          "Microsoft.NETCore.App": {
-            "include": "None",
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[3.0.0-preview7-27912-14, )",
-            "autoReferenced": true
-          },
           "MySql.Data": {
             "target": "Package",
             "version": "[8.0.17, )"
@@ -6189,9 +6162,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "frameworkReferences": [
-          "Microsoft.NETCore.App"
-        ]
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[3.0.1, 3.0.1]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[3.0.0, 3.0.0]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[3.0.0, 3.0.0]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
       }
     }
   }

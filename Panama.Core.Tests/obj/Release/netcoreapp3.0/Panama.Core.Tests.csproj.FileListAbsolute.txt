@@ -34,10 +34,8 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\SshNet.Secur
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Configuration.ConfigurationManager.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Data.SqlClient.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Drawing.Common.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Security.AccessControl.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Security.Cryptography.ProtectedData.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Security.Permissions.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Security.Principal.Windows.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Windows.Extensions.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\System.Xml.XPath.XmlDocument.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll
@@ -113,10 +111,7 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\uni
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netstandard2.0\System.Data.SqlClient.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netcoreapp2.0\System.Security.AccessControl.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll
-C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.IoC.Autofac.dll
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.dll
@@ -125,7 +120,6 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.pdb
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.MySql.Dapper.pdb
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csprojAssemblyReference.cache
-C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csproj.CoreCompileInputs.cache
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.AssemblyInfoInputs.cache
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.AssemblyInfo.cs
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csproj.CopyComplete

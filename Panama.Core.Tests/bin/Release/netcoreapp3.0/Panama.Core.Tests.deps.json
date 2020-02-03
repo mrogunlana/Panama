@@ -13,7 +13,6 @@
           "MSTest.TestAdapter": "1.4.0",
           "MSTest.TestFramework": "1.4.0",
           "Microsoft.NET.Test.Sdk": "16.0.1",
-          "Microsoft.NETCore.App": "3.0.0-preview7-27912-14",
           "Panama.Core": "1.0.4",
           "Panama.Core.IoC.Autofac": "1.0.1",
           "Panama.Core.Logger.Nlog": "1.0.1",
@@ -153,11 +152,6 @@
         "dependencies": {
           "Microsoft.CodeCoverage": "16.0.1",
           "Microsoft.TestPlatform.TestHost": "16.0.1"
-        }
-      },
-      "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3"
         }
       },
       "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {},
@@ -1331,20 +1325,6 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3",
           "System.Security.Principal.Windows": "4.6.0-preview8.19405.3"
-        },
-        "runtime": {
-          "lib/netstandard2.0/System.Security.AccessControl.dll": {
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp2.0/System.Security.AccessControl.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
         }
       },
       "System.Security.Cryptography.Algorithms/4.3.0": {
@@ -1498,28 +1478,7 @@
           }
         }
       },
-      "System.Security.Principal.Windows/4.6.0-preview8.19405.3": {
-        "runtime": {
-          "lib/netstandard2.0/System.Security.Principal.Windows.dll": {
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/unix/lib/netcoreapp2.1/System.Security.Principal.Windows.dll": {
-            "rid": "unix",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          },
-          "runtimes/win/lib/netcoreapp2.1/System.Security.Principal.Windows.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        }
-      },
+      "System.Security.Principal.Windows/4.6.0-preview8.19405.3": {},
       "System.Text.Encoding/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3",
@@ -1813,13 +1772,6 @@
       "sha512": "sha512-ON7UIMIhAwrYb0ep+3ztoWVGvtfo88IhiHVnbyOiuVsi8bOMCdMPVcR+EX1WYGgKAd030pHRaxazMlkQ6uDyJQ==",
       "path": "microsoft.net.test.sdk/16.0.1",
       "hashPath": "microsoft.net.test.sdk.16.0.1.nupkg.sha512"
-    },
-    "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-TNDdHAcfUqEaWXXJoCMUGZnsIP53jlShQV4Ccw8Nqbl8SWkkz1llq4ckfoRl7QrHoq328JhEyCSnPaaYHAB5Xg==",
-      "path": "microsoft.netcore.app/3.0.0-preview7-27912-14",
-      "hashPath": "microsoft.netcore.app.3.0.0-preview7-27912-14.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {
       "type": "package",
