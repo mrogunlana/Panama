@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Panama.Core" Version="1.0.4" />
+    <PackageReference Include="Panama.Core" Version="1.0.6" />
     <PackageReference Include="Quartz" Version="3.0.7" />
   </ItemGroup>
 

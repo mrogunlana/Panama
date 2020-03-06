@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Panama.Core" Version="1.0.4" />
+    <PackageReference Include="Panama.Core" Version="1.0.6" />
   </ItemGroup>
 
 </Project>
