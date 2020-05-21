@@ -120,8 +120,10 @@ C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.pdb
 C:\Projects\panama-core\Panama.Core.Tests\bin\Release\netcoreapp3.0\Panama.Core.MySql.Dapper.pdb
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csprojAssemblyReference.cache
+C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csproj.CoreCompileInputs.cache
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.AssemblyInfoInputs.cache
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.AssemblyInfo.cs
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.csproj.CopyComplete
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.dll
 C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.pdb
+C:\Projects\panama-core\Panama.Core.Tests\obj\Release\netcoreapp3.0\Panama.Core.Tests.genruntimeconfig.cache

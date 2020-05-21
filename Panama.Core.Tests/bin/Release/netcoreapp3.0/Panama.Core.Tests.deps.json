@@ -13,10 +13,10 @@
           "MSTest.TestAdapter": "1.4.0",
           "MSTest.TestFramework": "1.4.0",
           "Microsoft.NET.Test.Sdk": "16.0.1",
-          "Panama.Core": "1.0.4",
+          "Panama.Core": "1.0.7",
           "Panama.Core.IoC.Autofac": "1.0.1",
           "Panama.Core.Logger.Nlog": "1.0.1",
-          "Panama.Core.MySql.Dapper": "1.0.4",
+          "Panama.Core.MySql.Dapper": "1.0.6",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -547,11 +547,11 @@
           }
         }
       },
-      "Panama.Core/1.0.4": {
+      "Panama.Core/1.0.7": {
         "runtime": {
           "lib/netcoreapp3.0/Panama.Core.dll": {
-            "assemblyVersion": "1.0.4.0",
-            "fileVersion": "1.0.4.0"
+            "assemblyVersion": "1.0.7.0",
+            "fileVersion": "1.0.7.0"
           }
         }
       },
@@ -1667,7 +1667,7 @@
       "Panama.Core.IoC.Autofac/1.0.1": {
         "dependencies": {
           "Autofac": "4.9.3",
-          "Panama.Core": "1.0.4"
+          "Panama.Core": "1.0.7"
         },
         "runtime": {
           "Panama.Core.IoC.Autofac.dll": {}
@@ -1676,19 +1676,19 @@
       "Panama.Core.Logger.Nlog/1.0.1": {
         "dependencies": {
           "NLog": "4.6.3",
-          "Panama.Core": "1.0.4"
+          "Panama.Core": "1.0.7"
         },
         "runtime": {
           "Panama.Core.Logger.Nlog.dll": {}
         }
       },
-      "Panama.Core.MySql.Dapper/1.0.4": {
+      "Panama.Core.MySql.Dapper/1.0.6": {
         "dependencies": {
           "Dapper": "1.60.6",
           "DapperExtensions.DotnetCore": "1.0.1",
           "MySql.Data": "8.0.17",
           "Newtonsoft.Json": "12.0.2",
-          "Panama.Core": "1.0.4",
+          "Panama.Core": "1.0.7",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -1864,12 +1864,12 @@
       "path": "nlog/4.6.3",
       "hashPath": "nlog.4.6.3.nupkg.sha512"
     },
-    "Panama.Core/1.0.4": {
+    "Panama.Core/1.0.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Zdwbayt87di7KqD0BWEtR8d49fLly9MSXh1gcHGpeTr8QIZdnOVsh1ccUVuUZdVNSHp/MFXyFIYqHqWc8J/DqQ==",
-      "path": "panama.core/1.0.4",
-      "hashPath": "panama.core.1.0.4.nupkg.sha512"
+      "sha512": "sha512-omtpj+QkKqpb5g+OQd2YPRWXTWq2COBvM5ax6GNn/YOUXDyZ289dKGaqiOuiveqgehKuTQmBodSORM6CLntTAg==",
+      "path": "panama.core/1.0.7",
+      "hashPath": "panama.core.1.0.7.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
       "type": "package",
@@ -2630,7 +2630,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Panama.Core.MySql.Dapper/1.0.4": {
+    "Panama.Core.MySql.Dapper/1.0.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

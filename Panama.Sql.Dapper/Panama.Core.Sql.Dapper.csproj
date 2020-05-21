@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Diran Ogunlana</Authors>
     <Company>Diran Ogunlana</Company>
@@ -10,17 +10,17 @@
     <Copyright>2019</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Removed Dapper.Contrib dependency to allower DapperExtensions.ClassMap to work</PackageReleaseNotes>
+    <PackageReleaseNotes>updated impl for IQueryAsync on MySqlQueryAsync to allow connection string to be passed as parameter</PackageReleaseNotes>
     <Description>Basic Panama Core SqlQuery Implmentation with Dapper</Description>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.6" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Panama.Core" Version="1.0.6" />
+    <PackageReference Include="Panama.Core" Version="1.0.7" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
 

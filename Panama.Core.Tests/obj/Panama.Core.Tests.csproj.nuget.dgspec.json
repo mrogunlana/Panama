@@ -75,7 +75,7 @@
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.4, )"
+              "version": "[1.0.7, )"
             },
             "System.Configuration.ConfigurationManager": {
               "target": "Package",
@@ -111,7 +111,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -160,7 +160,7 @@
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.4, )"
+              "version": "[1.0.7, )"
             }
           },
           "imports": [
@@ -192,7 +192,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -241,7 +241,7 @@
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.4, )"
+              "version": "[1.0.7, )"
             }
           },
           "imports": [
@@ -273,12 +273,12 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
     "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
-      "version": "1.0.4",
+      "version": "1.0.6",
       "restore": {
         "projectUniqueName": "C:\\Projects\\panama-core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
         "projectName": "Panama.Core.MySql.Dapper",
@@ -334,7 +334,7 @@
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.4, )"
+              "version": "[1.0.7, )"
             },
             "System.Configuration.ConfigurationManager": {
               "target": "Package",
@@ -370,7 +370,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     }
