@@ -6,6 +6,6 @@ namespace Panama.Core.Commands
     public interface IValidation
     {
         bool IsValid(List<IModel> data);
-        string Message();
+        string Message(List<IModel> data);
     }
 }

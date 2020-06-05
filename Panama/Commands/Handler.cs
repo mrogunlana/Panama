@@ -36,7 +36,7 @@ namespace Panama.Core.Commands
             foreach (var validator in Validators)
             {
                 if (!validator.IsValid(Data))
-                    result.AddMessage(validator.Message());
+                    result.AddMessage(validator.Message(Data));
             }
             result.Success = !result.Messages.Any();
 
@@ -165,7 +165,7 @@ namespace Panama.Core.Commands
             foreach (var validator in Validators)
                 await Task.Run(() => {
                     if (!validator.IsValid(Data))
-                        result.AddMessage(validator.Message());
+                        result.AddMessage(validator.Message(Data));
                 });
 
             foreach (var message in messages)

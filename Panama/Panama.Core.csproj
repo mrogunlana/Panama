@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <PackageId>Panama.Core</PackageId>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>Added connection override for IQuery and IQueryAsync</PackageReleaseNotes>
+    <PackageReleaseNotes>Added data to IValidation.Message to allow full use of session data to generate/persist validation messages</PackageReleaseNotes>
     <Description>A simple command architecture for .NET CORE 3+ developed by Diran Ogunlana</Description>
     <Copyright>Copyright 2019</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />
