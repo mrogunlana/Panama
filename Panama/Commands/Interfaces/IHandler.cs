@@ -13,7 +13,7 @@ namespace Panama.Core.Commands
         IHandler Validate<Validator>() where Validator : IValidation;
         IHandler Add(IModel data);
         IHandler Add(params IModel[] data);
-        IHandler Add(IList<IModel> data);
+        IHandler Add(IEnumerable<IModel> data);
         IResult Invoke();
         Task<IResult> InvokeAsync();
     }

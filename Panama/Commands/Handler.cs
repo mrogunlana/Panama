@@ -150,7 +150,7 @@ namespace Panama.Core.Commands
             return this;
         }
 
-        public IHandler Add(IList<IModel> data)
+        public IHandler Add(IEnumerable<IModel> data)
         {
             Data.AddRange(data);
 
