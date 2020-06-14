@@ -12,6 +12,7 @@ namespace Panama.Core.Commands
         IHandler Command<Command>() where Command : ICommand;
         IHandler Validate<Validator>() where Validator : IValidation;
         IHandler Add(IModel data);
+        IHandler Add(params IModel[] data);
         IResult Invoke();
         Task<IResult> InvokeAsync();
     }

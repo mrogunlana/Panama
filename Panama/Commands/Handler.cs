@@ -143,6 +143,13 @@ namespace Panama.Core.Commands
             return this;
         }
 
+        public IHandler Add(params IModel[] data)
+        {
+            Data.AddRange(data);
+
+            return this;
+        }
+
         public IHandler Command<Command>() where Command : ICommand
         {
             Commands.Add(_serviceLocator.Resolve<ICommand>(typeof(Command).Name));
