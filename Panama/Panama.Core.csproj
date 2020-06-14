@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <PackageId>Panama.Core</PackageId>
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>Added params array on handler.add to allow array of models to be set in one function call</PackageReleaseNotes>
+    <PackageReleaseNotes>Added IList&lt;IModel&gt;  on handler.add to allow array of models to be set in one function call</PackageReleaseNotes>
     <Description>A simple command architecture for .NET CORE 3+ developed by Diran Ogunlana</Description>
     <Copyright>Copyright 2019</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <AssemblyVersion>1.0.9.0</AssemblyVersion>
-    <FileVersion>1.0.9.0</FileVersion>
+    <AssemblyVersion>1.0.10.0</AssemblyVersion>
+    <FileVersion>1.0.10.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />
