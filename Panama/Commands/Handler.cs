@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Panama.Core.Commands
 {
@@ -18,12 +19,14 @@ namespace Panama.Core.Commands
         public List<IModel> Data { get; set; }
         public List<ICommand> Commands { get; set; }
         public List<IValidation> Validators { get; set; }
+        public CancellationToken Token { get; set; }
 
         public Handler(IServiceLocator locator)
         {
             Data = new List<IModel>();
             Commands = new List<ICommand>();
             Validators = new List<IValidation>();
+            Token = new CancellationToken();
 
             _serviceLocator = locator;
             _log = _serviceLocator.Resolve<ILog>();
@@ -32,11 +35,15 @@ namespace Panama.Core.Commands
         private IResult Validate()
         {
             var result = new Result();
+            var subject = new Subject(Data, Token);
 
             foreach (var validator in Validators)
             {
-                if (!validator.IsValid(Data))
-                    result.AddMessage(validator.Message(Data));
+                if (Token.IsCancellationRequested)
+                    Token.ThrowIfCancellationRequested();
+                
+                if (!validator.IsValid(subject))
+                    result.AddMessage(validator.Message(subject));
             }
             result.Success = !result.Messages.Any();
 
@@ -47,7 +54,7 @@ namespace Panama.Core.Commands
         {
             var handler = new Stopwatch();
             var rule = new Stopwatch();
-
+            var subject = new Subject(Data, Token);
             try
             {
                 handler.Start();
@@ -56,10 +63,13 @@ namespace Panama.Core.Commands
 
                 Commands.ForEach(c => {
 
+                    if (Token.IsCancellationRequested)
+                        Token.ThrowIfCancellationRequested();
+
                     rule.Reset();
                     rule.Start();
 
-                    c.Execute(Data);
+                    c.Execute(subject);
 
                     rule.Stop();
 
@@ -92,6 +102,7 @@ namespace Panama.Core.Commands
         {
             var handler = new Stopwatch();
             var rule = new Stopwatch();
+            var subject = new Subject(Data, Token);
 
             try
             {
@@ -104,16 +115,19 @@ namespace Panama.Core.Commands
                 foreach (var command in Commands)
                     await Task.Run(() => {
 
+                        if (Token.IsCancellationRequested)
+                            Token.ThrowIfCancellationRequested();
+
                         rule.Reset();
                         rule.Start();
 
-                        command.Execute(Data);
+                        command.Execute(subject);
 
                         rule.Stop();
 
                         _log?.LogTrace(command, $"HID:{_id.ToString()}, Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
 
-                    });
+                    }, Token);
             }
             catch (Exception ex)
             {
@@ -157,6 +171,13 @@ namespace Panama.Core.Commands
             return this;
         }
 
+        public IHandler Add(CancellationToken token)
+        {
+            Token = token;
+
+            return this;
+        }
+
         public IHandler Command<Command>() where Command : ICommand
         {
             Commands.Add(_serviceLocator.Resolve<ICommand>(typeof(Command).Name));
@@ -175,15 +196,29 @@ namespace Panama.Core.Commands
         {
             var result = new Result();
             var messages = new List<string>();
+            var subject = new Subject(Data, Token);
 
-            foreach (var validator in Validators)
-                await Task.Run(() => {
-                    if (!validator.IsValid(Data))
-                        result.AddMessage(validator.Message(Data));
-                });
+            try
+            {
+                foreach (var validator in Validators)
+                    await Task.Run(() => {
 
-            foreach (var message in messages)
-                result.AddMessage(message);
+                        if (Token.IsCancellationRequested)
+                            Token.ThrowIfCancellationRequested();
+
+                        if (!validator.IsValid(subject))
+                            result.AddMessage(validator.Message(subject));
+
+                    }, Token);
+            }
+            catch (Exception ex)
+            {
+                _log?.LogException<Handler>(ex);
+
+                result.Success = false;
+                result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                return result;
+            }
 
             result.Success = !result.Messages.Any();
 

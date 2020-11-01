@@ -1,6 +1,6 @@
 ﻿namespace Panama.Core.Commands
 {
-    public interface ICommand
+    public interface IRollback
     {
         void Execute(Subject data);
     }

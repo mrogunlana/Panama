@@ -15,10 +15,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using MySqlData = MySql.Data;
+using Panama.Core.MySql.Dapper.Interfaces;
 
 namespace Panama.Core.MySql.Dapper
 {
-    public class MySqlQuery : IQuery
+    public class MySqlQuery : IMySqlQuery
     {
         private readonly ILog _log;
         private readonly ISqlGenerator _sql;
@@ -33,6 +34,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(_connection))
                 _connection = $"Server={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_SERVER")};Port={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_PORT")};Database={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_DATABASE")};Uid={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_USER")};Pwd={Environment.GetEnvironmentVariable("ASPNETCORE_MYSQL_PASSWORD")};";
         }
+
         public List<T> Get<T>(string sql, object parameters)
         {
             var result = new List<T>();
@@ -47,6 +49,27 @@ namespace Panama.Core.MySql.Dapper
                 result = connection.Query<T>(sql, parameters).ToList();
 
                 connection.Close();
+            }
+
+            return result.ToList();
+        }
+
+        public List<T> Get<T>(Definition definition)
+        {
+            var result = new List<T>();
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+            
+            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                _log.LogTrace<MySqlQuery>($"SELECT: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
+                mysql.Open();
+
+                result = mysql.Query<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token)).ToList();
+
+                mysql.Close();
             }
 
             return result.ToList();
@@ -81,6 +104,11 @@ namespace Panama.Core.MySql.Dapper
             return Get<T>(connection, sql, parameters).FirstOrDefault();
         }
 
+        public T GetSingle<T>(Definition definition)
+        {
+            return Get<T>(definition).FirstOrDefault();
+        }
+
         public void Insert<T>(T obj) where T : class
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
@@ -98,6 +126,26 @@ namespace Panama.Core.MySql.Dapper
                 c.Open();
                 c.Insert(obj);
                 c.Close();
+            }
+        }
+
+        public void Insert<T>(T obj, Definition definition) where T : class
+        {
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+
+            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                using (var transaction = c.BeginTransaction())
+                {
+                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                    var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
+                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
+                    if (!definition.Token.IsCancellationRequested)
+                        transaction.Commit();
+                }
             }
         }
 
@@ -121,6 +169,26 @@ namespace Panama.Core.MySql.Dapper
             }
         }
 
+        public void Update<T>(T obj, Definition definition) where T : class
+        {
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+
+            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                using (var transaction = c.BeginTransaction())
+                {
+                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                    var sql = _sql.Update(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
+                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
+                    if (!definition.Token.IsCancellationRequested)
+                        transaction.Commit();
+                }
+            }
+        }
+
         public void Save<T>(T obj, object parameters) where T : class, IModel
         {
             var properties = string.Join(" AND ", parameters.GetType().GetProperties().Select(x => $"{x.Name} = @{x.Name}"));
@@ -129,6 +197,22 @@ namespace Panama.Core.MySql.Dapper
                 Insert(obj);
             else
                 Update(obj);
+        }
+
+        public void Save<T>(T obj, Definition definition) where T : class, IModel
+        {
+            var properties = string.Join(" AND ", definition.Parameters.GetType().GetProperties().Select(x => $"{x.Name} = @{x.Name}"));
+            
+            var gist = new Definition();
+            gist.Sql = $"select * from `{ _sql.Configuration.GetMap<T>().TableName }` where {properties}";
+            gist.Token = definition.Token;
+            gist.Parameters = definition.Parameters;
+
+            var exist = Get<T>(gist);
+            if (exist.Count == 0)
+                Insert(obj, definition);
+            else
+                Update(obj, definition);
         }
 
         public void Save<T>(string connection, T obj, object parameters) where T : class, IModel
@@ -159,6 +243,15 @@ namespace Panama.Core.MySql.Dapper
             return true;
         }
 
+        public bool Exist<T>(Definition definition) where T : class, IModel
+        {
+            var exist = Get<T>(definition);
+            if (exist.Count == 0)
+                return false;
+
+            return true;
+        }
+
         public void Delete<T>(T obj) where T : class, IModel
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
@@ -179,6 +272,26 @@ namespace Panama.Core.MySql.Dapper
             }
         }
 
+        public void Delete<T>(T obj, Definition definition) where T : class, IModel
+        {
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+
+            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                using (var transaction = c.BeginTransaction())
+                {
+                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                    var sql = _sql.Delete(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
+                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
+                    if (!definition.Token.IsCancellationRequested)
+                        transaction.Commit();
+                }
+            }
+        }
+
         public void Execute(string sql, object parameters)
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
@@ -193,13 +306,29 @@ namespace Panama.Core.MySql.Dapper
 
         public void Execute(string connection, string sql, object parameters)
         {
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
-                c.Open();
-                c.Execute(sql, parameters);
-                c.Close();
+                mysql.Open();
+                mysql.Execute(sql, parameters);
+                mysql.Close();
+            }
+        }
+
+        public void Execute(Definition definition)
+        {
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+
+            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                _log.LogTrace<MySqlQuery>($"EXECUTE: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
+                mysql.Open();
+                mysql.Execute(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token));
+                mysql.Close();
             }
         }
 
@@ -232,6 +361,28 @@ namespace Panama.Core.MySql.Dapper
                 c.Open();
 
                 result = c.ExecuteScalar<T>(sql, parameters);
+
+                c.Close();
+            }
+
+            return result;
+        }
+
+        public T ExecuteScalar<T>(Definition definition)
+        {
+            var connection = definition.Connection;
+            if (string.IsNullOrEmpty(connection))
+                connection = _connection;
+
+            T result = default;
+
+            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            {
+                _log.LogTrace<MySqlQuery>($"EXECUTE: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
+                c.Open();
+
+                result = c.ExecuteScalar<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token));
 
                 c.Close();
             }

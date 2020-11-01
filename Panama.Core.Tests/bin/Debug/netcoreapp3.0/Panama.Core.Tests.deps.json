@@ -13,11 +13,10 @@
           "MSTest.TestAdapter": "1.4.0",
           "MSTest.TestFramework": "1.4.0",
           "Microsoft.NET.Test.Sdk": "16.0.1",
-          "Microsoft.NETCore.App": "3.0.0-preview7-27912-14",
-          "Panama.Core": "1.0.3",
+          "Panama.Core": "1.0.7",
           "Panama.Core.IoC.Autofac": "1.0.1",
           "Panama.Core.Logger.Nlog": "1.0.1",
-          "Panama.Core.MySql.Dapper": "1.0.4",
+          "Panama.Core.MySql.Dapper": "1.0.6",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -153,11 +152,6 @@
         "dependencies": {
           "Microsoft.CodeCoverage": "16.0.1",
           "Microsoft.TestPlatform.TestHost": "16.0.1"
-        }
-      },
-      "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3"
         }
       },
       "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {},
@@ -550,6 +544,14 @@
           "lib/netstandard2.0/NLog.dll": {
             "assemblyVersion": "4.0.0.0",
             "fileVersion": "4.6.3.9764"
+          }
+        }
+      },
+      "Panama.Core/1.0.7": {
+        "runtime": {
+          "lib/netcoreapp3.0/Panama.Core.dll": {
+            "assemblyVersion": "1.0.7.0",
+            "fileVersion": "1.0.7.0"
           }
         }
       },
@@ -1323,20 +1325,6 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3",
           "System.Security.Principal.Windows": "4.6.0-preview8.19405.3"
-        },
-        "runtime": {
-          "lib/netstandard2.0/System.Security.AccessControl.dll": {
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/netcoreapp2.0/System.Security.AccessControl.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
         }
       },
       "System.Security.Cryptography.Algorithms/4.3.0": {
@@ -1490,28 +1478,7 @@
           }
         }
       },
-      "System.Security.Principal.Windows/4.6.0-preview8.19405.3": {
-        "runtime": {
-          "lib/netstandard2.0/System.Security.Principal.Windows.dll": {
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        },
-        "runtimeTargets": {
-          "runtimes/unix/lib/netcoreapp2.1/System.Security.Principal.Windows.dll": {
-            "rid": "unix",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          },
-          "runtimes/win/lib/netcoreapp2.1/System.Security.Principal.Windows.dll": {
-            "rid": "win",
-            "assetType": "runtime",
-            "assemblyVersion": "4.1.2.0",
-            "fileVersion": "4.700.19.40503"
-          }
-        }
-      },
+      "System.Security.Principal.Windows/4.6.0-preview8.19405.3": {},
       "System.Text.Encoding/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.0.0-preview8.19405.3",
@@ -1697,15 +1664,10 @@
           }
         }
       },
-      "Panama.Core/1.0.3": {
-        "runtime": {
-          "Panama.Core.dll": {}
-        }
-      },
       "Panama.Core.IoC.Autofac/1.0.1": {
         "dependencies": {
           "Autofac": "4.9.3",
-          "Panama.Core": "1.0.3"
+          "Panama.Core": "1.0.7"
         },
         "runtime": {
           "Panama.Core.IoC.Autofac.dll": {}
@@ -1714,19 +1676,19 @@
       "Panama.Core.Logger.Nlog/1.0.1": {
         "dependencies": {
           "NLog": "4.6.3",
-          "Panama.Core": "1.0.3"
+          "Panama.Core": "1.0.7"
         },
         "runtime": {
           "Panama.Core.Logger.Nlog.dll": {}
         }
       },
-      "Panama.Core.MySql.Dapper/1.0.4": {
+      "Panama.Core.MySql.Dapper/1.0.6": {
         "dependencies": {
           "Dapper": "1.60.6",
           "DapperExtensions.DotnetCore": "1.0.1",
           "MySql.Data": "8.0.17",
           "Newtonsoft.Json": "12.0.2",
-          "Panama.Core": "1.0.3",
+          "Panama.Core": "1.0.7",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -1810,13 +1772,6 @@
       "sha512": "sha512-ON7UIMIhAwrYb0ep+3ztoWVGvtfo88IhiHVnbyOiuVsi8bOMCdMPVcR+EX1WYGgKAd030pHRaxazMlkQ6uDyJQ==",
       "path": "microsoft.net.test.sdk/16.0.1",
       "hashPath": "microsoft.net.test.sdk.16.0.1.nupkg.sha512"
-    },
-    "Microsoft.NETCore.App/3.0.0-preview7-27912-14": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-TNDdHAcfUqEaWXXJoCMUGZnsIP53jlShQV4Ccw8Nqbl8SWkkz1llq4ckfoRl7QrHoq328JhEyCSnPaaYHAB5Xg==",
-      "path": "microsoft.netcore.app/3.0.0-preview7-27912-14",
-      "hashPath": "microsoft.netcore.app.3.0.0-preview7-27912-14.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/3.0.0-preview8.19405.3": {
       "type": "package",
@@ -1908,6 +1863,13 @@
       "sha512": "sha512-DYbJKfpjciXc/y177fou0XsSB+ZsPFW63c3ZtrYNScU2Sw3j4o12zVpm7p30PCaaSUMLdn1iYF1KbdPcdR0Ofg==",
       "path": "nlog/4.6.3",
       "hashPath": "nlog.4.6.3.nupkg.sha512"
+    },
+    "Panama.Core/1.0.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-omtpj+QkKqpb5g+OQd2YPRWXTWq2COBvM5ax6GNn/YOUXDyZ289dKGaqiOuiveqgehKuTQmBodSORM6CLntTAg==",
+      "path": "panama.core/1.0.7",
+      "hashPath": "panama.core.1.0.7.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
       "type": "package",
@@ -2658,11 +2620,6 @@
       "path": "system.xml.xpath.xmldocument/4.0.1",
       "hashPath": "system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
     },
-    "Panama.Core/1.0.3": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
     "Panama.Core.IoC.Autofac/1.0.1": {
       "type": "project",
       "serviceable": false,
@@ -2673,7 +2630,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Panama.Core.MySql.Dapper/1.0.4": {
+    "Panama.Core.MySql.Dapper/1.0.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

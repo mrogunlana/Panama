@@ -1,26 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {}
+    "C:\\Projects\\Panama\\Core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {
+    "C:\\Projects\\Panama\\Core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj": {
       "version": "1.0.1",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
+        "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
         "projectName": "Panama.Core.Logger.Nlog",
-        "projectPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
-        "packagesPath": "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\.nuget\\packages\\",
-        "outputPath": "C:\\Projects\\panama-core\\Panama.Logger.Nlog\\obj\\",
+        "projectPath": "C:\\Projects\\Panama\\Core\\Panama.Logger.Nlog\\Panama.Core.Logger.Nlog.csproj",
+        "packagesPath": "C:\\Users\\ORLP02\\.nuget\\packages\\",
+        "outputPath": "C:\\Projects\\Panama\\Core\\Panama.Logger.Nlog\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\ORSHELL.DESKTOP-EJG44UP\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\ORLP02\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.0"
@@ -62,26 +60,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[3.0.1, 3.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[3.0.0, 3.0.0]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[3.0.0, 3.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
         }
       }
     }
