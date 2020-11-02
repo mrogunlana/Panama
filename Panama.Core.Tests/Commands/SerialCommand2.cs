@@ -8,9 +8,9 @@ namespace Panama.Core.Tests.Commands
 {
     public class SerialCommand2 : ICommand
     {
-        public void Execute(List<IModel> data)
+        public void Execute(Subject subject)
         {
-            data.Add(new KeyValuePair("test", 2));
+            subject.Context.Add(new KeyValuePair("test", 2));
 
             Thread.Sleep(5000);
         }

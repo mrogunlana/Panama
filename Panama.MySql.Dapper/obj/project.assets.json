@@ -6088,7 +6088,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.6",
+    "version": "2.0.0",
     "restore": {
       "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
       "projectName": "Panama.Core.MySql.Dapper",

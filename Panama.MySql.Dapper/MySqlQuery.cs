@@ -25,10 +25,11 @@ namespace Panama.Core.MySql.Dapper
         private readonly ISqlGenerator _sql;
         private readonly string _connection;
 
-        public MySqlQuery(ILog log)
+        public MySqlQuery(ILog log,
+            ISqlGenerator sql)
         {
             _log = log;
-            _sql = new SqlGeneratorImpl(new DapperExtensions.DapperExtensionsConfiguration());
+            _sql = sql;
             _connection = ConfigurationManager.AppSettings["Database"];
 
             if (string.IsNullOrEmpty(_connection))
@@ -137,6 +138,8 @@ namespace Panama.Core.MySql.Dapper
 
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                c.Open();
+
                 using (var transaction = c.BeginTransaction())
                 {
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
@@ -177,11 +180,23 @@ namespace Panama.Core.MySql.Dapper
 
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                c.Open();
+
                 using (var transaction = c.BeginTransaction())
                 {
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                     var sql = _sql.Update(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
-                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var parameters = new DynamicParameters();
+                    var map = _sql.Configuration.GetMap<T>();
+                    var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
+                    
+                    foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
+                        parameters.Add(property.Key, property.Value);
+
+                    foreach (var parameter in definition.Dictionary)
+                        parameters.Add(parameter.Key, parameter.Value);
+
+                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
                     if (!definition.Token.IsCancellationRequested)
                         transaction.Commit();
@@ -280,6 +295,8 @@ namespace Panama.Core.MySql.Dapper
 
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                c.Open();
+
                 using (var transaction = c.BeginTransaction())
                 {
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens

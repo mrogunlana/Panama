@@ -8,16 +8,16 @@ namespace Panama.Core.Commands
     {
         public Subject()
         {
-            if (Data == null)
-                Data = new List<IModel>();
+            if (Context == null)
+                Context = new List<IModel>();
         }
-        public Subject(List<IModel> data, CancellationToken token) 
+        public Subject(List<IModel> context, CancellationToken token) 
             : this()
         {
-            Data = data;
+            Context = context;
             Token = token;
         }
-        public List<IModel> Data { get; set; }
+        public List<IModel> Context { get; set; }
         public CancellationToken Token { get; set; }
     }
 }

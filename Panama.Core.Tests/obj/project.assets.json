@@ -586,15 +586,6 @@
           "lib/netstandard2.0/NLog.dll": {}
         }
       },
-      "Panama.Core/1.0.7": {
-        "type": "package",
-        "compile": {
-          "lib/netcoreapp3.0/Panama.Core.dll": {}
-        },
-        "runtime": {
-          "lib/netcoreapp3.0/Panama.Core.dll": {}
-        }
-      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package",
         "runtimeTargets": {
@@ -2427,6 +2418,16 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
+      "Panama.Core/2.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.0",
+        "compile": {
+          "bin/placeholder/Panama.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Panama.Core.dll": {}
+        }
+      },
       "Panama.Core.IoC.Autofac/1.0.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
@@ -2455,7 +2456,7 @@
           "bin/placeholder/Panama.Core.Logger.Nlog.dll": {}
         }
       },
-      "Panama.Core.MySql.Dapper/1.0.6": {
+      "Panama.Core.MySql.Dapper/2.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
@@ -3319,19 +3320,6 @@
         "lib/xamarinios10/NLog.xml",
         "nlog.4.6.3.nupkg.sha512",
         "nlog.nuspec"
-      ]
-    },
-    "Panama.Core/1.0.7": {
-      "sha512": "omtpj+QkKqpb5g+OQd2YPRWXTWq2COBvM5ax6GNn/YOUXDyZ289dKGaqiOuiveqgehKuTQmBodSORM6CLntTAg==",
-      "type": "package",
-      "path": "panama.core/1.0.7",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.md",
-        "lib/netcoreapp3.0/Panama.Core.dll",
-        "panama.core.1.0.7.nupkg.sha512",
-        "panama.core.nuspec"
       ]
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
@@ -7965,6 +7953,11 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
+    "Panama.Core/2.0.0": {
+      "type": "project",
+      "path": "../Panama/Panama.Core.csproj",
+      "msbuildProject": "../Panama/Panama.Core.csproj"
+    },
     "Panama.Core.IoC.Autofac/1.0.1": {
       "type": "project",
       "path": "../Panama.IoC.Autofac/Panama.Core.IoC.Autofac.csproj",
@@ -7975,7 +7968,7 @@
       "path": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj",
       "msbuildProject": "../Panama.Logger.Nlog/Panama.Core.Logger.Nlog.csproj"
     },
-    "Panama.Core.MySql.Dapper/1.0.6": {
+    "Panama.Core.MySql.Dapper/2.0.0": {
       "type": "project",
       "path": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj",
       "msbuildProject": "../Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj"
@@ -7991,7 +7984,7 @@
       "Panama.Core >= 1.0.7",
       "Panama.Core.IoC.Autofac >= 1.0.1",
       "Panama.Core.Logger.Nlog >= 1.0.1",
-      "Panama.Core.MySql.Dapper >= 1.0.6",
+      "Panama.Core.MySql.Dapper >= 2.0.0",
       "System.Configuration.ConfigurationManager >= 4.6.0-preview8.19405.3"
     ]
   },
@@ -8033,6 +8026,9 @@
             },
             "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
               "projectPath": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj"
+            },
+            "C:\\Projects\\Panama\\Core\\Panama\\Panama.Core.csproj": {
+              "projectPath": "C:\\Projects\\Panama\\Core\\Panama\\Panama.Core.csproj"
             }
           }
         }

@@ -4,7 +4,6 @@
     <id>Panama.Core.Logger.Nlog</id>
     <version>1.0.1</version>
     <authors>Diran Ogunlana</authors>
-    <owners>Diran Ogunlana</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://github.com/mrogunlana/Panama.Core</projectUrl>
     <description>Implementation of NLog logger component using Panama ILog Interface</description>
@@ -19,6 +18,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="C:\Projects\panama-core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.dll" target="lib\netcoreapp3.0\Panama.Core.Logger.Nlog.dll" />
+    <file src="C:\Projects\Panama\Core\Panama.Logger.Nlog\bin\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.dll" target="lib\netcoreapp3.0\Panama.Core.Logger.Nlog.dll" />
   </files>
 </package>

@@ -2,6 +2,6 @@
 {
     public interface ICommand
     {
-        void Execute(Subject data);
+        void Execute(Subject subject);
     }
 }

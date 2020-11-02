@@ -261,3 +261,4 @@ C:\Projects\Panama\Core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Te
 C:\Projects\Panama\Core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.dll
 C:\Projects\Panama\Core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.pdb
 C:\Projects\Panama\Core\Panama.Core.Tests\obj\Debug\netcoreapp3.0\Panama.Core.Tests.genruntimeconfig.cache
+C:\Projects\Panama\Core\Panama.Core.Tests\bin\Debug\netcoreapp3.0\Panama.Core.pdb

@@ -2,19 +2,20 @@
 
   <PropertyGroup>
     <PackageId>Panama.Core</PackageId>
-    <Version>1.0.11</Version>
+    <Version>2.0.0</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>Fix: Updated to IEnumerable&lt;IModel&gt;  on handler.add to allow array of models to be set in one function call</PackageReleaseNotes>
+    <PackageReleaseNotes>Major version release (Breaking Changes) :
+Added Subject to command and included legacy "Data" inside of subject among other things like a Cancellation Token  for eventual async handler conversion...</PackageReleaseNotes>
     <Description>A simple command architecture for .NET CORE 3+ developed by Diran Ogunlana</Description>
-    <Copyright>Copyright 2019</Copyright>
+    <Copyright>Copyright 2021</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <AssemblyVersion>1.0.11.0</AssemblyVersion>
-    <FileVersion>1.0.11.0</FileVersion>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />
