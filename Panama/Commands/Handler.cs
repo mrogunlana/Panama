@@ -137,7 +137,16 @@ namespace Panama.Core.Commands
                 {
                     Success = false
                 };
-                result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+
+                result.Cancelled = (ex is OperationCanceledException ||
+                                    ex is TaskCanceledException ||
+                                    Token.IsCancellationRequested);
+                
+                if (result.Cancelled)
+                    result.AddMessage($"HID:{_id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
+                else
+                    result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                
                 return result;
             }
             finally

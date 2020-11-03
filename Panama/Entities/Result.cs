@@ -53,6 +53,9 @@ namespace Panama.Core.Entities
         [DataMember]
         public bool Success { get; set; }
 
+        [DataMember]
+        public bool Cancelled { get; set; }
+
         internal static List<Type> DataContractKnownTypes()
         {
             List<Type> Ret = new List<Type>();

@@ -8,5 +8,6 @@ namespace Panama.Core.Entities
         IEnumerable<string> Messages { get; }
         void AddMessage(string message);
         bool Success { get; set; }
+        bool Cancelled { get; set; }
     }
 }

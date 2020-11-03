@@ -141,7 +141,7 @@
           "dependencies": {
             "Autofac": {
               "target": "Package",
-              "version": "[4.9.2, )"
+              "version": "[4.9.3, )"
             },
             "Panama.Core": {
               "target": "Package",
@@ -233,7 +233,7 @@
       }
     },
     "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
-      "version": "2.0.0",
+      "version": "2.0.1",
       "restore": {
         "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
         "projectName": "Panama.Core.MySql.Dapper",
@@ -271,7 +271,7 @@
           "dependencies": {
             "Dapper": {
               "target": "Package",
-              "version": "[1.60.6, )"
+              "version": "[2.0.35, )"
             },
             "DapperExtensions.DotnetCore": {
               "target": "Package",
@@ -314,7 +314,7 @@
       }
     },
     "C:\\Projects\\Panama\\Core\\Panama\\Panama.Core.csproj": {
-      "version": "2.0.0",
+      "version": "2.0.1",
       "restore": {
         "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama\\Panama.Core.csproj",
         "projectName": "Panama.Core",

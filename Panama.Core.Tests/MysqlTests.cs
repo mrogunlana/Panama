@@ -18,7 +18,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests
 {
@@ -113,6 +112,42 @@ namespace Panama.Core.Tests
                 .InvokeAsync();
 
             if (handler.Success)
+                Assert.IsTrue(true);
+            else
+                Assert.Fail();
+        }
+
+        [TestMethod]
+        public async Task DoesCancellationStopLongRunningDatabaseTask()
+        {
+            var source = new CancellationTokenSource();
+            source.CancelAfter(TimeSpan.FromSeconds(5));
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(source.Token)
+                .Command<LongRunningDatabaseCommand>()
+                .InvokeAsync();
+
+            if (result.Cancelled)
+                Assert.IsTrue(true);
+            else
+                Assert.Fail();
+        }
+
+        [TestMethod]
+        public async Task DoesCancellationInterruptSeriesOfLongRunningDatabaseTasks()
+        {
+            var source = new CancellationTokenSource();
+            source.CancelAfter(TimeSpan.FromSeconds(15));
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(source.Token)
+                .Command<LongRunningDatabaseCommand>()
+                .Command<LongRunningDatabaseCommand>()
+                .Command<LongRunningDatabaseCommand>()
+                .InvokeAsync();
+
+            if (result.Cancelled)
                 Assert.IsTrue(true);
             else
                 Assert.Fail();
