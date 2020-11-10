@@ -301,7 +301,17 @@ namespace Panama.Core.MySql.Dapper
                 {
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                     var sql = _sql.Delete(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
-                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var parameters = new DynamicParameters();
+                    var map = _sql.Configuration.GetMap<T>();
+                    var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
+
+                    foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
+                        parameters.Add(property.Key, property.Value);
+
+                    foreach (var parameter in definition.Dictionary)
+                        parameters.Add(parameter.Key, parameter.Value);
+
+                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
                     if (!definition.Token.IsCancellationRequested)
                         transaction.Commit();

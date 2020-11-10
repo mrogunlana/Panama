@@ -152,5 +152,27 @@ namespace Panama.Core.Tests
             else
                 Assert.Fail();
         }
+
+        [TestMethod]
+        public async Task DoesNewDeleteWithDefinitionWork()
+        {
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            var handler = await new Handler(ServiceLocator.Current)
+                .Add(token)
+                .Add(new User()
+                {
+                    ID = Guid.NewGuid()
+                })
+                .Command<InsertCommand>()
+                .Command<SelectCommand>()
+                .Command<DeleteCommand>()
+                .InvokeAsync();
+
+            if (handler.Success)
+                Assert.IsTrue(true);
+            else
+                Assert.Fail();
+        }
     }
 }
