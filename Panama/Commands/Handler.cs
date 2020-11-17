@@ -12,24 +12,25 @@ namespace Panama.Core.Commands
 {
     public class Handler : IHandler
     {
-        protected readonly ILog _log;
-        protected Guid _id = Guid.NewGuid();
-        protected readonly IServiceLocator _serviceLocator;
+        protected Execution _processing = Execution.Serial;
 
+        public ILog Log { get; }
+        public Guid Id { get; }
+        public IServiceLocator ServiceLocator { get; }
         public List<IModel> Data { get; set; }
-        public List<ICommand> Commands { get; set; }
+        public List<object> Commands { get; set; }
         public List<IValidation> Validators { get; set; }
         public CancellationToken Token { get; set; }
 
         public Handler(IServiceLocator locator)
         {
             Data = new List<IModel>();
-            Commands = new List<ICommand>();
+            Commands = new List<object>();
             Validators = new List<IValidation>();
             Token = new CancellationToken();
-
-            _serviceLocator = locator;
-            _log = _serviceLocator.Resolve<ILog>();
+            ServiceLocator = locator;
+            Id = Guid.NewGuid();
+            Log = ServiceLocator.Resolve<ILog>();
         }
 
         private IResult Validate()
@@ -59,9 +60,11 @@ namespace Panama.Core.Commands
             {
                 handler.Start();
 
-                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
+                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
 
                 Commands.ForEach(c => {
+
+                    var command = c as ICommand;
 
                     if (Token.IsCancellationRequested)
                         Token.ThrowIfCancellationRequested();
@@ -69,30 +72,30 @@ namespace Panama.Core.Commands
                     rule.Reset();
                     rule.Start();
 
-                    c.Execute(subject);
+                    command.Execute(subject);
 
                     rule.Stop();
 
-                    _log?.LogTrace(c, $"HID:{_id.ToString()}, Command: {c.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                    Log?.LogTrace(c, $"HID:{Id.ToString()}, Command: {c.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
                 });
 
             }
             catch (Exception ex)
             {
-                _log?.LogException<Handler>(ex);
+                Log?.LogException<Handler>(ex);
 
                 var result = new Result()
                 {
                     Success = false
                 };
-                result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
                 return result;
             }
             finally
             {
                 handler.Stop();
 
-                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }
 
             return new Result() { Success = true, Data = Data };
@@ -101,37 +104,38 @@ namespace Panama.Core.Commands
         private async Task<IResult> RunAsync()
         {
             var handler = new Stopwatch();
-            var rule = new Stopwatch();
-            var subject = new Subject(Data, Token);
 
             try
             {
                 handler.Start();
 
-                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
+                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
 
-                //perform serial execution of commands using unblocking await task in foreach
+                var tasks = this.ToTasks();
 
-                foreach (var command in Commands)
-                    await Task.Run(() => {
+                switch (_processing)
+                {
+                    case Execution.Serial:
 
-                        if (Token.IsCancellationRequested)
-                            Token.ThrowIfCancellationRequested();
+                        foreach (var task in tasks)
+                            await task;
 
-                        rule.Reset();
-                        rule.Start();
+                        break;
 
-                        command.Execute(subject);
+                    case Execution.Parallel:
 
-                        rule.Stop();
+                        Task.WhenAll(tasks).Wait(Token);
 
-                        _log?.LogTrace(command, $"HID:{_id.ToString()}, Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                        break;
 
-                    }, Token);
+                    default:
+
+                        throw new Exception($"The execution type for the handler is not found: {_processing}");
+                }
             }
             catch (Exception ex)
             {
-                _log?.LogException<Handler>(ex);
+                Log?.LogException<Handler>(ex);
 
                 var result = new Result()
                 {
@@ -143,9 +147,9 @@ namespace Panama.Core.Commands
                                     Token.IsCancellationRequested);
                 
                 if (result.Cancelled)
-                    result.AddMessage($"HID:{_id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
+                    result.AddMessage($"HID:{Id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
-                    result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                    result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
                 
                 return result;
             }
@@ -153,7 +157,7 @@ namespace Panama.Core.Commands
             {
                 handler.Stop();
 
-                _log?.LogTrace<Handler>($"Handler (HID:{_id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }
 
             return new Result() { Success = true, Data = Data };
@@ -187,16 +191,35 @@ namespace Panama.Core.Commands
             return this;
         }
 
-        public IHandler Command<Command>() where Command : ICommand
+        public IHandler Command<Command>()
         {
-            Commands.Add(_serviceLocator.Resolve<ICommand>(typeof(Command).Name));
+            if (typeof(Command) is ICommand)
+                Commands.Add(ServiceLocator.Resolve<ICommand>(typeof(Command).Name));
+            else if (typeof(Command) is ICommandAsync)
+                Commands.Add(ServiceLocator.Resolve<ICommandAsync>(typeof(Command).Name));
+            else
+                throw new ArgumentException($"Command type(s): {string.Join(',', typeof(Command)?.GetInterfaces()?.Select(x => x.Name))} are not compatible with supported ICommand and ICommandAsync Interfaces.");
+
+            return this;
+        }
+
+        public IHandler Serial()
+        {
+            _processing = Execution.Serial;
+
+            return this;
+        }
+
+        public IHandler Parallel()
+        {
+            _processing = Execution.Parallel;
 
             return this;
         }
 
         public IHandler Validate<Validator>() where Validator : IValidation
         {
-            Validators.Add(_serviceLocator.Resolve<IValidation>(typeof(Validator).Name));
+            Validators.Add(ServiceLocator.Resolve<IValidation>(typeof(Validator).Name));
 
             return this;
         }
@@ -222,10 +245,10 @@ namespace Panama.Core.Commands
             }
             catch (Exception ex)
             {
-                _log?.LogException<Handler>(ex);
+                Log?.LogException<Handler>(ex);
 
                 result.Success = false;
-                result.AddMessage($"HID:{_id.ToString()}, Looks like there was a problem with your request.");
+                result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
                 return result;
             }
 

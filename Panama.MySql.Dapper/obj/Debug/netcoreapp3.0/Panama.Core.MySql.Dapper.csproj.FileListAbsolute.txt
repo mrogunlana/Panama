@@ -15,3 +15,4 @@ C:\Projects\Panama\Core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.
 C:\Projects\Panama\Core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.csproj.CoreCompileInputs.cache
 C:\Projects\Panama\Core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.dll
 C:\Projects\Panama\Core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.pdb
+C:\Projects\Panama\Core\Panama.MySql.Dapper\obj\Debug\netcoreapp3.0\Panama.Core.MySql.Dapper.csprojAssemblyReference.cache
