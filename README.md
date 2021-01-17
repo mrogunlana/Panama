@@ -133,6 +133,29 @@ public class UserMap : ClassMapper<User>
 Two sample projects are included to serve as examples for configuring a Web Api application and a console application. There is a also a sql script called create.sql under the dev.Sql folder which will create the tables necessary to run the samples. These will need to be added to an existing database and configured in the config files in both projects. 
 
 
+### Deadlines
+We support deadlines (and timeouts) via a cancellation token. Usually, the cancellation token may be sourced from the termination of an upstream call, Grpc [deadlines and cancellation](https://docs.microsoft.com/en-us/aspnet/core/grpc/deadlines-cancellation)
+```cs
+var source = new CancellationTokenSource();
+source.CancelAfter(TimeSpan.FromSeconds(5));
+var token = source.Token;
+var handler = await new Handler(ServiceLocator.Current)
+    .Add(token)
+    .Add(new User() { 
+        ID = Guid.NewGuid(),  
+        Email = "test@test.com",
+        FirstName = "John_UPDATED",
+        LastName = "Doe"
+    })
+    .Command<UpdateCommand>()
+    .InvokeAsync();
+
+```
+
+The above code snippet processes an instruction with a deadline of 5 seconds.
+`handler.Cancelled` will be `True` if the processing timed out.
+Transactions are also not committed if upstream processing has timed out. See [sample](https://github.com/mrogunlana/Panama.Core/blob/master/Panama.MySql.Dapper/MySqlQuery.cs#L149)
+
 ### More Info
 
 For more detailed info on this project please see the following:
