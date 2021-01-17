@@ -48,7 +48,7 @@ The interface allows Command classes to act on IModel objects (IModel is explain
 
 ### Validators
 
-Validators must implement the IValidationr interface which currently specifies two methods:
+Validators must implement the IValidator interface which currently specifies two methods:
 ```
         bool IsValid(List<IModel> data);
         string Message();
