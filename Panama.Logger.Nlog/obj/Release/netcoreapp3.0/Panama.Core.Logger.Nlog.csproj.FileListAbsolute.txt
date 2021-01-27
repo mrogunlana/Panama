@@ -15,3 +15,4 @@ C:\Projects\Panama\Core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Core
 C:\Projects\Panama\Core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.csproj.CoreCompileInputs.cache
 C:\Projects\Panama\Core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.dll
 C:\Projects\Panama\Core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.pdb
+C:\Projects\Panama\Core\Panama.Logger.Nlog\obj\Release\netcoreapp3.0\Panama.Core.Logger.Nlog.csprojAssemblyReference.cache

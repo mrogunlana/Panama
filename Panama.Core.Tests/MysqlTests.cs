@@ -5,6 +5,7 @@ using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Core.Commands;
+using Panama.Core.Entities;
 using Panama.Core.IoC;
 using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
@@ -69,6 +70,22 @@ namespace Panama.Core.Tests
             builder.RegisterAssemblyTypes(domain)
                    .Where(t => t.IsAssignableTo<ICommand>())
                    .Named<ICommand>(t => t.Name)
+                   .AsImplementedInterfaces()
+                   .SingleInstance()
+                   .WithAttributeFiltering();
+
+            //Register all commands -- singletons
+            builder.RegisterAssemblyTypes(domain)
+                   .Where(t => t.IsAssignableTo<ICommandAsync>())
+                   .Named<ICommandAsync>(t => t.Name)
+                   .AsImplementedInterfaces()
+                   .SingleInstance()
+                   .WithAttributeFiltering();
+
+            //Register all commands -- singletons
+            builder.RegisterAssemblyTypes(domain)
+                   .Where(t => t.IsAssignableTo<IRollback>())
+                   .Named<IRollback>(t => t.Name)
                    .AsImplementedInterfaces()
                    .SingleInstance()
                    .WithAttributeFiltering();
@@ -173,6 +190,38 @@ namespace Panama.Core.Tests
                 Assert.IsTrue(true);
             else
                 Assert.Fail();
+        }
+
+        [TestMethod]
+        public async Task DoesSimpleRollbackCommandWork()
+        {
+            var id = Guid.NewGuid();
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            var handler = await new Handler(ServiceLocator.Current)
+                .Add(token)
+                .Add(new User()
+                {
+                    ID = id
+                })
+                .Command<InsertCommand>()
+                .Command<SelectByIdCommand>()
+                .Command<ExceptionCommand>()
+                .Rollback<RollbackInsertCommand>()
+                .InvokeAsync();
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(token)
+                .Add(new User()
+                {
+                    ID = id
+                })
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNull(user);
         }
     }
 }

@@ -54,6 +54,14 @@ namespace Panama.Core.Tests
                    .SingleInstance()
                    .WithAttributeFiltering();
 
+            //Register all commands -- singletons
+            builder.RegisterAssemblyTypes(domain)
+                   .Where(t => t.IsAssignableTo<ICommandAsync>())
+                   .Named<ICommandAsync>(t => t.Name)
+                   .AsImplementedInterfaces()
+                   .SingleInstance()
+                   .WithAttributeFiltering();
+
             ServiceLocator.SetLocator(new AutofacServiceLocator(builder.Build()));
         }
 
@@ -78,6 +86,66 @@ namespace Panama.Core.Tests
             if (_2.Value.ToString() != "2")
                 Assert.Fail();
             if (_3.Value.ToString() != "3")
+                Assert.Fail();
+
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod]
+        public async Task DoesConcurrentAsyncCommandsExecuteSerially()
+        {
+            var handler = await new Handler(ServiceLocator.Current)
+                .Command<AsyncSerialCommand1>()
+                .Command<AsyncSerialCommand2>()
+                .Command<AsyncSerialCommand3>()
+                .InvokeAsync();
+
+            if (handler.Data.Count == 0)
+                Assert.Fail();
+
+            var _1 = (handler.Data[0] as KeyValuePair);
+            var _2 = (handler.Data[1] as KeyValuePair);
+            var _3 = (handler.Data[2] as KeyValuePair);
+
+            if (_1.Value.ToString() != "1")
+                Assert.Fail();
+            if (_2.Value.ToString() != "2")
+                Assert.Fail();
+            if (_3.Value.ToString() != "3")
+                Assert.Fail();
+
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod]
+        public async Task DoesAsyncandNonAsyncCommandsPlayNicelyTogether()
+        {
+            var handler = await new Handler(ServiceLocator.Current)
+                .Command<AsyncSerialCommand1>()
+                .Command<AsyncSerialCommand2>()
+                .Command<AsyncSerialCommand3>()
+                .Command<SerialCommand4>()
+                .Command<SerialCommand5>()
+                .InvokeAsync();
+
+            if (handler.Data.Count == 0)
+                Assert.Fail();
+
+            var _1 = (handler.Data[0] as KeyValuePair);
+            var _2 = (handler.Data[1] as KeyValuePair);
+            var _3 = (handler.Data[2] as KeyValuePair);
+            var _4 = (handler.Data[3] as KeyValuePair);
+            var _5 = (handler.Data[4] as KeyValuePair);
+
+            if (_1.Value.ToString() != "1")
+                Assert.Fail();
+            if (_2.Value.ToString() != "2")
+                Assert.Fail();
+            if (_3.Value.ToString() != "3")
+                Assert.Fail();
+            if (_4.Value.ToString() != "4")
+                Assert.Fail();
+            if (_5.Value.ToString() != "5")
                 Assert.Fail();
 
             Assert.IsTrue(true);

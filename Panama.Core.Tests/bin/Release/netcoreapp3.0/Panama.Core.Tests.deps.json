@@ -16,7 +16,7 @@
           "Panama.Core": "2.0.1",
           "Panama.Core.IoC.Autofac": "1.0.1",
           "Panama.Core.Logger.Nlog": "1.0.1",
-          "Panama.Core.MySql.Dapper": "2.0.1",
+          "Panama.Core.MySql.Dapper": "2.0.2",
           "System.Configuration.ConfigurationManager": "4.6.0-preview8.19405.3"
         },
         "runtime": {
@@ -1618,7 +1618,7 @@
           "Panama.Core.Logger.Nlog.dll": {}
         }
       },
-      "Panama.Core.MySql.Dapper/2.0.1": {
+      "Panama.Core.MySql.Dapper/2.0.2": {
         "dependencies": {
           "Dapper": "2.0.35",
           "DapperExtensions.DotnetCore": "1.0.1",
@@ -2529,7 +2529,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Panama.Core.MySql.Dapper/2.0.1": {
+    "Panama.Core.MySql.Dapper/2.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

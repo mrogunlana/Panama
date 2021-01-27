@@ -2,7 +2,7 @@
 
 namespace Panama.Core.Commands
 {
-    public interface IRollback
+    public interface ICommandAsync
     {
         Task Execute(Subject subject);
     }

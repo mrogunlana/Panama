@@ -1,15 +1,25 @@
 ﻿using Panama.Core.Entities;
+using Panama.Core.IoC;
+using Panama.Core.Logger;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Panama.Core.Commands
 {
     public interface IHandler
     {
-        List<ICommand> Commands { get; set; }
+        ILog Log { get; }
+        Guid Id { get; }
+        IServiceLocator ServiceLocator { get; }
+        List<object> Commands { get; set; }
+        List<object> RollbackCommands { get; set; }
         List<IModel> Data { get; set; }
         List<IValidation> Validators { get; set; }
-        IHandler Command<Command>() where Command : ICommand;
+        CancellationToken Token { get; set; }
+        IHandler Command<Command>();
+        IHandler Rollback<Rollback>();
         IHandler Validate<Validator>() where Validator : IValidation;
         IHandler Add(IModel data);
         IHandler Add(params IModel[] data);

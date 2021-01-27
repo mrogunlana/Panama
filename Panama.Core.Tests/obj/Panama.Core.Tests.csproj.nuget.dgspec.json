@@ -233,7 +233,7 @@
       }
     },
     "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
-      "version": "2.0.1",
+      "version": "2.0.2",
       "restore": {
         "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
         "projectName": "Panama.Core.MySql.Dapper",
