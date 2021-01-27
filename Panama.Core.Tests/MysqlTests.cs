@@ -205,6 +205,7 @@ namespace Panama.Core.Tests
                     ID = id
                 })
                 .Command<InsertCommand>()
+                .Command<SelectByIdCommand>()
                 .Command<ExceptionCommand>()
                 .Rollback<RollbackInsertCommand>()
                 .InvokeAsync();
@@ -215,12 +216,12 @@ namespace Panama.Core.Tests
                 {
                     ID = id
                 })
-                .Command<SelectCommand>()
+                .Command<SelectByIdCommand>()
                 .InvokeAsync();
 
-            var user = result.DataGet<User>();
+            var user = result.DataGetSingle<User>();
 
-            Assert.IsNotNull(user);
+            Assert.IsNull(user);
         }
     }
 }

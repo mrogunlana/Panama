@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Panama.Core.Commands
 {
@@ -13,7 +12,7 @@ namespace Panama.Core.Commands
             var subject = new Subject(handler.Data, handler.Token);
 
             foreach (var command in handler.Commands)
-                result.Add(async () => { 
+                result.Add(() => { 
 
                     var rule = new Stopwatch();
 
@@ -24,16 +23,13 @@ namespace Panama.Core.Commands
                     rule.Start();
 
                     if (command is ICommandAsync)
-                        await (command as ICommandAsync).Execute(subject);
+                        (command as ICommandAsync)
+                            .Execute(subject)
+                            .ConfigureAwait(false)
+                            .GetAwaiter()
+                            .GetResult();
                     else
-                        await Task.Run(() => {
-
-                            if (subject.Token.IsCancellationRequested)
-                                subject.Token.ThrowIfCancellationRequested();
-
-                            (command as ICommand).Execute(subject);
-
-                        }, subject.Token);
+                        (command as ICommand).Execute(subject);
 
                     rule.Stop();
 
@@ -51,7 +47,7 @@ namespace Panama.Core.Commands
             var subject = new Subject(handler.Data, handler.Token);
 
             foreach (var command in handler.RollbackCommands)
-                result.Add(async () => {
+                result.Add(() => {
 
                     var rule = new Stopwatch();
 
@@ -61,7 +57,11 @@ namespace Panama.Core.Commands
                     rule.Reset();
                     rule.Start();
 
-                    await (command as IRollback).Execute(subject);
+                    (command as IRollback)
+                        .Execute(subject)
+                            .ConfigureAwait(false)
+                            .GetAwaiter()
+                            .GetResult();
 
                     rule.Stop();
 

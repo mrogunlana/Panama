@@ -150,8 +150,7 @@ namespace Panama.Core.Commands
                     case Execution.Serial:
                         
                         foreach (var action in actions)
-                            await Task
-                                .Run(action, Token)
+                            await Task.Run(action, Token)
                                 .ConfigureAwait(false);
 
                         break;
@@ -162,7 +161,7 @@ namespace Panama.Core.Commands
                         foreach (var action in actions)
                             tasks.Add(Task.Run(action, Token));
 
-                        Task.WhenAll(tasks).Wait(Token);
+                        await Task.WhenAll(tasks);
 
                         break;
 
@@ -218,8 +217,7 @@ namespace Panama.Core.Commands
                     case Execution.Serial:
 
                         foreach (var action in actions)
-                            await Task
-                                .Run(action, Token)
+                            await Task.Run(action, Token)
                                 .ConfigureAwait(false);
 
                         break;
@@ -230,7 +228,7 @@ namespace Panama.Core.Commands
                         foreach (var action in actions)
                             tasks.Add(Task.Run(action, Token));
 
-                        Task.WhenAll(tasks).Wait(Token);
+                        await Task.WhenAll(tasks);
 
                         break;
 
