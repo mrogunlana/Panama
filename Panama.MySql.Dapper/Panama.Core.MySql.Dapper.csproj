@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company />
     <Product>Panama.Core.MySql.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Added the parameters from the dapper-extensions sql generator to the obj parameters before the command is sent. Note: the update and delete convention is that if we're using the identity column (e.g. ID or _ID) to delete then it will not be included in the object parameters even though the object may have it populated; in order for the identity column to be used, we must add a predicate.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added log tracing in all MySqlQuery functions</PackageReleaseNotes>
     <Copyright>2021</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Panama.Core.MySql.Dapper</PackageId>
-    <AssemblyVersion>2.0.2.0</AssemblyVersion>
-    <FileVersion>2.0.2.0</FileVersion>
+    <AssemblyVersion>2.0.3.0</AssemblyVersion>
+    <FileVersion>2.0.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

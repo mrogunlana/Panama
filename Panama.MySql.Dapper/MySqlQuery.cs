@@ -64,7 +64,7 @@ namespace Panama.Core.MySql.Dapper
             
             using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
-                _log.LogTrace<MySqlQuery>($"SELECT: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+                _log.LogTrace<MySqlQuery>($"SELECT: {definition.Sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
                 mysql.Open();
 
@@ -83,7 +83,7 @@ namespace Panama.Core.MySql.Dapper
             //var test = new MySql.Data.MySqlClient()
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
-                _log.LogTrace<MySqlQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
+                _log.LogTrace<MySqlQuery>($"SELECT: {sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
                 c.Open();
 
@@ -114,6 +114,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
+                _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 connection.Open();
                 connection.Insert(obj);
                 connection.Close();
@@ -124,6 +126,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 c.Open();
                 c.Insert(obj);
                 c.Close();
@@ -145,6 +149,9 @@ namespace Panama.Core.MySql.Dapper
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                     var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
                     var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+
+                    _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
                     if (!definition.Token.IsCancellationRequested)
                         transaction.Commit();
@@ -156,6 +163,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
+                _log.LogTrace<MySqlQuery>($"UPDATE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 connection.Open();
                 connection.Update(obj);
                 connection.Close();
@@ -166,6 +175,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                _log.LogTrace<MySqlQuery>($"UPDATE: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 c.Open();
                 c.Update(obj);
                 c.Close();
@@ -197,6 +208,9 @@ namespace Panama.Core.MySql.Dapper
                         parameters.Add(parameter.Key, parameter.Value);
 
                     var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
+
+                    _log.LogTrace<MySqlQuery>($"UPDATE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
                     if (!definition.Token.IsCancellationRequested)
                         transaction.Commit();
@@ -271,6 +285,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
             {
+                _log.LogTrace<MySqlQuery>($"DELETE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 connection.Open();
                 connection.Delete(obj);
                 connection.Close();
@@ -281,6 +297,8 @@ namespace Panama.Core.MySql.Dapper
         {
             using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
             {
+                _log.LogTrace<MySqlQuery>($"DELETE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
+
                 c.Open();
                 c.Delete(obj);
                 c.Close();
@@ -312,6 +330,9 @@ namespace Panama.Core.MySql.Dapper
                         parameters.Add(parameter.Key, parameter.Value);
 
                     var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
+
+                    _log.LogTrace<MySqlQuery>($"DELETE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
                     if (!definition.Token.IsCancellationRequested)
                         transaction.Commit();
