@@ -1,7 +1,9 @@
-﻿namespace Panama.Core.Commands
+﻿using System.Threading.Tasks;
+
+namespace Panama.Core.Commands
 {
     public interface IRollback
     {
-        void Execute(Subject data);
+        Task Execute(Subject subject);
     }
 }

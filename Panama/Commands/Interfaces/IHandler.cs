@@ -14,6 +14,7 @@ namespace Panama.Core.Commands
         Guid Id { get; }
         IServiceLocator ServiceLocator { get; }
         List<object> Commands { get; set; }
+        List<object> RollbackCommands { get; set; }
         List<IModel> Data { get; set; }
         List<IValidation> Validators { get; set; }
         CancellationToken Token { get; set; }

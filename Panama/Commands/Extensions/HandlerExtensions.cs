@@ -1,4 +1,5 @@
-﻿using Panama.Core.IoC;
+﻿using Panama.Core.Entities;
+using Panama.Core.IoC;
 using Panama.Core.Logger;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Panama.Core.Commands
 {
     public static class HandlerExtensions
     {
-        public static List<Task> ToTasks(this IHandler handler)
+        public static List<Task> ToCommandTasks(this IHandler handler)
         {
             var result = new List<Task>();
             var subject = new Subject(handler.Data, handler.Token);
@@ -41,6 +42,34 @@ namespace Panama.Core.Commands
                     rule.Stop();
 
                     handler.Log?.LogTrace(command, $"HID:{handler.Id}, Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+
+                }, subject.Token));
+
+            return result;
+
+        }
+
+        public static List<Task> ToRollbackTasks(this IHandler handler)
+        {
+            var result = new List<Task>();
+            var subject = new Subject(handler.Data, handler.Token);
+
+            foreach (var command in handler.RollbackCommands)
+                result.Add(Task.Run(async () => {
+
+                    var rule = new Stopwatch();
+
+                    if (subject.Token.IsCancellationRequested)
+                        subject.Token.ThrowIfCancellationRequested();
+
+                    rule.Reset();
+                    rule.Start();
+
+                    await (command as IRollback).Execute(subject);
+
+                    rule.Stop();
+
+                    handler.Log?.LogTrace(command, $"HID:{handler.Id}, Rollback Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
 
                 }, subject.Token));
 
