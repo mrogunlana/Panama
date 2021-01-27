@@ -1,23 +1,19 @@
-﻿using Panama.Core.Entities;
-using Panama.Core.IoC;
-using Panama.Core.Logger;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Panama.Core.Commands
 {
     public static class HandlerExtensions
     {
-        public static List<Task> ToCommandTasks(this IHandler handler)
+        public static List<Action> ToCommandActions(this IHandler handler)
         {
-            var result = new List<Task>();
+            var result = new List<Action>();
             var subject = new Subject(handler.Data, handler.Token);
 
             foreach (var command in handler.Commands)
-                result.Add(Task.Run(async () => {
+                result.Add(async () => { 
 
                     var rule = new Stopwatch();
 
@@ -43,19 +39,19 @@ namespace Panama.Core.Commands
 
                     handler.Log?.LogTrace(command, $"HID:{handler.Id}, Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
 
-                }, subject.Token));
+                });
 
             return result;
 
         }
 
-        public static List<Task> ToRollbackTasks(this IHandler handler)
+        public static List<Action> ToRollbackActions(this IHandler handler)
         {
-            var result = new List<Task>();
+            var result = new List<Action>();
             var subject = new Subject(handler.Data, handler.Token);
 
             foreach (var command in handler.RollbackCommands)
-                result.Add(Task.Run(async () => {
+                result.Add(async () => {
 
                     var rule = new Stopwatch();
 
@@ -71,7 +67,7 @@ namespace Panama.Core.Commands
 
                     handler.Log?.LogTrace(command, $"HID:{handler.Id}, Rollback Command: {command.GetType().Name} Processed in [{rule.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
 
-                }, subject.Token));
+                });
 
             return result;
 

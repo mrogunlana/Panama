@@ -19,6 +19,7 @@ namespace Panama.Core.Commands
         List<IValidation> Validators { get; set; }
         CancellationToken Token { get; set; }
         IHandler Command<Command>();
+        IHandler Rollback<Rollback>();
         IHandler Validate<Validator>() where Validator : IValidation;
         IHandler Add(IModel data);
         IHandler Add(params IModel[] data);

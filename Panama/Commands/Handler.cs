@@ -27,6 +27,7 @@ namespace Panama.Core.Commands
         {
             Data = new List<IModel>();
             Commands = new List<object>();
+            RollbackCommands = new List<object>();
             Validators = new List<IValidation>();
             Token = new CancellationToken();
             ServiceLocator = locator;
@@ -63,10 +64,11 @@ namespace Panama.Core.Commands
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
 
-                var tasks = this.ToCommandTasks();
+                var actions = this.ToCommandActions();
 
-                foreach (var task in tasks)
-                    task.ConfigureAwait(false)
+                foreach (var action in actions)
+                    Task.Run(action)
+                        .ConfigureAwait(false)
                         .GetAwaiter()
                         .GetResult();
             }
@@ -102,10 +104,11 @@ namespace Panama.Core.Commands
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{RollbackCommands.Count}] Rollback Commands Queued.");
 
-                var tasks = this.ToRollbackTasks();
+                var actions = this.ToRollbackActions();
 
-                foreach (var task in tasks)
-                    task.ConfigureAwait(false)
+                foreach (var action in actions)
+                    Task.Run(action)
+                        .ConfigureAwait(false)
                         .GetAwaiter()
                         .GetResult();
             }
@@ -140,18 +143,24 @@ namespace Panama.Core.Commands
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
 
-                var tasks = this.ToCommandTasks();
+                var actions = this.ToCommandActions();
 
                 switch (_processing)
                 {
                     case Execution.Serial:
-
-                        foreach (var task in tasks)
-                            await task;
+                        
+                        foreach (var action in actions)
+                            await Task
+                                .Run(action, Token)
+                                .ConfigureAwait(false);
 
                         break;
 
                     case Execution.Parallel:
+
+                        var tasks = new List<Task>();
+                        foreach (var action in actions)
+                            tasks.Add(Task.Run(action, Token));
 
                         Task.WhenAll(tasks).Wait(Token);
 
@@ -202,18 +211,24 @@ namespace Panama.Core.Commands
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
 
-                var tasks = this.ToRollbackTasks();
+                var actions = this.ToRollbackActions();
 
                 switch (_processing)
                 {
                     case Execution.Serial:
 
-                        foreach (var task in tasks)
-                            await task;
+                        foreach (var action in actions)
+                            await Task
+                                .Run(action, Token)
+                                .ConfigureAwait(false);
 
                         break;
 
                     case Execution.Parallel:
+
+                        var tasks = new List<Task>();
+                        foreach (var action in actions)
+                            tasks.Add(Task.Run(action, Token));
 
                         Task.WhenAll(tasks).Wait(Token);
 
@@ -284,9 +299,9 @@ namespace Panama.Core.Commands
 
         public IHandler Command<Command>()
         {
-            if (typeof(Command) is ICommand)
+            if (typeof(Command).GetInterfaces().Contains(typeof(ICommand)))
                 Commands.Add(ServiceLocator.Resolve<ICommand>(typeof(Command).Name));
-            else if (typeof(Command) is ICommandAsync)
+            else if (typeof(Command).GetInterfaces().Contains(typeof(ICommandAsync)))
                 Commands.Add(ServiceLocator.Resolve<ICommandAsync>(typeof(Command).Name));
             else
                 throw new ArgumentException($"Command type(s): {string.Join(',', typeof(Command)?.GetInterfaces()?.Select(x => x.Name))} are not compatible with supported ICommand and ICommandAsync Interfaces.");
@@ -296,7 +311,7 @@ namespace Panama.Core.Commands
 
         public IHandler Rollback<Rollback>()
         {
-            if (typeof(Rollback) is IRollback)
+            if (typeof(Rollback).GetInterfaces().Contains(typeof(IRollback)))
                 RollbackCommands.Add(ServiceLocator.Resolve<IRollback>(typeof(Rollback).Name));
             else
                 throw new ArgumentException($"Rollback type(s): {string.Join(',', typeof(Rollback)?.GetInterfaces()?.Select(x => x.Name))} are not compatible with supported the IRollback Interface.");
@@ -342,7 +357,7 @@ namespace Panama.Core.Commands
                         if (!validator.IsValid(subject))
                             result.AddMessage(validator.Message(subject));
 
-                    }, Token);
+                    }, Token).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

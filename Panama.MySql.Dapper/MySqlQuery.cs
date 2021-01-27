@@ -19,6 +19,7 @@ using Panama.Core.MySql.Dapper.Interfaces;
 
 namespace Panama.Core.MySql.Dapper
 {
+    //todo: expose Task on CRUD ops now that Panama supports async commands
     public class MySqlQuery : IMySqlQuery
     {
         private readonly ILog _log;
