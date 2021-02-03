@@ -53,7 +53,7 @@ namespace Panama.Core.Commands
             return result;
         }
 
-        private IResult Run()
+        private IResult Run(List<Action> actions)
         {
             var handler = new Stopwatch();
             var rule = new Stopwatch();
@@ -63,8 +63,6 @@ namespace Panama.Core.Commands
                 handler.Start();
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
-
-                var actions = this.ToCommandActions();
 
                 foreach (var action in actions)
                     Task.Run(action)
@@ -93,47 +91,7 @@ namespace Panama.Core.Commands
             return new Result() { Success = true, Data = Data };
         }
 
-        private IResult Rollback()
-        {
-            var handler = new Stopwatch();
-            var rule = new Stopwatch();
-            var subject = new Subject(Data, Token);
-            try
-            {
-                handler.Start();
-
-                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{RollbackCommands.Count}] Rollback Commands Queued.");
-
-                var actions = this.ToRollbackActions();
-
-                foreach (var action in actions)
-                    Task.Run(action)
-                        .ConfigureAwait(false)
-                        .GetAwaiter()
-                        .GetResult();
-            }
-            catch (Exception ex)
-            {
-                Log?.LogException<Handler>(ex);
-
-                var result = new Result()
-                {
-                    Success = false
-                };
-                result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
-                return result;
-            }
-            finally
-            {
-                handler.Stop();
-
-                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
-            }
-
-            return new Result() { Success = true, Data = Data };
-        }
-
-        private async Task<IResult> RunAsync()
+        private async Task<IResult> RunAsync(List<Action> actions)
         {
             var handler = new Stopwatch();
 
@@ -142,8 +100,6 @@ namespace Panama.Core.Commands
                 handler.Start();
 
                 Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
-
-                var actions = this.ToCommandActions();
 
                 switch (_processing)
                 {
@@ -188,73 +144,6 @@ namespace Panama.Core.Commands
                 else
                     result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
                 
-                return result;
-            }
-            finally
-            {
-                handler.Stop();
-
-                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Complete: [{handler.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
-            }
-
-            return new Result() { Success = true, Data = Data };
-        }
-
-        private async Task<IResult> RollbackAsync()
-        {
-            var handler = new Stopwatch();
-
-            try
-            {
-                handler.Start();
-
-                Log?.LogTrace<Handler>($"Handler (HID:{Id.ToString()}) Start: [{Commands.Count}] Commands Queued.");
-
-                var actions = this.ToRollbackActions();
-
-                switch (_processing)
-                {
-                    case Execution.Serial:
-
-                        foreach (var action in actions)
-                            await Task.Run(action, Token)
-                                .ConfigureAwait(false);
-
-                        break;
-
-                    case Execution.Parallel:
-
-                        var tasks = new List<Task>();
-                        foreach (var action in actions)
-                            tasks.Add(Task.Run(action, Token));
-
-                        await Task.WhenAll(tasks);
-
-                        break;
-
-                    default:
-
-                        throw new Exception($"The execution type for the handler is not found: {_processing}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log?.LogException<Handler>(ex);
-
-                var result = new Result()
-                {
-                    Success = false
-                };
-
-                result.Cancelled = (ex is OperationCanceledException ||
-                                    ex is TaskCanceledException ||
-                                    Token.IsCancellationRequested);
-
-                if (result.Cancelled)
-                    result.AddMessage($"HID:{Id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
-                else
-                    result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
-
                 return result;
             }
             finally
@@ -377,11 +266,11 @@ namespace Panama.Core.Commands
             if (!result.Success)
                 return result;
 
-            result = Run();
+            result = Run(this.ToCommandActions());
             if (result.Success) 
                 return result;
 
-            var rollback = Rollback();
+            var rollback = Run(this.ToRollbackActions());
             foreach (var message in rollback.Messages)
                 result.AddMessage(message);
 
@@ -394,11 +283,11 @@ namespace Panama.Core.Commands
             if (!result.Success)
                 return result;
 
-            result = await RunAsync();
+            result = await RunAsync(this.ToCommandActions());
             if (result.Success)
                 return result;
 
-            var rollback = await RollbackAsync();
+            var rollback = await RunAsync(this.ToRollbackActions());
             foreach (var message in rollback.Messages)
                 result.AddMessage(message);
 
