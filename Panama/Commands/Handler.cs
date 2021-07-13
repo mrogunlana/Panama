@@ -74,11 +74,13 @@ namespace Panama.Core.Commands
             {
                 Log?.LogException<Handler>(ex);
 
-                var result = new Result()
-                {
-                    Success = false
-                };
-                result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
+                var result = new Result() { Success = false, Data = Data };
+
+                if (ex is ValidationException)
+                    result.AddMessages(((ValidationException)ex).Messages);
+                else
+                    result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
+
                 return result;
             }
             finally
@@ -130,16 +132,15 @@ namespace Panama.Core.Commands
             {
                 Log?.LogException<Handler>(ex);
 
-                var result = new Result()
-                {
-                    Success = false
-                };
+                var result = new Result() { Success = false, Data = Data };
 
                 result.Cancelled = (ex is OperationCanceledException ||
                                     ex is TaskCanceledException ||
                                     Token.IsCancellationRequested);
-                
-                if (result.Cancelled)
+
+                if (ex is ValidationException)
+                    result.AddMessages(((ValidationException)ex).Messages);
+                else if (result.Cancelled)
                     result.AddMessage($"HID:{Id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
                     result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");

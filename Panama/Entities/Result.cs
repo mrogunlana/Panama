@@ -50,6 +50,12 @@ namespace Panama.Core.Entities
             _messages.Add(message);
         }
 
+        public void AddMessages(IEnumerable<string> messages)
+        {
+            foreach (var message in messages)
+                _messages.Add(message);
+        }
+
         [DataMember]
         public bool Success { get; set; }
 
