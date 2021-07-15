@@ -78,6 +78,8 @@ namespace Panama.Core.Commands
 
                 if (ex is ValidationException)
                     result.AddMessages(((ValidationException)ex).Messages);
+                else if (ex is ServiceException)
+                    result.AddMessages(((ServiceException)ex).Messages);
                 else
                     result.AddMessage($"HID:{Id.ToString()}, Looks like there was a problem with your request.");
 
@@ -140,6 +142,8 @@ namespace Panama.Core.Commands
 
                 if (ex is ValidationException)
                     result.AddMessages(((ValidationException)ex).Messages);
+                else if (ex is ServiceException)
+                    result.AddMessages(((ServiceException)ex).Messages);
                 else if (result.Cancelled)
                     result.AddMessage($"HID:{Id.ToString()}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
