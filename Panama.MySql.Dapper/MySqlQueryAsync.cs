@@ -355,6 +355,9 @@ namespace Panama.Core.MySql.Dapper
                                         case "int":
                                             parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
                                             break;
+                                        case "bigint":
+                                            parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -487,6 +490,9 @@ namespace Panama.Core.MySql.Dapper
                                             break;
                                         case "int":
                                             parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                            break;
+                                        case "bigint":
+                                            parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
                                             break;
                                         default:
                                             throw new NotImplementedException();

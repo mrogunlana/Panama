@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>2.0.3</Version>
+    <Version>2.0.5</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company />
     <Product>Panama.Core.MySql.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Added log tracing in all MySqlQuery functions</PackageReleaseNotes>
+    <PackageReleaseNotes>Adding bigint support for InsertBatch in MySqlQuery and MySqlQueryAsync</PackageReleaseNotes>
     <Copyright>2021</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Panama.Core.MySql.Dapper</PackageId>
-    <AssemblyVersion>2.0.3.0</AssemblyVersion>
-    <FileVersion>2.0.3.0</FileVersion>
+    <AssemblyVersion>2.0.5.0</AssemblyVersion>
+    <FileVersion>2.0.5.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

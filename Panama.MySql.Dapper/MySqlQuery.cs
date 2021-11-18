@@ -69,7 +69,7 @@ namespace Panama.Core.MySql.Dapper
 
                 mysql.Open();
 
-                result = mysql.QueryAsync<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token)).GetAwaiter().GetResult().ToList();
+                result = mysql.QueryAsync<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout)).GetAwaiter().GetResult().ToList();
 
                 mysql.Close();
             }
@@ -149,7 +149,7 @@ namespace Panama.Core.MySql.Dapper
                 {
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                     var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
-                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token);
+                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
                     _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -208,7 +208,7 @@ namespace Panama.Core.MySql.Dapper
                     foreach (var parameter in definition.Dictionary)
                         parameters.Add(parameter.Key, parameter.Value);
 
-                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
+                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
                     _log.LogTrace<MySqlQuery>($"UPDATE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -237,6 +237,8 @@ namespace Panama.Core.MySql.Dapper
             gist.Sql = $"select * from `{ _sql.Configuration.GetMap<T>().TableName }` where {properties}";
             gist.Token = definition.Token;
             gist.Parameters = definition.Parameters;
+            gist.CommandTimeout = definition.CommandTimeout;
+            gist.Connection = definition.Connection;
 
             var exist = Get<T>(gist);
             if (exist.Count == 0)
@@ -330,7 +332,7 @@ namespace Panama.Core.MySql.Dapper
                     foreach (var parameter in definition.Dictionary)
                         parameters.Add(parameter.Key, parameter.Value);
 
-                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token);
+                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
                     _log.LogTrace<MySqlQuery>($"DELETE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -376,7 +378,7 @@ namespace Panama.Core.MySql.Dapper
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
                 mysql.Open();
-                mysql.ExecuteAsync(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token)).GetAwaiter().GetResult();
+                mysql.ExecuteAsync(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout)).GetAwaiter().GetResult();
                 mysql.Close();
             }
         }
@@ -431,7 +433,7 @@ namespace Panama.Core.MySql.Dapper
 
                 c.Open();
 
-                result = c.ExecuteScalarAsync<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token)).GetAwaiter().GetResult();
+                result = c.ExecuteScalarAsync<T>(new CommandDefinition(definition.Sql, definition.Parameters, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout)).GetAwaiter().GetResult();
 
                 c.Close();
             }
@@ -526,6 +528,9 @@ namespace Panama.Core.MySql.Dapper
                                         break;
                                     case "int":
                                         parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                        break;
+                                    case "bigint":
+                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
                                         break;
                                     default:
                                         throw new NotImplementedException();
@@ -657,6 +662,9 @@ namespace Panama.Core.MySql.Dapper
                                         break;
                                     case "int":
                                         parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                        break;
+                                    case "bigint":
+                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
                                         break;
                                     default:
                                         throw new NotImplementedException();
