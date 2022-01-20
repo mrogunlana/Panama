@@ -10,6 +10,7 @@ using Panama.Core.IoC;
 using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.MySql.Dapper;
+using Panama.Core.MySql.Dapper.Commands;
 using Panama.Core.MySql.Dapper.Interfaces;
 using Panama.Core.Tests.Commands;
 using Panama.Core.Tests.Models;
@@ -294,5 +295,126 @@ namespace Panama.Core.Tests
             Assert.IsNotNull(user);
         }
 
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForSuccessCase()
+        {
+            var ID = Guid.NewGuid();
+
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var response = await new Handler(ServiceLocator.Current)
+                    .Add(new User()
+                    {
+                        ID = ID,
+                        Email = "test@test.com",
+                        FirstName = "John_UPDATED",
+                        LastName = "Doe"
+                    })
+                    .Command<InsertCommand>()
+                    .Command<InsertCommandSomeBatchRandomUsers>()
+                    .InvokeAsync();
+
+                if (response.Success)
+                    scope.Complete();
+            }
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(user);
+        }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForRollbackCase()
+        {
+            var ID = Guid.NewGuid();
+
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var response = await new Handler(ServiceLocator.Current)
+                    .Add(new User()
+                    {
+                        ID = ID,
+                        Email = "test@test.com",
+                        FirstName = "John_UPDATED",
+                        LastName = "Doe"
+                    })
+                    .Command<InsertCommand>()
+                    .Command<InsertCommandSomeBatchRandomUsers>()
+                    .Command<InsertCommandWithRunTimeException>()
+                    .InvokeAsync();
+
+                if (response.Success)
+                    scope.Complete();
+            }
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNull(user);
+        }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForSuccessCaseUsingNewTransactionHandler()
+        {
+            var ID = Guid.NewGuid();
+
+            await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<InsertCommandSomeBatchRandomUsers>()
+                .InvokeAsync();
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(user);
+        }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForRollbackCaseUsingNewTransactionHandler()
+        {
+            var ID = Guid.NewGuid();
+
+            await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<InsertCommandSomeBatchRandomUsers>()
+                .Command<InsertCommandWithRunTimeException>()
+                .InvokeAsync();
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNull(user);
+        }
     }
 }

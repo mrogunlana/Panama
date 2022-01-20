@@ -35,7 +35,7 @@ namespace Panama.Core.Commands
             Log = ServiceLocator.Resolve<ILog>();
         }
 
-        private IResult Validate()
+        protected virtual IResult Validate()
         {
             var result = new Result();
             var subject = new Subject(Data, Token);
@@ -53,7 +53,7 @@ namespace Panama.Core.Commands
             return result;
         }
 
-        private IResult Run(List<Action> actions)
+        protected virtual IResult Run(List<Action> actions)
         {
             var handler = new Stopwatch();
             var rule = new Stopwatch();
@@ -95,7 +95,7 @@ namespace Panama.Core.Commands
             return new Result() { Success = true, Data = Data };
         }
 
-        private async Task<IResult> RunAsync(List<Action> actions)
+        protected virtual async Task<IResult> RunAsync(List<Action> actions)
         {
             var handler = new Stopwatch();
 
@@ -232,7 +232,7 @@ namespace Panama.Core.Commands
             return this;
         }
 
-        private async Task<IResult> ValidateAsync()
+        protected virtual async Task<IResult> ValidateAsync()
         {
             var result = new Result();
             var messages = new List<string>();

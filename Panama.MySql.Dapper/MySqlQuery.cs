@@ -145,19 +145,13 @@ namespace Panama.Core.MySql.Dapper
             {
                 c.Open();
 
-                //using (var transaction = c.BeginTransaction())
-                //{
-                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
-                    var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
-                    //var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
-                    var command = new CommandDefinition(sql, obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
+                var command = new CommandDefinition(sql, obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
-                    _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+                _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
-                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
-                    //if (!definition.Token.IsCancellationRequested)
-                    //    transaction.Commit();
-                //}
+                c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
             }
         }
 
@@ -195,28 +189,23 @@ namespace Panama.Core.MySql.Dapper
             {
                 c.Open();
 
-                using (var transaction = c.BeginTransaction())
-                {
-                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
-                    var sql = _sql.Update(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
-                    var parameters = new DynamicParameters();
-                    var map = _sql.Configuration.GetMap<T>();
-                    var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
-                    
-                    foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
-                        parameters.Add(property.Key, property.Value);
+                //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                var sql = _sql.Update(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
+                var parameters = new DynamicParameters();
+                var map = _sql.Configuration.GetMap<T>();
+                var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
 
-                    foreach (var parameter in definition.Dictionary)
-                        parameters.Add(parameter.Key, parameter.Value);
+                foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
+                    parameters.Add(property.Key, property.Value);
 
-                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                foreach (var parameter in definition.Dictionary)
+                    parameters.Add(parameter.Key, parameter.Value);
 
-                    _log.LogTrace<MySqlQuery>($"UPDATE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+                var command = new CommandDefinition(sql, parameters, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
-                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
-                    if (!definition.Token.IsCancellationRequested)
-                        transaction.Commit();
-                }
+                _log.LogTrace<MySqlQuery>($"UPDATE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+
+                c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
             }
         }
 
@@ -319,28 +308,23 @@ namespace Panama.Core.MySql.Dapper
             {
                 c.Open();
 
-                using (var transaction = c.BeginTransaction())
-                {
-                    //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
-                    var sql = _sql.Delete(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
-                    var parameters = new DynamicParameters();
-                    var map = _sql.Configuration.GetMap<T>();
-                    var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
+                //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
+                var sql = _sql.Delete(_sql.Configuration.GetMap<T>(), definition.Predicate, definition.Dictionary);
+                var parameters = new DynamicParameters();
+                var map = _sql.Configuration.GetMap<T>();
+                var columns = map.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity));
 
-                    foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
-                        parameters.Add(property.Key, property.Value);
+                foreach (var property in ReflectionHelper.GetObjectValues(obj).Where(property => columns.Any(c => c.Name == property.Key)))
+                    parameters.Add(property.Key, property.Value);
 
-                    foreach (var parameter in definition.Dictionary)
-                        parameters.Add(parameter.Key, parameter.Value);
+                foreach (var parameter in definition.Dictionary)
+                    parameters.Add(parameter.Key, parameter.Value);
 
-                    var command = new CommandDefinition(sql, parameters, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                var command = new CommandDefinition(sql, parameters, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
-                    _log.LogTrace<MySqlQuery>($"DELETE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+                _log.LogTrace<MySqlQuery>($"DELETE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
-                    var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
-                    if (!definition.Token.IsCancellationRequested)
-                        transaction.Commit();
-                }
+                var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
             }
         }
 
@@ -448,129 +432,119 @@ namespace Panama.Core.MySql.Dapper
             {
                 connection.Open();
 
-                using (var transaction = connection.BeginTransaction())
+                try
                 {
-                    try
+                    var map = _sql?.Configuration?.GetMap<T>();
+                    if (map == null)
+                        throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
+
+                    var name = map.TableName;
+                    var table = models.ToDataTable();
+                    if (table.Rows.Count == 0)
+                        return;
+
+                    var builder = new StringBuilder();
+                    builder.Append("SELECT TABLE_NAME");
+                    builder.Append(", COLUMN_NAME");
+                    builder.Append(", DATA_TYPE");
+                    builder.Append(", CHARACTER_MAXIMUM_LENGTH");
+                    builder.Append(", CHARACTER_OCTET_LENGTH");
+                    builder.Append(", NUMERIC_PRECISION");
+                    builder.Append(", NUMERIC_SCALE AS SCALE");
+                    builder.Append(", COLUMN_DEFAULT");
+                    builder.Append(", IS_NULLABLE");
+                    builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
+                    builder.Append(" WHERE TABLE_NAME = @Table");
+
+                    var schema = new List<Schema>();
+
+                    //get table schema (e.g. names and datatypes for mapping)
+                    using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), connection))
                     {
-                        var map = _sql?.Configuration?.GetMap<T>();
-                        if (map == null)
-                            throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
+                        var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                        parameter.Value = map.TableName;
+                        parameter.ParameterName = "@Table";
+                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
 
-                        var name = map.TableName;
-                        var table = models.ToDataTable();
-                        if (table.Rows.Count == 0)
-                            return;
+                        command.Parameters.Add(parameter);
 
-                        var builder = new StringBuilder();
-                        builder.Append("SELECT TABLE_NAME");
-                        builder.Append(", COLUMN_NAME");
-                        builder.Append(", DATA_TYPE");
-                        builder.Append(", CHARACTER_MAXIMUM_LENGTH");
-                        builder.Append(", CHARACTER_OCTET_LENGTH");
-                        builder.Append(", NUMERIC_PRECISION");
-                        builder.Append(", NUMERIC_SCALE AS SCALE");
-                        builder.Append(", COLUMN_DEFAULT");
-                        builder.Append(", IS_NULLABLE");
-                        builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
-                        builder.Append(" WHERE TABLE_NAME = @Table");
+                        using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
+                        {
+                            var result = new DataTable();
+                            var parameters = map.Properties
+                                .Where(x => x.Ignored == false)
+                                .Where(x => x.IsReadOnly == false)
+                                .Where(x => x.KeyType == KeyType.NotAKey);
 
-                        var schema = new List<Schema>();
-                        
-                        //get table schema (e.g. names and datatypes for mapping)
-                        using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), connection))
+                            sql.Fill(result);
+
+                            schema = (from p in parameters
+                                      join s in result.AsEnumerable() on p.ColumnName equals s.Field<string>("COLUMN_NAME")
+                                      select new Schema()
+                                      {
+                                          ColumnName = s.Field<string>("COLUMN_NAME"),
+                                          DataType = s.Field<string>("DATA_TYPE"),
+                                          Size = s.Field<object>("CHARACTER_OCTET_LENGTH")
+                                      }).ToList();
+                        }
+                    }
+
+                    using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", connection))
+                    {
+                        command.UpdatedRowSource = UpdateRowSource.None;
+
+                        foreach (var type in schema)
                         {
                             var parameter = new MySqlData.MySqlClient.MySqlParameter();
-                            parameter.Value = map.TableName;
-                            parameter.ParameterName = "@Table";
-                            parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                            parameter.ParameterName = $"@{type.ColumnName}";
+                            parameter.SourceColumn = type.ColumnName;
+
+                            switch (type.DataType.ToLower())
+                            {
+                                case "varchar":
+                                case "char":
+                                case "text":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                                    parameter.Size = Int32.Parse(type.Size.ToString());
+                                    break;
+                                case "datetime":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
+                                    break;
+                                case "int":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                    break;
+                                case "bigint":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                            }
 
                             command.Parameters.Add(parameter);
-
-                            using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
-                            {
-                                var result = new DataTable();
-                                var parameters = map.Properties
-                                    .Where(x => x.Ignored == false)
-                                    .Where(x => x.IsReadOnly == false)
-                                    .Where(x => x.KeyType == KeyType.NotAKey);
-
-                                sql.Fill(result);
-
-                                schema = (from p in parameters
-                                            join s in result.AsEnumerable() on p.ColumnName equals s.Field<string>("COLUMN_NAME")
-                                            select new Schema() {
-                                                ColumnName = s.Field<string>("COLUMN_NAME"),
-                                                DataType = s.Field<string>("DATA_TYPE"),
-                                                Size = s.Field<object>("CHARACTER_OCTET_LENGTH")
-                                            }).ToList();
-                            }
                         }
 
-                        using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", connection))
+                        using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
                         {
-                            command.UpdatedRowSource = UpdateRowSource.None;
+                            adapter.InsertCommand = command;
 
-                            foreach (var type in schema)
-                            {
-                                var parameter = new MySqlData.MySqlClient.MySqlParameter();
-                                parameter.ParameterName = $"@{type.ColumnName}";
-                                parameter.SourceColumn = type.ColumnName;
-                                
-                                switch (type.DataType.ToLower())
-                                {
-                                    case "varchar":
-                                    case "char":
-                                    case "text":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
-                                        parameter.Size = Int32.Parse(type.Size.ToString());
-                                        break;
-                                    case "datetime":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
-                                        break;
-                                    case "int":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
-                                        break;
-                                    case "bigint":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
-                                        break;
-                                    default:
-                                        throw new NotImplementedException();
-                                }
+                            var timer = Stopwatch.StartNew();
 
-                                command.Parameters.Add(parameter);
-                            }
+                            _log.LogTrace<MySqlQuery>($"Bulk Insert on {name}. {models.Count} rows queued for insert.");
 
-                            using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
-                            {
-                                adapter.InsertCommand = command;
-                                
-                                var timer = Stopwatch.StartNew();
+                            timer.Start();
 
-                                _log.LogTrace<MySqlQuery>($"Bulk Insert on {name}. {models.Count} rows queued for insert.");
+                            if (batch > 0)
+                                adapter.UpdateBatchSize = 100;
 
-                                timer.Start();
+                            adapter.Update(table);
 
-                                if (batch > 0)
-                                    adapter.UpdateBatchSize = 100;
-
-                                adapter.Update(table);
-
-                                transaction.Commit();
-
-                                _log.LogTrace<MySqlQuery>($"Bulk Insert on {name} complete in: {timer.Elapsed.ToString(@"hh\:mm\:ss\:fff")}");
-                            }
+                            _log.LogTrace<MySqlQuery>($"Bulk Insert on {name} complete in: {timer.Elapsed.ToString(@"hh\:mm\:ss\:fff")}");
                         }
                     }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-
-                        throw;
-                    }
-                    finally
-                    {
-                        connection.Close();
-                    }
+                }
+                finally
+                {
+                    connection.Close();
                 }
             }
         }
@@ -581,130 +555,119 @@ namespace Panama.Core.MySql.Dapper
             {
                 c.Open();
 
-                using (var transaction = c.BeginTransaction())
+                try
                 {
-                    try
+                    var map = _sql?.Configuration?.GetMap<T>();
+                    if (map == null)
+                        throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
+
+                    var name = map.TableName;
+                    var table = models.ToDataTable();
+                    if (table.Rows.Count == 0)
+                        return;
+
+                    var builder = new StringBuilder();
+                    builder.Append("SELECT TABLE_NAME");
+                    builder.Append(", COLUMN_NAME");
+                    builder.Append(", DATA_TYPE");
+                    builder.Append(", CHARACTER_MAXIMUM_LENGTH");
+                    builder.Append(", CHARACTER_OCTET_LENGTH");
+                    builder.Append(", NUMERIC_PRECISION");
+                    builder.Append(", NUMERIC_SCALE AS SCALE");
+                    builder.Append(", COLUMN_DEFAULT");
+                    builder.Append(", IS_NULLABLE");
+                    builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
+                    builder.Append(" WHERE TABLE_NAME = @Table");
+
+                    var schema = new List<Schema>();
+
+                    //get table schema (e.g. names and datatypes for mapping)
+                    using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), c))
                     {
-                        var map = _sql?.Configuration?.GetMap<T>();
-                        if (map == null)
-                            throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
+                        var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                        parameter.Value = map.TableName;
+                        parameter.ParameterName = "@Table";
+                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
 
-                        var name = map.TableName;
-                        var table = models.ToDataTable();
-                        if (table.Rows.Count == 0)
-                            return;
+                        command.Parameters.Add(parameter);
 
-                        var builder = new StringBuilder();
-                        builder.Append("SELECT TABLE_NAME");
-                        builder.Append(", COLUMN_NAME");
-                        builder.Append(", DATA_TYPE");
-                        builder.Append(", CHARACTER_MAXIMUM_LENGTH");
-                        builder.Append(", CHARACTER_OCTET_LENGTH");
-                        builder.Append(", NUMERIC_PRECISION");
-                        builder.Append(", NUMERIC_SCALE AS SCALE");
-                        builder.Append(", COLUMN_DEFAULT");
-                        builder.Append(", IS_NULLABLE");
-                        builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
-                        builder.Append(" WHERE TABLE_NAME = @Table");
+                        using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
+                        {
+                            var result = new DataTable();
+                            var parameters = map.Properties
+                                .Where(x => x.Ignored == false)
+                                .Where(x => x.IsReadOnly == false)
+                                .Where(x => x.KeyType == KeyType.NotAKey);
 
-                        var schema = new List<Schema>();
+                            sql.Fill(result);
 
-                        //get table schema (e.g. names and datatypes for mapping)
-                        using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), c))
+                            schema = (from p in parameters
+                                      join s in result.AsEnumerable() on p.ColumnName equals s.Field<string>("COLUMN_NAME")
+                                      select new Schema()
+                                      {
+                                          ColumnName = s.Field<string>("COLUMN_NAME"),
+                                          DataType = s.Field<string>("DATA_TYPE"),
+                                          Size = s.Field<object>("CHARACTER_OCTET_LENGTH")
+                                      }).ToList();
+                        }
+                    }
+
+                    using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
+                    {
+                        command.UpdatedRowSource = UpdateRowSource.None;
+
+                        foreach (var type in schema)
                         {
                             var parameter = new MySqlData.MySqlClient.MySqlParameter();
-                            parameter.Value = map.TableName;
-                            parameter.ParameterName = "@Table";
-                            parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                            parameter.ParameterName = $"@{type.ColumnName}";
+                            parameter.SourceColumn = type.ColumnName;
+
+                            switch (type.DataType.ToLower())
+                            {
+                                case "varchar":
+                                case "char":
+                                case "text":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                                    parameter.Size = Int32.Parse(type.Size.ToString());
+                                    break;
+                                case "datetime":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
+                                    break;
+                                case "int":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                    break;
+                                case "bigint":
+                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                            }
 
                             command.Parameters.Add(parameter);
-
-                            using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
-                            {
-                                var result = new DataTable();
-                                var parameters = map.Properties
-                                    .Where(x => x.Ignored == false)
-                                    .Where(x => x.IsReadOnly == false)
-                                    .Where(x => x.KeyType == KeyType.NotAKey);
-
-                                sql.Fill(result);
-
-                                schema = (from p in parameters
-                                          join s in result.AsEnumerable() on p.ColumnName equals s.Field<string>("COLUMN_NAME")
-                                          select new Schema()
-                                          {
-                                              ColumnName = s.Field<string>("COLUMN_NAME"),
-                                              DataType = s.Field<string>("DATA_TYPE"),
-                                              Size = s.Field<object>("CHARACTER_OCTET_LENGTH")
-                                          }).ToList();
-                            }
                         }
 
-                        using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
+                        using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
                         {
-                            command.UpdatedRowSource = UpdateRowSource.None;
+                            adapter.InsertCommand = command;
 
-                            foreach (var type in schema)
-                            {
-                                var parameter = new MySqlData.MySqlClient.MySqlParameter();
-                                parameter.ParameterName = $"@{type.ColumnName}";
-                                parameter.SourceColumn = type.ColumnName;
+                            var timer = Stopwatch.StartNew();
 
-                                switch (type.DataType.ToLower())
-                                {
-                                    case "varchar":
-                                    case "char":
-                                    case "text":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
-                                        parameter.Size = Int32.Parse(type.Size.ToString());
-                                        break;
-                                    case "datetime":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
-                                        break;
-                                    case "int":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
-                                        break;
-                                    case "bigint":
-                                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
-                                        break;
-                                    default:
-                                        throw new NotImplementedException();
-                                }
+                            _log.LogTrace<MySqlQuery>($"Bulk Insert on {name}. {models.Count} rows queued for insert.");
 
-                                command.Parameters.Add(parameter);
-                            }
+                            timer.Start();
 
-                            using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
-                            {
-                                adapter.InsertCommand = command;
+                            if (batch > 0)
+                                adapter.UpdateBatchSize = 100;
 
-                                var timer = Stopwatch.StartNew();
+                            adapter.Update(table);
 
-                                _log.LogTrace<MySqlQuery>($"Bulk Insert on {name}. {models.Count} rows queued for insert.");
-
-                                timer.Start();
-
-                                if (batch > 0)
-                                    adapter.UpdateBatchSize = 100;
-
-                                adapter.Update(table);
-
-                                transaction.Commit();
-
-                                _log.LogTrace<MySqlQuery>($"Bulk Insert on {name} complete in: {timer.Elapsed.ToString(@"hh\:mm\:ss\:fff")}");
-                            }
+                            _log.LogTrace<MySqlQuery>($"Bulk Insert on {name} complete in: {timer.Elapsed.ToString(@"hh\:mm\:ss\:fff")}");
                         }
                     }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-
-                        throw;
-                    }
-                    finally
-                    {
-                        c.Close();
-                    }
+                }
+                finally
+                {
+                    c.Close();
                 }
             }
         }
