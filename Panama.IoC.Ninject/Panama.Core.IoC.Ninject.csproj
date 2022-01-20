@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>Upgraded to .NET Core 3.1 For LTS</PackageReleaseNotes>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>Updated internal dependencies</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Panama.Core" Version="1.0.7" />
+    <PackageReference Include="Panama.Core" Version="2.0.7" />
   </ItemGroup>
 
 </Project>
