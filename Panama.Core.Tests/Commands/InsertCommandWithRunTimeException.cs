@@ -7,36 +7,35 @@ using Panama.Core.MySql.Dapper.Interfaces;
 using Panama.Core.MySql.Dapper.Models;
 using Panama.Core.Tests.Models;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests.Commands
 {
-    public class SelectByIdCommand : ICommand
+    public class InsertCommandWithRunTimeException : ICommand
     {
         private readonly IMySqlQuery _query;
 
-        public SelectByIdCommand(IMySqlQuery query)
+        public InsertCommandWithRunTimeException(IMySqlQuery query)
         {
             _query = query;
         }
         public void Execute(Subject subject)
         {
             var user = subject.Context.DataGetSingle<User>();
-            var ID = user?.ID;
-            if (ID == null)
-                ID = subject.Context.KvpGetSingle<System.Guid>("ID");
-
             var definition = new Definition();
 
-            definition.Sql = "select u.* from User u where u.ID = @ID;";
-            definition.Parameters = new { ID };
             definition.Token = subject.Token;
 
-            var result = _query.GetSingle<User>(definition);
+            var builder = new StringBuilder();
 
-            subject.Context.Remove(user);
-            subject.Context.Add(result);
+            builder.Append("insert into User (ID, FirstName) ");
+            builder.Append("value (@ID, 1); ");
+
+            _query.Execute(builder.ToString(), new {
+                ID = System.Guid.NewGuid()
+            });
         }
     }
 }

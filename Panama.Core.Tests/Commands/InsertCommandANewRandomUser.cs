@@ -12,31 +12,28 @@ using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests.Commands
 {
-    public class SelectByIdCommand : ICommand
+    public class InsertCommandANewRandomUser : ICommand
     {
         private readonly IMySqlQuery _query;
 
-        public SelectByIdCommand(IMySqlQuery query)
+        public InsertCommandANewRandomUser(IMySqlQuery query)
         {
             _query = query;
         }
         public void Execute(Subject subject)
         {
-            var user = subject.Context.DataGetSingle<User>();
-            var ID = user?.ID;
-            if (ID == null)
-                ID = subject.Context.KvpGetSingle<System.Guid>("ID");
-
+            var ID = System.Guid.NewGuid();
+            var user = new User() {
+                ID = ID,
+                Email = $"test.{ID.ToString().Replace("-", "")}@test.com",
+                FirstName = "test",
+                LastName = "test"
+            };
             var definition = new Definition();
 
-            definition.Sql = "select u.* from User u where u.ID = @ID;";
-            definition.Parameters = new { ID };
             definition.Token = subject.Token;
 
-            var result = _query.GetSingle<User>(definition);
-
-            subject.Context.Remove(user);
-            subject.Context.Add(result);
+            _query.Insert(user, definition);
         }
     }
 }

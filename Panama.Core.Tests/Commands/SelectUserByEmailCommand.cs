@@ -12,25 +12,21 @@ using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests.Commands
 {
-    public class SelectByIdCommand : ICommand
+    public class SelectUserByEmailCommand : ICommand
     {
         private readonly IMySqlQuery _query;
 
-        public SelectByIdCommand(IMySqlQuery query)
+        public SelectUserByEmailCommand(IMySqlQuery query)
         {
             _query = query;
         }
         public void Execute(Subject subject)
         {
             var user = subject.Context.DataGetSingle<User>();
-            var ID = user?.ID;
-            if (ID == null)
-                ID = subject.Context.KvpGetSingle<System.Guid>("ID");
-
             var definition = new Definition();
 
-            definition.Sql = "select u.* from User u where u.ID = @ID;";
-            definition.Parameters = new { ID };
+            definition.Sql = "select u.* from User u where u.Email = @Email;";
+            definition.Parameters = new { user.Email };
             definition.Token = subject.Token;
 
             var result = _query.GetSingle<User>(definition);

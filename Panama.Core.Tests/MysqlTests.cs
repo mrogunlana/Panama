@@ -19,6 +19,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
+using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests
 {
@@ -223,5 +225,74 @@ namespace Panama.Core.Tests
 
             Assert.IsNull(user);
         }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsForRollbackCase()
+        {
+            var ID = Guid.NewGuid();
+            
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var response = await new Handler(ServiceLocator.Current)
+                    .Add(new User() {
+                        ID = ID,
+                        Email = "test@test.com",
+                        FirstName = "John_UPDATED",
+                        LastName = "Doe"
+                    })
+                    .Command<InsertCommand>()
+                    .Command<InsertCommandANewRandomUser>()
+                    .Command<InsertCommandANewRandomUser>()
+                    .Command<InsertCommandANewRandomUser>()
+                    .Command<InsertCommandWithRunTimeException>()
+                    .InvokeAsync();
+
+                if (response.Success)
+                    scope.Complete();
+            }
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNull(user);
+        }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsForSuccessCase()
+        {
+            var ID = Guid.NewGuid();
+
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var response = await new Handler(ServiceLocator.Current)
+                    .Add(new User()
+                    {
+                        ID = ID,
+                        Email = "test@test.com",
+                        FirstName = "John_UPDATED",
+                        LastName = "Doe"
+                    })
+                    .Command<InsertCommand>()
+                    .Command<InsertCommandANewRandomUser>()
+                    .InvokeAsync();
+
+                if (response.Success)
+                    scope.Complete();
+            }
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(user);
+        }
+
     }
 }

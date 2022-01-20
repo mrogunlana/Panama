@@ -145,18 +145,19 @@ namespace Panama.Core.MySql.Dapper
             {
                 c.Open();
 
-                using (var transaction = c.BeginTransaction())
-                {
+                //using (var transaction = c.BeginTransaction())
+                //{
                     //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                     var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
-                    var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                    //var command = new CommandDefinition(sql, obj, transaction, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                    var command = new CommandDefinition(sql, obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
                     _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
                     var result = c.ExecuteScalarAsync<T>(command).GetAwaiter().GetResult();
-                    if (!definition.Token.IsCancellationRequested)
-                        transaction.Commit();
-                }
+                    //if (!definition.Token.IsCancellationRequested)
+                    //    transaction.Commit();
+                //}
             }
         }
 
