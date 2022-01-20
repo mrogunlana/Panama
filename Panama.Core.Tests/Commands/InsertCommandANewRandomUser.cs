@@ -1,14 +1,7 @@
-﻿using DapperExtensions;
-using DapperExtensions.Sql;
-using Org.BouncyCastle.Cms;
-using Panama.Core.Commands;
-using Panama.Core.Entities;
+﻿using Panama.Core.Commands;
 using Panama.Core.MySql.Dapper.Interfaces;
 using Panama.Core.MySql.Dapper.Models;
 using Panama.Core.Tests.Models;
-using System.Collections.Generic;
-using System.Threading;
-using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests.Commands
 {

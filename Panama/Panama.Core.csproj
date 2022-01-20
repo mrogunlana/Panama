@@ -2,19 +2,19 @@
 
   <PropertyGroup>
     <PackageId>Panama.Core</PackageId>
-    <Version>2.0.6</Version>
+    <Version>2.0.7</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>Moved TransactionHandler into the Panama.Core namespace since its only "database" dependency is System.Transactions</PackageReleaseNotes>
+    <PackageReleaseNotes>Upgraded to .NET Core 3.1 For LTS</PackageReleaseNotes>
     <Description>A simple command architecture for .NET CORE 3+ developed by Diran Ogunlana</Description>
     <Copyright>Copyright 2021</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <AssemblyVersion>2.0.6.0</AssemblyVersion>
-    <FileVersion>2.0.6.0</FileVersion>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />

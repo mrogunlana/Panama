@@ -1,33 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Diran Ogunlana</Authors>
     <Description>Custom security encryptors for the Panama.Core framework using IStringEncryptor</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
     <Copyright>2019</Copyright>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <PackageReleaseNotes>Updated AES generator and encryptor to accept the following environment variables along side the original configuration manager settings:
-
-Environment Variables:
-1. ASPNETCORE_ENCRYPTION_SECRET
-2. ASPNETCORE_ENCRYPTION_SALT
-3. ASPNETCORE_ENCRYPTION_VECTOR
-
-ConfigurationManager.AppSettings:
-1. Secret
-2. Salt
-3. Vector
-
-variables are set like so:
-
-ConfigurationManager.AppSettings["Secret"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET");
-ConfigurationManager.AppSettings["Salt"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT");
-ConfigurationManager.AppSettings["Vector"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR");</PackageReleaseNotes>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
+    <PackageReleaseNotes>Upgraded to .NET Core 3.1 For LTS</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

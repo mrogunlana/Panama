@@ -1,4 +1,4 @@
-use `panama-core`;
+use `tempdb`;
 
 create table if not exists `User` (
     _ID int auto_increment,

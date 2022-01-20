@@ -35,6 +35,7 @@ namespace Panama.Core.Tests
             Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_SERVER", "localhost", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_PORT", "3309", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_DATABASE", "panama-core", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_DATABASE_TEMP", "tempdb", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_USER", "panama-db", EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("ASPNETCORE_MYSQL_PASSWORD", "abc123", EnvironmentVariableTarget.Process);
 
@@ -417,5 +418,64 @@ namespace Panama.Core.Tests
 
             Assert.IsNull(user);
         }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForSuccessCaseUsingNewTransactionHandlerAcrossMultipleDatabasesOnSameServer()
+        {
+            var ID = Guid.NewGuid();
+
+            await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<InsertCommandSomeBatchRandomUsersOnDifferentDatabase>()
+                .Command<InsertCommandUsingExecuteSql>()
+                .InvokeAsync();
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(user);
+        }
+
+        [TestMethod]
+        public async Task DoesTransactionScopeAutomaticallyEnlistAmbientConnectionsWithBatchInsertForRollbackCaseUsingNewTransactionHandlerAcrossMultipleDatabasesOnSameServer()
+        {
+            var ID = Guid.NewGuid();
+
+            await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<InsertCommandSomeBatchRandomUsers>()
+                .Command<InsertCommandSomeBatchRandomUsersOnDifferentDatabase>()
+                .Command<InsertCommandUsingExecuteSql>()
+                .Command<InsertCommandWithRunTimeException>()
+                .InvokeAsync();
+
+            var result = await new Handler(ServiceLocator.Current)
+                .Add(new KeyValuePair("ID", ID))
+                .Command<SelectByIdCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNull(user);
+        }
+
     }
 }

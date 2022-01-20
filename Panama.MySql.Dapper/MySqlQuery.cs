@@ -5,7 +5,7 @@ using DapperExtensions.Sql;
 using Newtonsoft.Json;
 using Panama.Core.Entities;
 using Panama.Core.Logger;
-using Panama.Core.Sql;
+using Panama.Core.MySql.Dapper.Interfaces;
 using Panama.Core.MySql.Dapper.Models;
 using System;
 using System.Collections.Generic;
@@ -14,8 +14,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using MySqlData = MySql.Data;
-using Panama.Core.MySql.Dapper.Interfaces;
+using MySqlData = MySqlConnector;
 
 namespace Panama.Core.MySql.Dapper
 {
@@ -42,7 +41,7 @@ namespace Panama.Core.MySql.Dapper
             var result = new List<T>();
             
             //var test = new MySql.Data.MySqlClient()
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -63,7 +62,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(connection))
                 connection = _connection;
             
-            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var mysql = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"SELECT: {definition.Sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -82,7 +81,7 @@ namespace Panama.Core.MySql.Dapper
             var result = new List<T>();
 
             //var test = new MySql.Data.MySqlClient()
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"SELECT: {sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -113,7 +112,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Insert<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -125,7 +124,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Insert<T>(string connection, T obj) where T : class
         {
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -141,7 +140,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(connection))
                 connection = _connection;
 
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 c.Open();
 
@@ -157,7 +156,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Update<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"UPDATE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -169,7 +168,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Update<T>(string connection, T obj) where T : class
         {
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"UPDATE: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -185,7 +184,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(connection))
                 connection = _connection;
 
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 c.Open();
 
@@ -276,7 +275,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Delete<T>(T obj) where T : class, IModel
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"DELETE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -288,7 +287,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Delete<T>(string connection, T obj) where T : class, IModel
         {
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"DELETE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -304,7 +303,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(connection))
                 connection = _connection;
 
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 c.Open();
 
@@ -330,7 +329,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Execute(string sql, object parameters)
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -342,7 +341,7 @@ namespace Panama.Core.MySql.Dapper
 
         public void Execute(string connection, string sql, object parameters)
         {
-            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var mysql = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -358,7 +357,7 @@ namespace Panama.Core.MySql.Dapper
             if (string.IsNullOrEmpty(connection))
                 connection = _connection;
 
-            using (var mysql = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var mysql = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -372,7 +371,7 @@ namespace Panama.Core.MySql.Dapper
         {
             T result = default;
 
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -390,7 +389,7 @@ namespace Panama.Core.MySql.Dapper
         {
             T result = default;
 
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -412,7 +411,7 @@ namespace Panama.Core.MySql.Dapper
 
             T result = default;
 
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 _log.LogTrace<MySqlQuery>($"EXECUTE: {definition.Sql}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
@@ -428,7 +427,10 @@ namespace Panama.Core.MySql.Dapper
 
         public void InsertBatch<T>(List<T> models, int batch = 0) where T : class, IModel
         {
-            using (var connection = new MySqlData.MySqlClient.MySqlConnection(_connection))
+            var mysql = new MySqlData.MySqlConnectionStringBuilder(_connection);
+            var database = mysql.Database;
+
+            using (var connection = new MySqlData.MySqlConnection(_connection))
             {
                 connection.Open();
 
@@ -455,20 +457,27 @@ namespace Panama.Core.MySql.Dapper
                     builder.Append(", IS_NULLABLE");
                     builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
                     builder.Append(" WHERE TABLE_NAME = @Table");
+                    builder.Append(" AND TABLE_SCHEMA = @Database");
 
                     var schema = new List<Schema>();
 
                     //get table schema (e.g. names and datatypes for mapping)
-                    using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), connection))
+                    using (var command = new MySqlData.MySqlCommand(builder.ToString(), connection))
                     {
-                        var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                        var parameter = new MySqlData.MySqlParameter();
                         parameter.Value = map.TableName;
                         parameter.ParameterName = "@Table";
-                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                        parameter.MySqlDbType = MySqlData.MySqlDbType.String;
+
+                        var parameter2 = new MySqlData.MySqlParameter();
+                        parameter2.Value = database;
+                        parameter2.ParameterName = "@Database";
+                        parameter2.MySqlDbType = MySqlData.MySqlDbType.String;
 
                         command.Parameters.Add(parameter);
+                        command.Parameters.Add(parameter2);
 
-                        using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
+                        using (var sql = new MySqlData.MySqlDataAdapter(command))
                         {
                             var result = new DataTable();
                             var parameters = map.Properties
@@ -489,13 +498,13 @@ namespace Panama.Core.MySql.Dapper
                         }
                     }
 
-                    using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", connection))
+                    using (var command = new MySqlData.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", connection))
                     {
                         command.UpdatedRowSource = UpdateRowSource.None;
 
                         foreach (var type in schema)
                         {
-                            var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                            var parameter = new MySqlData.MySqlParameter();
                             parameter.ParameterName = $"@{type.ColumnName}";
                             parameter.SourceColumn = type.ColumnName;
 
@@ -504,17 +513,17 @@ namespace Panama.Core.MySql.Dapper
                                 case "varchar":
                                 case "char":
                                 case "text":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.String;
                                     parameter.Size = Int32.Parse(type.Size.ToString());
                                     break;
                                 case "datetime":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.DateTime;
                                     break;
                                 case "int":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.Int32;
                                     break;
                                 case "bigint":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.Int64;
                                     break;
                                 default:
                                     throw new NotImplementedException();
@@ -523,7 +532,7 @@ namespace Panama.Core.MySql.Dapper
                             command.Parameters.Add(parameter);
                         }
 
-                        using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
+                        using (var adapter = new MySqlData.MySqlDataAdapter())
                         {
                             adapter.InsertCommand = command;
 
@@ -551,7 +560,10 @@ namespace Panama.Core.MySql.Dapper
 
         public void InsertBatch<T>(string connection, List<T> models, int batch = 0) where T : class, IModel
         {
-            using (var c = new MySqlData.MySqlClient.MySqlConnection(connection))
+            var mysql = new MySqlData.MySqlConnectionStringBuilder(connection);
+            var database = mysql.Database;
+
+            using (var c = new MySqlData.MySqlConnection(connection))
             {
                 c.Open();
 
@@ -578,20 +590,27 @@ namespace Panama.Core.MySql.Dapper
                     builder.Append(", IS_NULLABLE");
                     builder.Append(" FROM INFORMATION_SCHEMA.COLUMNS");
                     builder.Append(" WHERE TABLE_NAME = @Table");
+                    builder.Append(" AND TABLE_SCHEMA = @Database");
 
                     var schema = new List<Schema>();
 
                     //get table schema (e.g. names and datatypes for mapping)
-                    using (var command = new MySqlData.MySqlClient.MySqlCommand(builder.ToString(), c))
+                    using (var command = new MySqlData.MySqlCommand(builder.ToString(), c))
                     {
-                        var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                        var parameter = new MySqlData.MySqlParameter();
                         parameter.Value = map.TableName;
                         parameter.ParameterName = "@Table";
-                        parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                        parameter.MySqlDbType = MySqlData.MySqlDbType.String;
+
+                        var parameter2 = new MySqlData.MySqlParameter();
+                        parameter2.Value = database;
+                        parameter2.ParameterName = "@Database";
+                        parameter2.MySqlDbType = MySqlData.MySqlDbType.String;
 
                         command.Parameters.Add(parameter);
+                        command.Parameters.Add(parameter2);
 
-                        using (var sql = new MySqlData.MySqlClient.MySqlDataAdapter(command))
+                        using (var sql = new MySqlData.MySqlDataAdapter(command))
                         {
                             var result = new DataTable();
                             var parameters = map.Properties
@@ -612,13 +631,13 @@ namespace Panama.Core.MySql.Dapper
                         }
                     }
 
-                    using (var command = new MySqlData.MySqlClient.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
+                    using (var command = new MySqlData.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
                     {
                         command.UpdatedRowSource = UpdateRowSource.None;
 
                         foreach (var type in schema)
                         {
-                            var parameter = new MySqlData.MySqlClient.MySqlParameter();
+                            var parameter = new MySqlData.MySqlParameter();
                             parameter.ParameterName = $"@{type.ColumnName}";
                             parameter.SourceColumn = type.ColumnName;
 
@@ -627,17 +646,17 @@ namespace Panama.Core.MySql.Dapper
                                 case "varchar":
                                 case "char":
                                 case "text":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.String;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.String;
                                     parameter.Size = Int32.Parse(type.Size.ToString());
                                     break;
                                 case "datetime":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.DateTime;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.DateTime;
                                     break;
                                 case "int":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int32;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.Int32;
                                     break;
                                 case "bigint":
-                                    parameter.MySqlDbType = MySqlData.MySqlClient.MySqlDbType.Int64;
+                                    parameter.MySqlDbType = MySqlData.MySqlDbType.Int64;
                                     break;
                                 default:
                                     throw new NotImplementedException();
@@ -646,7 +665,7 @@ namespace Panama.Core.MySql.Dapper
                             command.Parameters.Add(parameter);
                         }
 
-                        using (var adapter = new MySqlData.MySqlClient.MySqlDataAdapter())
+                        using (var adapter = new MySqlData.MySqlDataAdapter())
                         {
                             adapter.InsertCommand = command;
 
