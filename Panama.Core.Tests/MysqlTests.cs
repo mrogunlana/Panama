@@ -377,6 +377,7 @@ namespace Panama.Core.Tests
                 })
                 .Command<InsertCommand>()
                 .Command<InsertCommandSomeBatchRandomUsers>()
+                .Command<InsertCommandUsingExecuteSql>()
                 .InvokeAsync();
 
             var result = await new Handler(ServiceLocator.Current)
@@ -404,6 +405,7 @@ namespace Panama.Core.Tests
                 })
                 .Command<InsertCommand>()
                 .Command<InsertCommandSomeBatchRandomUsers>()
+                .Command<InsertCommandUsingExecuteSql>()
                 .Command<InsertCommandWithRunTimeException>()
                 .InvokeAsync();
 
