@@ -1,12 +1,11 @@
-﻿using Panama.Core.Commands;
-using Panama.Core.Entities;
+﻿using Panama.Core.Entities;
 using Panama.Core.IoC;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Panama.Core.MySql.Dapper.Commands
+namespace Panama.Core.Commands
 {
     public class TransactionHandler : Handler
     {

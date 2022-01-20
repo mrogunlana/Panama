@@ -10,7 +10,6 @@ using Panama.Core.IoC;
 using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.MySql.Dapper;
-using Panama.Core.MySql.Dapper.Commands;
 using Panama.Core.MySql.Dapper.Interfaces;
 using Panama.Core.Tests.Commands;
 using Panama.Core.Tests.Models;
