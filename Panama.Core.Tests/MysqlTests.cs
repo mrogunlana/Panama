@@ -477,5 +477,53 @@ namespace Panama.Core.Tests
             Assert.IsNull(user);
         }
 
+
+        [TestMethod]
+        public async Task CanWeQueryWithReadSingleSelectStatement()
+        {
+            var ID = Guid.NewGuid();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<SelectReadSingleCommand>()
+                .InvokeAsync();
+
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(user);
+        }
+
+        [TestMethod]
+        public async Task CanWeQueryWithReadMultipleSelectStatement()
+        {
+            var ID = Guid.NewGuid();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .Command<InsertCommandSomeBatchRandomUsers>()
+                .Command<SelectReadMultipleCommand>()
+                .InvokeAsync();
+
+
+            var users = result.DataGet<User>();
+
+            Assert.IsTrue(users.Count > 1);
+        }
+
     }
 }
