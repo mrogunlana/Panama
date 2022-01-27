@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Diran Ogunlana</Authors>
     <Description>Implementation of NLog logger component using Panama ILog Interface</Description>
     <Copyright>2019</Copyright>
@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.7.13" />
-    <PackageReference Include="Panama.Core" Version="2.0.7" />
+    <PackageReference Include="Panama.Core" Version="2.0.8" />
   </ItemGroup>
 
 </Project>

@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <PackageReleaseNotes>Updated internal dependencies</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Panama.Core" Version="2.0.7" />
+    <PackageReference Include="Panama.Core" Version="2.0.8" />
   </ItemGroup>
 
 </Project>
