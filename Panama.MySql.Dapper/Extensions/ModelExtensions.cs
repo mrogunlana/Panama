@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 
 namespace Panama.Core.MySql.Dapper
 {
@@ -55,6 +56,29 @@ namespace Panama.Core.MySql.Dapper
                 table.Rows.Add(row);
             }
             return table;
+        }
+
+        public static void SetKey<T>(this T model, object key) where T : class
+        {
+            var map = _sql?.Configuration?.GetMap<T>();
+            if (map == null)
+                throw new Exception($"Class Map for:{typeof(T).Name} could not be found.");
+
+            var identity = map.Properties
+                .Where(x => x.KeyType == KeyType.Identity)
+                .FirstOrDefault();
+
+            if (identity == null)
+                return;
+
+            var property = model.GetType().GetProperty(identity.PropertyInfo.Name, BindingFlags.Public | BindingFlags.Instance);
+
+            if (property == null)
+                return;
+            if (!property.CanWrite)
+                return;
+
+            property.SetValue(model, Convert.ChangeType(key, identity.PropertyInfo.PropertyType));
         }
     }
 }

@@ -525,5 +525,127 @@ namespace Panama.Core.Tests
             Assert.IsTrue(users.Count > 1);
         }
 
+        [TestMethod]
+        public async Task Insert1UnitTest()
+        {
+            var ID = Guid.NewGuid();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertCommand>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsTrue(user._ID > 0);
+        }
+
+        [TestMethod]
+        public async Task Insert2UnitTest()
+        {
+            var ID = Guid.NewGuid();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertV2Command>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsTrue(user._ID > 0);
+        }
+
+        [TestMethod]
+        public async Task Insert3UnitTest()
+        {
+            var ID = Guid.NewGuid();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User()
+                {
+                    ID = ID,
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<InsertV3Command>()
+                .InvokeAsync();
+
+            var user = result.DataGetSingle<User>();
+
+            Assert.IsTrue(user._ID > 0);
+        }
+
+        [TestMethod]
+        public async Task ModifyVolitileDataInTransactionScope()
+        {
+            var prerequisite = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new User() {
+                    ID = Guid.NewGuid(),
+                    Email = "test@test.com",
+                    FirstName = "John_UPDATED",
+                    LastName = "Doe"
+                })
+                .Command<SaveCommand>()
+                .InvokeAsync();
+
+            var user = prerequisite.DataGetSingle<User>();
+
+            var result = await new TransactionHandler(ServiceLocator.Current)
+                .Add(new KeyValuePair("_ID", user._ID))
+                .Command<SelectBy_IDCommand>()
+                .Command<ModifyUserName>()
+                .Command<UpdateCommand>()
+                .Command<SelectBy_IDCommand>()
+                .Command<ModifyUserName>()
+                .Command<UpdateCommand>()
+                .InvokeAsync();
+
+            var final = result.DataGetSingle<User>();
+
+            Assert.IsNotNull(final);
+        }
+
+        [TestMethod]
+        public async Task ModifyNewlyVolitileDataInTransactionScopeShouldFail()
+        {
+            try
+            {
+                var ID = Guid.NewGuid();
+
+                var result = await new TransactionHandler(ServiceLocator.Current)
+                    .Add(new User()
+                    {
+                        ID = ID,
+                        Email = "test@test.com",
+                        FirstName = "John_UPDATED",
+                        LastName = "Doe"
+                    })
+                    .Command<InsertV3Command>()
+                    .Command<ModifyUserName>()
+                    .Command<UpdateCommand>()
+                    .InvokeAsync();
+
+                var user = result.DataGet<User>();
+
+                Assert.Fail();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsNotNull(ex);
+            }
+        }
     }
 }

@@ -117,8 +117,10 @@ namespace Panama.Core.MySql.Dapper
                 _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
                 connection.Open();
-                connection.Insert(obj);
+                var key = connection.Insert(obj);
                 connection.Close();
+                
+                obj.SetKey((object)key);
             }
         }
 
@@ -129,8 +131,10 @@ namespace Panama.Core.MySql.Dapper
                 _log.LogTrace<MySqlQuery>($"INSERT: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
 
                 c.Open();
-                c.Insert(obj);
+                var key = c.Insert(obj);
                 c.Close();
+
+                obj.SetKey((object)key);
             }
         }
 
@@ -146,11 +150,20 @@ namespace Panama.Core.MySql.Dapper
 
                 //NOTE: we can not use DapperExtensions here as they do not support cancellation tokens
                 var sql = _sql.Insert(_sql.Configuration.GetMap<T>());
-                var command = new CommandDefinition(sql, obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
+                var builder = new StringBuilder();
+
+                builder.Append($"{sql}; ");
+                builder.Append("SELECT CONVERT(LAST_INSERT_ID(), SIGNED INTEGER) AS ID; ");
+
+                var command = new CommandDefinition(builder.ToString(), obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
                 _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
-                c.ExecuteScalar<T>(command);
+                var key = c.ExecuteScalar(command);
+
+                c.Close();
+
+                obj.SetKey(key);
             }
         }
 
@@ -204,7 +217,7 @@ namespace Panama.Core.MySql.Dapper
 
                 _log.LogTrace<MySqlQuery>($"UPDATE: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
-                c.ExecuteScalar<T>(command);
+                c.ExecuteScalar(command);
             }
         }
 

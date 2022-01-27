@@ -9,11 +9,27 @@ namespace Panama.Core.Commands
 {
     public class TransactionHandler : Handler
     {
-        public TransactionHandler(IServiceLocator locator) : base(locator) { }
+        private readonly TransactionOptions _options;
+
+        public TransactionHandler(
+              IServiceLocator locator
+            , TransactionOptions options = default) : base(locator) 
+        {
+            _options = options;
+
+            if (_options == default)
+                _options = new TransactionOptions {
+                    IsolationLevel = IsolationLevel.ReadCommitted,
+                    Timeout = TransactionManager.DefaultTimeout
+                };
+        }
 
         protected override IResult Run(List<Action> actions)
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                _options,
+                TransactionScopeAsyncFlowOption.Enabled))
             {
                 var result = base.Run(actions);
 
@@ -29,7 +45,10 @@ namespace Panama.Core.Commands
 
         protected override async Task<IResult> RunAsync(List<Action> actions)
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                _options,
+                TransactionScopeAsyncFlowOption.Enabled))
             {
                 var result = await base.RunAsync(actions);
 
@@ -45,7 +64,10 @@ namespace Panama.Core.Commands
 
         protected override IResult Validate()
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                _options,
+                TransactionScopeAsyncFlowOption.Enabled))
             {
                 var result = base.Validate();
 
@@ -61,7 +83,10 @@ namespace Panama.Core.Commands
 
         protected override async Task<IResult> ValidateAsync()
         {
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                _options,
+                TransactionScopeAsyncFlowOption.Enabled))
             {
                 var result = await base.ValidateAsync();
 

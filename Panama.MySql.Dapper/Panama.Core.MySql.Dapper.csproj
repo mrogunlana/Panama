@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>2.0.11</Version>
+    <Version>2.0.12</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company />
     <Product>Panama.Core.MySql.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Removed ReadSingle and opted for AllowUserVariable=true where in line parameters use the set syntax instead of the select syntax</PackageReleaseNotes>
+    <PackageReleaseNotes>MySqlQuery now sets identity property of models in Insert and Save operations based on the ClassMapper of the model being persisted.</PackageReleaseNotes>
     <Copyright>2021</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Panama.Core.MySql.Dapper</PackageId>
@@ -20,9 +20,9 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
-    <PackageReference Include="MySqlConnector" Version="2.1.2" />
+    <PackageReference Include="MySqlConnector" Version="2.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Panama.Core" Version="2.0.7" />
+    <PackageReference Include="Panama.Core" Version="2.0.8" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
   </ItemGroup>
 
