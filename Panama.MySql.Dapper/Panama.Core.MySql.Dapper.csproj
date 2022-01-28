@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>2.0.12</Version>
+    <Version>2.0.13</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company />
     <Product>Panama.Core.MySql.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations; also contains BulkInsert</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>MySqlQuery now sets identity property of models in Insert and Save operations based on the ClassMapper of the model being persisted.</PackageReleaseNotes>
+    <PackageReleaseNotes>Adding MySql.Data only for InsertBatch support as it seems to out perform MySqlConnector on its MySqlDataAdapter.Update() function by a high order of magnitude; for example, batch inserting 100K rows of data using MySqlConnector takes on average of 20 minutes; where as MySql.Data inserts the same recordset in under a minute. </PackageReleaseNotes>
     <Copyright>2021</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Panama.Core.MySql.Dapper</PackageId>
@@ -20,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="MySqlConnector" Version="2.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Panama.Core" Version="2.0.8" />
