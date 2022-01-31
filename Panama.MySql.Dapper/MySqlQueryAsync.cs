@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using MySqlData = MySqlConnector;
-using MySqlDataBatch = MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 using Panama.Core.Sql;
 
@@ -340,15 +339,15 @@ namespace Panama.Core.MySql.Dapper
                 //at 50K around 10 minutes... whereas MySql.Data runs a
                 //full 100k around 1 minute...
 
-                using (var c = new MySqlDataBatch.MySqlConnection(_connection))
-                using (var adapter = new MySqlDataBatch.MySqlDataAdapter())
-                using (var command = new MySqlDataBatch.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
+                using (var c = new MySqlData.MySqlConnection(_connection))
+                using (var adapter = new MySqlData.MySqlDataAdapter())
+                using (var command = new MySqlData.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
                 {
                     command.UpdatedRowSource = UpdateRowSource.None;
 
                     foreach (var type in schema)
                     {
-                        var parameter = new MySqlDataBatch.MySqlParameter();
+                        var parameter = new MySqlData.MySqlParameter();
                         parameter.ParameterName = $"@{type.ColumnName}";
                         parameter.SourceColumn = type.ColumnName;
 
@@ -357,17 +356,17 @@ namespace Panama.Core.MySql.Dapper
                             case "varchar":
                             case "char":
                             case "text":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.String;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.String;
                                 parameter.Size = Int32.Parse(type.Size.ToString());
                                 break;
                             case "datetime":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.DateTime;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.DateTime;
                                 break;
                             case "int":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.Int32;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.Int32;
                                 break;
                             case "bigint":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.Int64;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.Int64;
                                 break;
                             default:
                                 throw new NotImplementedException();
@@ -469,15 +468,15 @@ namespace Panama.Core.MySql.Dapper
                 //at 50K around 10 minutes... whereas MySql.Data runs a
                 //full 100k around 1 minute...
 
-                using (var c = new MySqlDataBatch.MySqlConnection(connection))
-                using (var adapter = new MySqlDataBatch.MySqlDataAdapter())
-                using (var command = new MySqlDataBatch.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
+                using (var c = new MySqlData.MySqlConnection(connection))
+                using (var adapter = new MySqlData.MySqlDataAdapter())
+                using (var command = new MySqlData.MySqlCommand($"INSERT INTO {map.TableName} ({string.Join(",", schema.Select(x => x.ColumnName))}) VALUES ({string.Join(",", schema.Select(x => $"@{x.ColumnName}"))});", c))
                 {
                     command.UpdatedRowSource = UpdateRowSource.None;
 
                     foreach (var type in schema)
                     {
-                        var parameter = new MySqlDataBatch.MySqlParameter();
+                        var parameter = new MySqlData.MySqlParameter();
                         parameter.ParameterName = $"@{type.ColumnName}";
                         parameter.SourceColumn = type.ColumnName;
 
@@ -486,17 +485,17 @@ namespace Panama.Core.MySql.Dapper
                             case "varchar":
                             case "char":
                             case "text":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.String;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.String;
                                 parameter.Size = Int32.Parse(type.Size.ToString());
                                 break;
                             case "datetime":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.DateTime;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.DateTime;
                                 break;
                             case "int":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.Int32;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.Int32;
                                 break;
                             case "bigint":
-                                parameter.MySqlDbType = MySqlDataBatch.MySqlDbType.Int64;
+                                parameter.MySqlDbType = MySqlData.MySqlDbType.Int64;
                                 break;
                             default:
                                 throw new NotImplementedException();
