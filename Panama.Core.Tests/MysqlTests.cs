@@ -136,7 +136,7 @@ namespace Panama.Core.Tests
             else
                 Assert.Fail();
         }
-
+        
         [TestMethod]
         public async Task DoesCancellationStopLongRunningDatabaseTask()
         {
@@ -647,5 +647,54 @@ namespace Panama.Core.Tests
                 Assert.IsNotNull(ex);
             }
         }
+
+        [TestMethod]
+        public async Task DoesNewSaveUserReturnAn_ID()
+        {
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            var handler = await new Handler(ServiceLocator.Current)
+                .Add(token)
+                .Add(new User()
+                {
+                    ID = Guid.NewGuid()
+                })
+                .Command<SaveCommand>()
+                .InvokeAsync();
+
+            if (!handler.Success)
+                Assert.Fail();
+
+            var user = handler.DataGetSingle<User>();
+            if (user == null)
+                Assert.Fail();
+
+            Assert.IsTrue(user._ID > 0);
+        }
+
+        [TestMethod]
+        public async Task DoesInsertUserReturnAn_ID()
+        {
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            var handler = await new Handler(ServiceLocator.Current)
+                .Add(token)
+                .Add(new User()
+                {
+                    ID = Guid.NewGuid()
+                })
+                .Command<InsertCommand>()
+                .InvokeAsync();
+
+            if (!handler.Success)
+                Assert.Fail();
+
+            var user = handler.DataGetSingle<User>();
+            if (user == null)
+                Assert.Fail();
+
+            Assert.IsTrue(user._ID > 0);
+        }
+
     }
 }
