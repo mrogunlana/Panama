@@ -34,13 +34,13 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="Panama.Core" Version="2.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Panama.IoC.Autofac\Panama.Core.IoC.Autofac.csproj" />
     <ProjectReference Include="..\Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj" />
     <ProjectReference Include="..\Panama.MySql.Dapper\Panama.Core.MySql.Dapper.csproj" />
-    <ProjectReference Include="..\Panama\Panama.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +55,13 @@
   </Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y /S &quot;$(SolutionDir)Panama.Core.Tests\Data\*&quot; &quot;$(TargetDir)data\&quot;" />
+    <ItemGroup>
+      <DataFiles Include="$(ProjectDir)Data\*" />
+    </ItemGroup>
+    <Copy 
+      SourceFiles="@(DataFiles)"
+      DestinationFolder="$(TargetDir)data\"
+    />
 	</Target>
 	
 </Project>
