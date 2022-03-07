@@ -157,7 +157,7 @@ namespace Panama.Core.MySql.Dapper
 
                 var command = new CommandDefinition(builder.ToString(), obj, cancellationToken: definition.Token, commandTimeout: definition.CommandTimeout);
 
-                _log.LogTrace<MySqlQuery>($"INSERT: {definition.Sql}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
+                _log.LogTrace<MySqlQuery>($"INSERT: {command.CommandText}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}. Parameters: {JsonConvert.SerializeObject(definition.Parameters)}");
 
                 var key = c.ExecuteScalar(command);
 
