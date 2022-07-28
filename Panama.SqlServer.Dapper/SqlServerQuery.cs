@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Panama.Core.SqlServer.Dapper
+namespace Panama.SqlServer.Dapper
 {
     public class SqlServerQuery : IQuery
     {
@@ -37,7 +37,7 @@ namespace Panama.Core.SqlServer.Dapper
             var result = new List<T>();
             
             //var test = new MySql.Data.MySqlClient()
-            using (var connection = new MySqlData.MySqlConnection(_connection))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlServerQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
 
@@ -53,7 +53,7 @@ namespace Panama.Core.SqlServer.Dapper
 
         public void Insert<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlConnection(_connection))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlServerQuery>($"INSERT: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -67,7 +67,7 @@ namespace Panama.Core.SqlServer.Dapper
 
         public void Insert<T>(string connection, T obj) where T : class
         {
-            using (var c = new MySqlData.MySqlConnection(connection))
+            using (var c = new SqlConnection(connection))
             {
                 _log.LogTrace<SqlServerQuery>($"INSERT: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -81,7 +81,7 @@ namespace Panama.Core.SqlServer.Dapper
 
         public void Update<T>(T obj) where T : class
         {
-            using (var connection = new MySqlData.MySqlConnection(_connection))
+            using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlServerQuery>($"UPDATE: {nameof(obj)}. Object: {JsonConvert.SerializeObject(obj)}");
 
@@ -93,7 +93,7 @@ namespace Panama.Core.SqlServer.Dapper
 
         public void Update<T>(string connection, T obj) where T : class
         {
-            using (var c = new MySqlData.MySqlConnection(connection))
+            using (var c = new SqlConnection(connection))
             {
                 _log.LogTrace<SqlServerQuery>($"UPDATE: {nameof(obj)}. Connection: {connection}. Object: {JsonConvert.SerializeObject(obj)}");
 

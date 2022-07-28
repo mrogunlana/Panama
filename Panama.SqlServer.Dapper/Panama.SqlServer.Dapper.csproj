@@ -5,14 +5,14 @@
     <Version>2.1.0</Version>
     <Authors>Idiakose Sunday</Authors>
     <Company />
-    <Product>Panama.Core.SqlServer.Dapper</Product>
+    <Product>Panama.SqlServer.Dapper</Product>
     <Description>Implementation of Dapper MicroORM with Extensions for CRUD operations;</Description>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
     <PackageReleaseNotes>Removing MySql.Data with the latest MySqlConnector 2.1.5 update that optimizes batch inserts</PackageReleaseNotes>
     <Copyright>2022</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Panama.Core.SqlServer.Dapper</PackageId>
+    <PackageId>Panama.SqlServer.Dapper</PackageId>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
   </PropertyGroup>
@@ -20,10 +20,10 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DapperExtensions.DotnetCore" Version="1.0.1" />
-    <!-- <PackageReference Include="MySqlConnector" Version="2.1.5" /> -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Panama.Core" Version="2.0.8" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

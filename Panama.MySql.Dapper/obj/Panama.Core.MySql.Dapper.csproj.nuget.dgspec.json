@@ -1,34 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {}
+    "/Users/ispoa/Projects/Panama/Panama.Core/Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj": {}
   },
   "projects": {
-    "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj": {
-      "version": "2.0.2",
+    "/Users/ispoa/Projects/Panama/Panama.Core/Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj": {
+      "version": "2.0.14",
       "restore": {
-        "projectUniqueName": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
+        "projectUniqueName": "/Users/ispoa/Projects/Panama/Panama.Core/Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj",
         "projectName": "Panama.Core.MySql.Dapper",
-        "projectPath": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\Panama.Core.MySql.Dapper.csproj",
-        "packagesPath": "C:\\Users\\ORLP02\\.nuget\\packages\\",
-        "outputPath": "C:\\Projects\\Panama\\Core\\Panama.MySql.Dapper\\obj\\",
+        "projectPath": "/Users/ispoa/Projects/Panama/Panama.Core/Panama.MySql.Dapper/Panama.Core.MySql.Dapper.csproj",
+        "packagesPath": "/Users/ispoa/.nuget/packages/",
+        "outputPath": "/Users/ispoa/Projects/Panama/Panama.Core/Panama.MySql.Dapper/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\ORLP02\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/ispoa/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "netcoreapp3.0"
+          "netcoreapp3.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netcoreapp3.0": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {}
           }
         },
@@ -39,27 +38,28 @@
         }
       },
       "frameworks": {
-        "netcoreapp3.0": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "Dapper": {
               "target": "Package",
-              "version": "[2.0.35, )"
+              "version": "[2.0.123, )"
             },
             "DapperExtensions.DotnetCore": {
               "target": "Package",
               "version": "[1.0.1, )"
             },
-            "MySql.Data": {
+            "MySqlConnector": {
               "target": "Package",
-              "version": "[8.0.17, )"
+              "version": "[2.1.5, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[12.0.2, )"
+              "version": "[13.0.1, )"
             },
             "Panama.Core": {
               "target": "Package",
-              "version": "[1.0.7, )"
+              "version": "[2.0.8, )"
             },
             "System.Configuration.ConfigurationManager": {
               "target": "Package",
@@ -76,12 +76,18 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[3.1.10, 3.1.10]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.203/RuntimeIdentifierGraph.json"
         }
       }
     }
