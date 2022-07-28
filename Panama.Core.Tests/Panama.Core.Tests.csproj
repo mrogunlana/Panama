@@ -33,7 +33,7 @@
     <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="Panama.Core" Version="2.0.8" />
   </ItemGroup>
 
@@ -41,6 +41,7 @@
     <ProjectReference Include="..\Panama.IoC.Autofac\Panama.Core.IoC.Autofac.csproj" />
     <ProjectReference Include="..\Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj" />
     <ProjectReference Include="..\Panama.MySql.Dapper\Panama.Core.MySql.Dapper.csproj" />
+    <ProjectReference Include="..\Panama.SqlServer.Dapper\Panama.SqlServer.Dapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
