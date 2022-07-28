@@ -38,7 +38,6 @@ namespace Panama.SqlServer.Dapper
         {
             var result = new List<T>();
             
-            //var test = new MySql.Data.MySqlClient()
             using (var connection = new SqlConnection(_connection))
             {
                 _log.LogTrace<SqlServerQuery>($"SELECT: {sql}. Parameters: {JsonConvert.SerializeObject(parameters)}");
@@ -57,7 +56,6 @@ namespace Panama.SqlServer.Dapper
         {
             var result = new List<T>();
 
-            //var test = new MySql.Data.MySqlClient()
             using (var c = new SqlConnection(connection))
             {
                 _log.LogTrace<SqlServerQuery>($"SELECT: {sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(parameters)}");
