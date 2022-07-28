@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Diran Ogunlana</Authors>
     <Company>Diran Ogunlana</Company>
     <Product>Panama.Core.Sql.Dapper</Product>
-    <Copyright>2019</Copyright>
+    <Copyright>2022</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
-    <PackageReleaseNotes>Updated internal dependencies</PackageReleaseNotes>
+    <PackageReleaseNotes>Added SqlQueryAsync to support MSSQL async CRUD operations</PackageReleaseNotes>
     <Description>Basic Panama Core SqlQuery Implmentation with Dapper</Description>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>

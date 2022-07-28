@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+
+  core_mssqldb:
+    env_file: Panama.Database.Sql/.env
+    container_name: core_mssqldb
+    build:
+      context: Panama.Database.Sql
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Jf4UZh4Lz64AbqbG 
+    ports:
+      - "1433:1433"

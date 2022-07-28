@@ -7,7 +7,7 @@ namespace Panama.Core.Tests.Maps
     {
         public UserMap()
         {
-            Table("User");
+            Table("[User]");
 
             Map(x => x._ID).Key(KeyType.Identity);
             Map(x => x.TestValue).ReadOnly();

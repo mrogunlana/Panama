@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/mssql/server:2017-latest
+
+# Elevate to root to update permissions on files below
+USER root 
+
+# Create work directory
+RUN mkdir -p /usr/work
+WORKDIR /usr/work
+
+# Copy all scripts into working directory
+COPY . /usr/work/
+
+# Grant permissions for the import-data script to be executable
+RUN chmod +x /usr/work/import-data.sh
+
+ENV ACCEPT_EULA=Y 
+ENV SA_PASSWORD=Jf4UZh4Lz64AbqbG 
+
+EXPOSE 1433
+
+CMD /bin/bash /usr/work/entrypoint.sh
