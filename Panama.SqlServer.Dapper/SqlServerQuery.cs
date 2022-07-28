@@ -12,6 +12,8 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Microsoft.Data.SqlClient;
+using Panama.Core.Sql;
 
 namespace Panama.SqlServer.Dapper
 {
@@ -46,6 +48,25 @@ namespace Panama.SqlServer.Dapper
                 result = connection.Query<T>(sql, parameters).ToList();
 
                 connection.Close();
+            }
+
+            return result.ToList();
+        }
+
+        public List<T> Get<T>(string connection, string sql, object parameters)
+        {
+            var result = new List<T>();
+
+            //var test = new MySql.Data.MySqlClient()
+            using (var c = new SqlConnection(connection))
+            {
+                _log.LogTrace<SqlServerQuery>($"SELECT: {sql}. Connection: {connection}. Parameters: {JsonConvert.SerializeObject(parameters)}");
+
+                c.Open();
+
+                result = c.Query<T>(sql, parameters).ToList();
+
+                c.Close();
             }
 
             return result.ToList();
@@ -123,5 +144,64 @@ namespace Panama.SqlServer.Dapper
                 Update(connection, obj);
         }
 
+        bool IQuery.Exist<T>(string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IQuery.Exist<T>(string connection, string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T GetSingle<T>(string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T GetSingle<T>(string connection, string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IQuery.Delete<T>(T obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IQuery.Delete<T>(string connection, T obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(string connection, string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T ExecuteScalar<T>(string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T ExecuteScalar<T>(string connection, string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IQuery.InsertBatch<T>(List<T> models, int batch)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IQuery.InsertBatch<T>(string connection, List<T> models, int batch)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
