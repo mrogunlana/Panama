@@ -24,7 +24,18 @@ namespace Panama.Core.Commands
         public CancellationToken Token { get; set; }
         private IServiceProvider ServiceProvider;
 
-        public Handler(ILog log, IServiceProvider serviceProvider)
+        public Handler(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+            Data = new List<IModel>();
+            Commands = new List<object>();
+            RollbackCommands = new List<object>();
+            Validators = new List<IValidation>();
+            Token = new CancellationToken();
+            Id = Guid.NewGuid();
+        }
+        
+        public Handler(IServiceProvider serviceProvider, ILog log)
         {
             ServiceProvider = serviceProvider;
             Data = new List<IModel>();

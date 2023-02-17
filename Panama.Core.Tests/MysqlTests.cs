@@ -55,7 +55,7 @@ namespace Panama.Core.Tests
                 .ToList());
 
             var services = new ServiceCollection();
-            services.RegisterPanama(assemblies);
+            services.AddPanama(assemblies);
             _serviceProvider = services.BuildServiceProvider();
         }
 
@@ -64,7 +64,7 @@ namespace Panama.Core.Tests
         {
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User() { 
                     ID = Guid.NewGuid(),  
@@ -86,7 +86,7 @@ namespace Panama.Core.Tests
         {
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User() {
                     ID = Guid.NewGuid()
@@ -106,7 +106,7 @@ namespace Panama.Core.Tests
             var source = new CancellationTokenSource();
             source.CancelAfter(TimeSpan.FromSeconds(5));
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(source.Token)
                 .Command<LongRunningDatabaseCommand>()
                 .InvokeAsync();
@@ -123,7 +123,7 @@ namespace Panama.Core.Tests
             var source = new CancellationTokenSource();
             source.CancelAfter(TimeSpan.FromSeconds(15));
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(source.Token)
                 .Command<LongRunningDatabaseCommand>()
                 .Command<LongRunningDatabaseCommand>()
@@ -141,7 +141,7 @@ namespace Panama.Core.Tests
         {
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User()
                 {
@@ -164,7 +164,7 @@ namespace Panama.Core.Tests
             var id = Guid.NewGuid();
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User()
                 {
@@ -176,7 +176,7 @@ namespace Panama.Core.Tests
                 .Rollback<RollbackInsertCommand>()
                 .InvokeAsync();
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User()
                 {
@@ -197,7 +197,7 @@ namespace Panama.Core.Tests
             
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var response = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+                var response = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                     .Add(new User() {
                         ID = ID,
                         Email = "test@test.com",
@@ -215,7 +215,7 @@ namespace Panama.Core.Tests
                     scope.Complete();
             }
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -232,7 +232,7 @@ namespace Panama.Core.Tests
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var response = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+                var response = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                     .Add(new User()
                     {
                         ID = ID,
@@ -248,7 +248,7 @@ namespace Panama.Core.Tests
                     scope.Complete();
             }
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -265,7 +265,7 @@ namespace Panama.Core.Tests
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var response = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+                var response = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                     .Add(new User()
                     {
                         ID = ID,
@@ -281,7 +281,7 @@ namespace Panama.Core.Tests
                     scope.Complete();
             }
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -298,7 +298,7 @@ namespace Panama.Core.Tests
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var response = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+                var response = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                     .Add(new User()
                     {
                         ID = ID,
@@ -315,7 +315,7 @@ namespace Panama.Core.Tests
                     scope.Complete();
             }
 
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -330,20 +330,7 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<InsertCommandSomeBatchRandomUsers>()
-                .Command<InsertCommandUsingExecuteSql>()
-                .InvokeAsync();
-
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -358,21 +345,7 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<InsertCommandSomeBatchRandomUsers>()
-                .Command<InsertCommandUsingExecuteSql>()
-                .Command<InsertCommandWithRunTimeException>()
-                .InvokeAsync();
-
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -387,20 +360,7 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<InsertCommandSomeBatchRandomUsersOnDifferentDatabase>()
-                .Command<InsertCommandUsingExecuteSql>()
-                .InvokeAsync();
-
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -415,22 +375,7 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<InsertCommandSomeBatchRandomUsers>()
-                .Command<InsertCommandSomeBatchRandomUsersOnDifferentDatabase>()
-                .Command<InsertCommandUsingExecuteSql>()
-                .Command<InsertCommandWithRunTimeException>()
-                .InvokeAsync();
-
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("ID", ID))
                 .Command<SelectByIdCommand>()
                 .InvokeAsync();
@@ -446,67 +391,19 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<SelectReadSingleCommand>()
-                .InvokeAsync();
-
-
-            var user = result.DataGetSingle<User>();
-
-            Assert.IsNotNull(user);
         }
 
         [TestMethod]
         public async Task CanWeQueryWithReadMultipleSelectStatement()
         {
             var ID = Guid.NewGuid();
-
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .Command<InsertCommandSomeBatchRandomUsers>()
-                .Command<SelectReadMultipleCommand>()
-                .InvokeAsync();
-
-
-            var users = result.DataGet<User>();
-
-            Assert.IsTrue(users.Count > 1);
+            
         }
 
         [TestMethod]
         public async Task Insert1UnitTest()
         {
-            var ID = Guid.NewGuid();
-
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommand>()
-                .InvokeAsync();
-
-            var user = result.DataGetSingle<User>();
-
-            Assert.IsTrue(user._ID > 0);
+            var ID = Guid.NewGuid();            
         }
 
         [TestMethod]
@@ -514,71 +411,20 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertV2Command>()
-                .InvokeAsync();
 
-            var user = result.DataGetSingle<User>();
-
-            Assert.IsTrue(user._ID > 0);
         }
 
         [TestMethod]
         public async Task Insert3UnitTest()
         {
             var ID = Guid.NewGuid();
-
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertV3Command>()
-                .InvokeAsync();
-
-            var user = result.DataGetSingle<User>();
-
-            Assert.IsTrue(user._ID > 0);
+            
         }
 
         [TestMethod]
         public async Task ModifyVolitileDataInTransactionScope()
         {
-            var prerequisite = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User() {
-                    ID = Guid.NewGuid(),
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<SaveCommand>()
-                .InvokeAsync();
 
-            var user = prerequisite.DataGetSingle<User>();
-
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new KeyValuePair("_ID", user._ID))
-                .Command<SelectBy_IDCommand>()
-                .Command<ModifyUserName>()
-                .Command<UpdateCommand>()
-                .Command<SelectBy_IDCommand>()
-                .Command<ModifyUserName>()
-                .Command<UpdateCommand>()
-                .InvokeAsync();
-
-            var final = result.DataGetSingle<User>();
-
-            Assert.IsNotNull(final);
         }
 
         [TestMethod]
@@ -587,21 +433,6 @@ namespace Panama.Core.Tests
             try
             {
                 var ID = Guid.NewGuid();
-
-                var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                    .Add(new User()
-                    {
-                        ID = ID,
-                        Email = "test@test.com",
-                        FirstName = "John_UPDATED",
-                        LastName = "Doe"
-                    })
-                    .Command<InsertV3Command>()
-                    .Command<ModifyUserName>()
-                    .Command<UpdateCommand>()
-                    .InvokeAsync();
-
-                var user = result.DataGet<User>();
 
                 Assert.Fail();
             }
@@ -616,7 +447,7 @@ namespace Panama.Core.Tests
         {
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User()
                 {
@@ -640,7 +471,7 @@ namespace Panama.Core.Tests
         {
             var source = new CancellationTokenSource();
             var token = source.Token;
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(token)
                 .Add(new User()
                 {

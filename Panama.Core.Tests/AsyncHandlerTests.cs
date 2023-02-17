@@ -41,7 +41,7 @@ namespace Panama.Core.Tests
 
             var domain = assemblies.ToArray();
             var services = new ServiceCollection();
-            services.RegisterPanama(assemblies);
+            services.AddPanama(assemblies);
             services.AddSingleton<ILog, Logger.NLog>();
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -49,7 +49,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentCommandsExecuteSerially()
         {
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Command<SerialCommand1>()
                 .Command<SerialCommand2>()
                 .Command<SerialCommand3>()
@@ -75,7 +75,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentAsyncCommandsExecuteSerially()
         {
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()
@@ -101,7 +101,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesAsyncandNonAsyncCommandsPlayNicelyTogether()
         {
-            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()

@@ -54,7 +54,7 @@ namespace Panama.Core.Tests
                 .ToList());
 
             var services = new ServiceCollection();
-            services.RegisterPanama(assemblies);
+            services.AddPanama(assemblies);
             _serviceProvider = services.BuildServiceProvider();
 
         }
@@ -62,7 +62,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingMySqlConnector()
         {
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()
@@ -75,7 +75,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingMySqlData()
         {
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()
@@ -88,7 +88,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingPanamaCoreMySqlDapperLibrary()
         {
-            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()

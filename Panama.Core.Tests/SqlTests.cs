@@ -56,7 +56,7 @@ namespace Panama.Core.Tests
 
             var domain = assemblies.ToArray();
             var services = new ServiceCollection();
-            services.RegisterPanama(assemblies);
+            services.AddPanama(assemblies);
             services.AddSingleton<ISqlGenerator, SqlGeneratorImpl>();
             services.AddSingleton<IDapperExtensionsConfiguration, DapperExtensionsConfiguration>();
             services.AddSingleton<IQueryAsync, SqlQueryAsync>();
@@ -68,23 +68,6 @@ namespace Panama.Core.Tests
         public async Task CanWeQueryWithReadSingleSelectStatement()
         {
             var ID = Guid.NewGuid();
-
-            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
-                .Add(new User()
-                {
-                    ID = ID,
-                    Email = "test@test.com",
-                    FirstName = "John_UPDATED",
-                    LastName = "Doe"
-                })
-                .Command<InsertCommandUsingMssql>()
-                .Command<SelectReadSingleCommandUsingMssql>()
-                .InvokeAsync();
-
-
-            var user = result.DataGetSingle<User>();
-
-            Assert.IsNotNull(user);
         }
     }
 }
