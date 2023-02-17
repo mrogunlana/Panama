@@ -20,6 +20,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.MySql.Dapper", "Panama.MySql.Dapper\Panama.Core.MySql.Dapper.csproj", "{2312D4C9-06F8-49EF-83EB-2AC81336CE92}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Tests", "Panama.Core.Tests\Panama.Core.Tests.csproj", "{8F37003C-2B9F-462B-801A-D106E930C772}"
+	ProjectSection(ProjectDependencies) = postProject
+		{005CE007-CFD8-4D57-BEA6-E94CC05474A4} = {005CE007-CFD8-4D57-BEA6-E94CC05474A4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,7 +5,7 @@
     <Version>2.0.8</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageReleaseNotes>Added TransactionOptions in TransactionHandler constructor to allow customizations surrounding the IsolationLevel and Timeouts for distributed transactions. </PackageReleaseNotes>
@@ -18,5 +18,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 </Project>

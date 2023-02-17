@@ -7,6 +7,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Panama.Core.Commands
 {
@@ -16,23 +17,23 @@ namespace Panama.Core.Commands
 
         public ILog Log { get; }
         public Guid Id { get; }
-        public IServiceLocator ServiceLocator { get; }
         public List<IModel> Data { get; set; }
         public List<object> Commands { get; set; }
         public List<object> RollbackCommands { get; set; }
         public List<IValidation> Validators { get; set; }
         public CancellationToken Token { get; set; }
+        private IServiceProvider ServiceProvider;
 
-        public Handler(IServiceLocator locator)
+        public Handler(ILog log, IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             Data = new List<IModel>();
             Commands = new List<object>();
             RollbackCommands = new List<object>();
             Validators = new List<IValidation>();
             Token = new CancellationToken();
-            ServiceLocator = locator;
             Id = Guid.NewGuid();
-            Log = ServiceLocator.Resolve<ILog>();
+            Log = log;
         }
 
         protected virtual IResult Validate()
@@ -191,10 +192,12 @@ namespace Panama.Core.Commands
 
         public IHandler Command<Command>()
         {
-            if (typeof(Command).GetInterfaces().Contains(typeof(ICommand)))
-                Commands.Add(ServiceLocator.Resolve<ICommand>(typeof(Command).Name));
-            else if (typeof(Command).GetInterfaces().Contains(typeof(ICommandAsync)))
-                Commands.Add(ServiceLocator.Resolve<ICommandAsync>(typeof(Command).Name));
+            if (typeof(Command).GetInterfaces().Contains(typeof(ICommand)) 
+                || typeof(Command).GetInterfaces().Contains(typeof(ICommandAsync)))
+            {
+                Commands.Add(ServiceProvider.GetService<Command>());
+            }
+
             else
                 throw new ArgumentException($"Command type(s): {string.Join(',', typeof(Command)?.GetInterfaces()?.Select(x => x.Name))} are not compatible with supported ICommand and ICommandAsync Interfaces.");
 
@@ -204,7 +207,7 @@ namespace Panama.Core.Commands
         public IHandler Rollback<Rollback>()
         {
             if (typeof(Rollback).GetInterfaces().Contains(typeof(IRollback)))
-                RollbackCommands.Add(ServiceLocator.Resolve<IRollback>(typeof(Rollback).Name));
+                RollbackCommands.Add(ServiceProvider.GetService<Rollback>());
             else
                 throw new ArgumentException($"Rollback type(s): {string.Join(',', typeof(Rollback)?.GetInterfaces()?.Select(x => x.Name))} are not compatible with supported the IRollback Interface.");
 
@@ -227,8 +230,7 @@ namespace Panama.Core.Commands
 
         public IHandler Validate<Validator>() where Validator : IValidation
         {
-            Validators.Add(ServiceLocator.Resolve<IValidation>(typeof(Validator).Name));
-
+            RollbackCommands.Add(ServiceProvider.GetService<Validator>());
             return this;
         }
 

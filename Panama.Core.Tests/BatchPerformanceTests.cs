@@ -4,6 +4,7 @@ using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Core.Commands;
 using Panama.Core.IoC;
@@ -11,6 +12,7 @@ using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.MySql.Dapper;
 using Panama.Core.MySql.Dapper.Interfaces;
+using Panama.Core.Service;
 using Panama.Core.Tests.Commands;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace Panama.Core.Tests
     [TestClass]
     public class BatchPerformanceTests
     {
+        private static IServiceProvider _serviceProvider { get; set; }
         [ClassInitialize]
         public static void ClassInit(TestContext context)
         {
@@ -50,58 +53,16 @@ namespace Panama.Core.Tests
                 .Select(x => Assembly.Load(x))
                 .ToList());
 
-            var domain = assemblies.ToArray();
-            var builder = new ContainerBuilder();
+            var services = new ServiceCollection();
+            services.RegisterPanama(assemblies);
+            _serviceProvider = services.BuildServiceProvider();
 
-            builder.RegisterType<SqlGeneratorImpl>()
-               .As<ISqlGenerator>()
-               .WithParameter("configuration", new DapperExtensionsConfiguration(typeof(ClassMapper<>), AppDomain.CurrentDomain.GetAssemblies(), new MySqlDialect()))
-               .SingleInstance();
-
-            builder.RegisterType<Logger.NLog>().As<ILog>();
-            builder.RegisterType<MySqlQuery>().As<IMySqlQuery>();
-
-            //Register convenience Csv client
-            builder.RegisterType<MockCsvClient>().As<ICsvClient>().SingleInstance();
-
-            //Register all validators -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<IValidation>())
-                   .Named<IValidation>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommand>())
-                   .Named<ICommand>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommandAsync>())
-                   .Named<ICommandAsync>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<IRollback>())
-                   .Named<IRollback>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            ServiceLocator.SetLocator(new AutofacServiceLocator(builder.Build()));
         }
 
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingMySqlConnector()
         {
-            var result = await new Handler(ServiceLocator.Current)
+            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()
@@ -114,7 +75,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingMySqlData()
         {
-            var result = await new Handler(ServiceLocator.Current)
+            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()
@@ -127,7 +88,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task ImportCsvDataAndPersistUsingPanamaCoreMySqlDapperLibrary()
         {
-            var result = await new Handler(ServiceLocator.Current)
+            var result = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Add(new KeyValuePair("Filename", @"data\test-data-100k.csv"))
                 .Add(new KeyValuePair("Batch", 100))
                 .Command<Get100kTestDataFromCsvAsModels>()

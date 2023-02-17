@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Core.Commands;
 using Panama.Core.IoC;
@@ -12,13 +13,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Panama.Core.Service;
 using KeyValuePair = Panama.Core.Entities.KeyValuePair;
+using Panama.Core.MySql.Dapper.Interfaces;
+using DapperExtensions.Sql;
 
 namespace Panama.Core.Tests
 {
     [TestClass]
     public class AsyncHandlerTests
     {
+        private static IServiceProvider _serviceProvider { get; set; }
         [ClassInitialize]
         public static void ClassInit(TestContext context)
         {
@@ -35,40 +40,16 @@ namespace Panama.Core.Tests
                 .ToList());
 
             var domain = assemblies.ToArray();
-            var builder = new ContainerBuilder();
-
-            builder.RegisterType<Logger.NLog>().As<ILog>();
-
-            //Register all validators -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<IValidation>())
-                   .Named<IValidation>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommand>())
-                   .Named<ICommand>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommandAsync>())
-                   .Named<ICommandAsync>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            ServiceLocator.SetLocator(new AutofacServiceLocator(builder.Build()));
+            var services = new ServiceCollection();
+            services.RegisterPanama(assemblies);
+            services.AddSingleton<ILog, Logger.NLog>();
+            _serviceProvider = services.BuildServiceProvider();
         }
 
         [TestMethod]
         public async Task DoesConcurrentCommandsExecuteSerially()
         {
-            var handler = await new Handler(ServiceLocator.Current)
+            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Command<SerialCommand1>()
                 .Command<SerialCommand2>()
                 .Command<SerialCommand3>()
@@ -94,7 +75,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentAsyncCommandsExecuteSerially()
         {
-            var handler = await new Handler(ServiceLocator.Current)
+            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()
@@ -120,7 +101,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesAsyncandNonAsyncCommandsPlayNicelyTogether()
         {
-            var handler = await new Handler(ServiceLocator.Current)
+            var handler = await new Handler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()

@@ -3,6 +3,7 @@ using Autofac.Features.AttributeFilters;
 using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Core.Commands;
 using Panama.Core.Entities;
@@ -11,6 +12,7 @@ using Panama.Core.IoC.Autofac;
 using Panama.Core.Logger;
 using Panama.Core.MySql.Dapper;
 using Panama.Core.MySql.Dapper.Interfaces;
+using Panama.Core.Service;
 using Panama.Core.Sql;
 using Panama.Core.Sql.Dapper;
 using Panama.Core.Tests.Commands;
@@ -29,6 +31,7 @@ namespace Panama.Core.Tests
     [TestClass]
     public class SqlTests
     {
+        private static IServiceProvider _serviceProvider { get; set; }
         [ClassInitialize]
         public static void ClassInit(TestContext context)
         {
@@ -52,48 +55,13 @@ namespace Panama.Core.Tests
                 .ToList());
 
             var domain = assemblies.ToArray();
-            var builder = new ContainerBuilder();
-
-            builder.RegisterType<SqlGeneratorImpl>()
-               .As<ISqlGenerator>()
-               .WithParameter("configuration", new DapperExtensionsConfiguration())
-               .SingleInstance();
-
-            builder.RegisterType<Logger.NLog>().As<ILog>();
-            builder.RegisterType<SqlQueryAsync>().As<IQueryAsync>();
-
-            //Register all validators -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<IValidation>())
-                   .Named<IValidation>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommand>())
-                   .Named<ICommand>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<ICommandAsync>())
-                   .Named<ICommandAsync>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            //Register all commands -- singletons
-            builder.RegisterAssemblyTypes(domain)
-                   .Where(t => t.IsAssignableTo<IRollback>())
-                   .Named<IRollback>(t => t.Name)
-                   .AsImplementedInterfaces()
-                   .SingleInstance()
-                   .WithAttributeFiltering();
-
-            ServiceLocator.SetLocator(new AutofacServiceLocator(builder.Build()));
+            var services = new ServiceCollection();
+            services.RegisterPanama(assemblies);
+            services.AddSingleton<ISqlGenerator, SqlGeneratorImpl>();
+            services.AddSingleton<IDapperExtensionsConfiguration, DapperExtensionsConfiguration>();
+            services.AddSingleton<IQueryAsync, SqlQueryAsync>();
+            services.AddSingleton<ILog, Logger.NLog>();
+            _serviceProvider = services.BuildServiceProvider();
         }
 
         [TestMethod]
@@ -101,7 +69,7 @@ namespace Panama.Core.Tests
         {
             var ID = Guid.NewGuid();
 
-            var result = await new TransactionHandler(ServiceLocator.Current)
+            var result = await new TransactionHandler(_serviceProvider.GetService<ILog>(), _serviceProvider)
                 .Add(new User()
                 {
                     ID = ID,

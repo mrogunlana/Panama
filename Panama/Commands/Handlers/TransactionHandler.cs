@@ -1,5 +1,6 @@
 ﻿using Panama.Core.Entities;
 using Panama.Core.IoC;
+using Panama.Core.Logger;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,8 +13,9 @@ namespace Panama.Core.Commands
         private readonly TransactionOptions _options;
 
         public TransactionHandler(
-              IServiceLocator locator
-            , TransactionOptions options = default) : base(locator) 
+            ILog log,
+            IServiceProvider provider
+            , TransactionOptions options = default) : base(log, provider) 
         {
             _options = options;
 

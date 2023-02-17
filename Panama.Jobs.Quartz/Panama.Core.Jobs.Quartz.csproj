@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>1.0.3</Version>
     <PackageReleaseNotes>Updated internal dependencies</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -10,6 +10,10 @@
   <ItemGroup>
     <PackageReference Include="Panama.Core" Version="2.0.8" />
     <PackageReference Include="Quartz" Version="3.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Panama\Panama.Core.csproj" />
   </ItemGroup>
 
 </Project>
