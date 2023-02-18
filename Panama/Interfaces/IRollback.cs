@@ -1,9 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Panama.Core.Interfaces
+﻿namespace Panama.Core.Interfaces
 {
-    public interface IRollback
-    {
-        Task Execute(IContext context);
-    }
+    public interface IRollback : IExecute { }
 }

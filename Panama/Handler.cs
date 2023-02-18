@@ -1,6 +1,4 @@
-﻿using Panama.Core.IoC;
-using Panama.Core.Logger;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;

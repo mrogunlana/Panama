@@ -2,8 +2,5 @@
 
 namespace Panama.Core.Interfaces
 {
-    public interface ICommand
-    {
-        Task Execute(IContext context);
-    }
+    public interface ICommand : IExecute { }
 }

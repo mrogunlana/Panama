@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace Panama.Core.Interfaces
+﻿namespace Panama.Core.Interfaces
 {
-    public interface IValidate
+    public interface IValidate : IExecute<bool>
     {
-        Task Execute(IContext context);
         string Message(IContext context);
     }
 }
