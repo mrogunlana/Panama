@@ -20,10 +20,7 @@ namespace Panama.Core
         public CancellationToken Token => _token;
         public IServiceProvider Locator { get; }
         public IList<IModel> Data { get; }
-        public IList<IQuery> Queries { get; }
-        public IList<ICommand> Commands { get; }
-        public IList<IRollback> Rollbacks { get; }
-        public IList<IValidate> Validators { get; }
+        public IList<IExecute> Manifest { get; }
 
         public Handler(IServiceProvider serviceProvider)
         {
@@ -33,10 +30,7 @@ namespace Panama.Core
             Locator = serviceProvider;
 
             Data = new List<IModel>();
-            Queries = new List<IQuery>();
-            Commands = new List<ICommand>();
-            Rollbacks = new List<IRollback>();
-            Validators = new List<IValidate>();
+            Manifest = new List<IExecute>();
 
             Log = serviceProvider.GetService<ILogger<Handler>>();
         }
@@ -76,25 +70,25 @@ namespace Panama.Core
         
         public IHandler Command<Command>() where Command : ICommand
         {
-            Commands.Add(Locator.GetService<Command>());
+            Manifest.Add(Locator.GetService<Command>());
 
             return this;
         }
         public IHandler Query<Query>() where Query : IQuery
         {
-            Queries.Add(Locator.GetService<Query>());
+            Manifest.Add(Locator.GetService<Query>());
 
             return this;
         }
         public IHandler Rollback<Rollback>() where Rollback : IRollback
         {
-            Rollbacks.Add(Locator.GetService<Rollback>());
+            Manifest.Add(Locator.GetService<Rollback>());
 
             return this;
         }
         public IHandler Validate<Validate>() where Validate : IValidate
         {
-            Validators.Add(Locator.GetService<Validate>());
+            Manifest.Add(Locator.GetService<Validate>());
 
             return this;
         }

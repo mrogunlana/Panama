@@ -6,8 +6,4 @@ namespace Panama.Core.Interfaces
     {
         Task Execute(IContext context);
     }
-    public interface IExecute<T>
-    {
-        Task<T> Execute(IContext context);
-    }
 }

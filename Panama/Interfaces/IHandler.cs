@@ -14,10 +14,7 @@ namespace Panama.Core.Interfaces
         CancellationToken Token { get; }
         
         IList<IModel> Data { get; }
-        IList<IQuery> Queries { get; }
-        IList<ICommand> Commands { get; }
-        IList<IRollback> Rollbacks { get; }
-        IList<IValidate> Validators { get; }
+        IList<IExecute> Manifest { get; }
         
         IHandler Query<Query>() where Query : IQuery;
         IHandler Command<Command>() where Command : ICommand;
