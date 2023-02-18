@@ -30,8 +30,15 @@ namespace Panama.Core
                 _log.LogTrace($"Handler (HID:{handler.Id}) Start: [{manifest.Count()}] Actions Queued.");
 
                 foreach (var action in manifest)
-                    await action.Execute(context)
+                {
+                    if (handler.Token.IsCancellationRequested)
+                        handler.Token.ThrowIfCancellationRequested();
+
+                    await action
+                        .Execute(context)
                         .ConfigureAwait(false);
+                }
+                
             }
             catch (Exception ex)
             {

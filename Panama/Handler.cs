@@ -84,7 +84,7 @@ namespace Panama.Core
             return this;
         }
         
-        public async Task<IResult> Invoke()
+        public virtual async Task<IResult> Invoke()
         {
             var validators = Locator.GetService<Invoker<IValidate>>();
             var queries = Locator.GetService<Invoker<IQuery>>();
