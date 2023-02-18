@@ -24,7 +24,6 @@ namespace Panama.Core.Interfaces
         IHandler Add(CancellationToken token);
         IHandler Add(params IModel[] data);
         IHandler Add(IEnumerable<IModel> data);
-        IHandler Add(Guid id);
 
         Task<IResult> Invoke();
     }

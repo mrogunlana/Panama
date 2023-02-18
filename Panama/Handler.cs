@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
-using Panama.Core.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Panama.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Panama.Core
 {
@@ -61,13 +59,6 @@ namespace Panama.Core
 
             return this;
         }
-        public IHandler Add(Guid id)
-        {
-            _id = id;
-
-            return this; 
-        }
-        
         public IHandler Command<Command>() where Command : ICommand
         {
             Manifest.Add(Locator.GetService<Command>());
@@ -93,9 +84,27 @@ namespace Panama.Core
             return this;
         }
         
-        public Task<IResult> Invoke()
+        public async Task<IResult> Invoke()
         {
-            throw new NotImplementedException();
+            var validators = Locator.GetService<Invoker<IValidate>>();
+            var queries = Locator.GetService<Invoker<IQuery>>();
+            var commands = Locator.GetService<Invoker<ICommand>>();
+            var rollbacks = Locator.GetService<Invoker<IRollback>>();
+
+            var valid = await validators.Invoke(this);
+            if (!valid.Success)
+                return valid;
+
+            var queried = await queries.Invoke(this);
+            if (!queried.Success)
+                return queried;
+
+            var performed = await commands.Invoke(this);
+            if (performed.Success)
+                return performed;
+
+            var compensated = await rollbacks.Invoke(this);
+            return compensated;
         }
     }
 }
