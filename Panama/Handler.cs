@@ -14,21 +14,26 @@ namespace Panama.Core
 {
     public class Handler : IHandler
     {
-        public Guid Id { get; set;  }
+        private Guid _id;
+        private CancellationToken _token;
+
+        public Guid Id => _id;
         public ILogger Log { get; }
-        public CancellationToken Token { get; set; }
+        public CancellationToken Token => _token;
         public IServiceProvider Locator { get; }
-        public IList<IModel> Data { get; set; }
-        public IList<IQuery> Queries { get; set; }
-        public IList<ICommand> Commands { get; set; }
-        public IList<IRollback> Rollbacks { get; set; }
-        public IList<IValidate> Validators { get; set; }
+        public IList<IModel> Data { get; }
+        public IList<IQuery> Queries { get; }
+        public IList<ICommand> Commands { get; }
+        public IList<IRollback> Rollbacks { get; }
+        public IList<IValidate> Validators { get; }
 
         public Handler(IServiceProvider serviceProvider)
         {
+            _id = Guid.NewGuid();
+            _token = CancellationToken.None;
+            
             Locator = serviceProvider;
 
-            Id = Guid.NewGuid();
             Data = new List<IModel>();
             Queries = new List<IQuery>();
             Commands = new List<ICommand>();
@@ -46,7 +51,7 @@ namespace Panama.Core
         }
         public IHandler Add(CancellationToken token)
         {
-            Token = token;
+            _token = token;
 
             return this;
         }
@@ -66,7 +71,7 @@ namespace Panama.Core
         }
         public IHandler Add(Guid id)
         {
-            Id = id;
+            _id = id;
 
             return this; 
         }

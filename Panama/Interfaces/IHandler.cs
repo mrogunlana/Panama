@@ -8,16 +8,16 @@ namespace Panama.Core.Interfaces
 {
     public interface IHandler
     {
-        Guid Id { get; set; }
+        Guid Id { get; }
         ILogger Log { get; }
         IServiceProvider Locator { get; }
-        CancellationToken Token { get; set; }
+        CancellationToken Token { get; }
         
-        IList<IModel> Data { get; set; }
-        IList<IQuery> Queries { get; set; }
-        IList<ICommand> Commands { get; set; }
-        IList<IRollback> Rollbacks { get; set; }
-        IList<IValidate> Validators { get; set; }
+        IList<IModel> Data { get; }
+        IList<IQuery> Queries { get; }
+        IList<ICommand> Commands { get; }
+        IList<IRollback> Rollbacks { get; }
+        IList<IValidate> Validators { get; }
         
         IHandler Query<Query>() where Query : IQuery;
         IHandler Command<Command>() where Command : ICommand;
