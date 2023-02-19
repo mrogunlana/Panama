@@ -1,4 +1,4 @@
 ﻿namespace Panama.Core.Interfaces
 {
-    public interface IQuery : IExecute { }
+    public interface IQuery : IAction { }
 }

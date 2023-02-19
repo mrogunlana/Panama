@@ -38,10 +38,6 @@
    </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama.IoC.Autofac\Panama.Core.IoC.Autofac.csproj" />
-    <ProjectReference Include="..\Panama.Logger.Nlog\Panama.Core.Logger.Nlog.csproj" />
-    <ProjectReference Include="..\Panama.MySql.Dapper\Panama.Core.MySql.Dapper.csproj" />
-    <ProjectReference Include="..\Panama.Sql.Dapper\Panama.Core.Sql.Dapper.csproj" />
     <ProjectReference Include="..\Panama\Panama.Core.csproj" />
   </ItemGroup>
 

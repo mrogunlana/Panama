@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Panama.Core.Service
 {
-    public static class ServiceRegistrar
+    public static class Registrar
     {
         public static void AddPanama(this IServiceCollection services)
         {

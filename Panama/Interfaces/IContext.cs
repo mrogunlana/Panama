@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Panama.Core.Interfaces
 {
     public interface IContext
     {
-        IList<IModel> Data { get; set; }
-        CancellationToken Token { get; set; }
+        Guid HandlerId { get; }
+        Guid CorrelationId { get; }
+        IList<IModel> Data { get; }
+        CancellationToken Token { get; }
     }
 }

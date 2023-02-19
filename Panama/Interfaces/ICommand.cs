@@ -2,5 +2,5 @@
 
 namespace Panama.Core.Interfaces
 {
-    public interface ICommand : IExecute { }
+    public interface ICommand : IAction { }
 }

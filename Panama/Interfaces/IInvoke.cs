@@ -2,7 +2,11 @@
 
 namespace Panama.Core.Interfaces
 {
-    public interface IInvoke<T> where T : IExecute
+    public interface IInvoke
+    {
+        Task<IResult> Invoke();
+    }
+    public interface IInvoke<T>
     {
         Task<IResult> Invoke(IHandler handler);
     }

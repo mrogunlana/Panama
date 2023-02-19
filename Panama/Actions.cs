@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Panama.Core.Interfaces;
+﻿using Panama.Core.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -7,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Panama.Core
 {
-    public class Invoker<T> : IInvoke<T> where T : IExecute
+    public class Actions<T> : IInvoke<T>
+        where T : IAction
     {
-        private ILogger _log;
+        private ILog<Actions<T>> _log;
         
-        public Invoker(ILogger<Invoker<T>> log)
+        public Actions(ILog<Actions<T>> log)
         {
             _log = log;
         }
@@ -23,11 +23,10 @@ namespace Panama.Core
             try
             {
                 var manifest = handler.Manifest.OfType<T>();
-                var context = new Context(handler.Data, handler.Token);
 
                 stopwatch.Start();
 
-                _log.LogTrace($"Handler (HID:{handler.Id}) Start: [{manifest.Count()}] Actions Queued.");
+                _log.LogTrace($"{nameof(T)} Processing (HID:{handler.HandlerId}) Start: [{manifest.Count()}] Actions Queued.");
 
                 foreach (var action in manifest)
                 {
@@ -35,14 +34,14 @@ namespace Panama.Core
                         handler.Token.ThrowIfCancellationRequested();
 
                     await action
-                        .Execute(context)
+                        .Execute(handler)
                         .ConfigureAwait(false);
                 }
                 
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, null);
+                _log.LogException(ex);
 
                 var result = new Result() { Success = false, Data = handler.Data };
 
@@ -55,9 +54,9 @@ namespace Panama.Core
                 else if (ex is ServiceException)
                     result.AddMessages(((ServiceException)ex).Messages);
                 else if (result.Cancelled)
-                    result.AddMessage($"HID:{handler.Id}, Looks like there was a cancellation request that caused your request to end prematurely.");
+                    result.AddMessage($"HID:{handler.HandlerId}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
-                    result.AddMessage($"HID:{handler.Id}, Looks like there was a problem with your request.");
+                    result.AddMessage($"HID:{handler.HandlerId}, Looks like there was a problem with your request.");
 
                 return result;
             }
@@ -65,7 +64,7 @@ namespace Panama.Core
             {
                 stopwatch.Stop();
 
-                _log.LogTrace($"Handler (HID:{handler.Id}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                _log.LogTrace($"{nameof(T)} Processing (HID:{handler.HandlerId}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }
 
             return new Result() { Success = true, Data = handler.Data };

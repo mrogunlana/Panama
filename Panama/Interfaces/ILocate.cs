@@ -1,6 +1,6 @@
-﻿namespace Panama.Core.IoC
+﻿namespace Panama.Core.Interfaces
 {
-    public interface IServiceLocator
+    public interface ILocate
     {
         T Resolve<T>();
         T Resolve<T>(string name);
