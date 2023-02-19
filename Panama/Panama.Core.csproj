@@ -8,7 +8,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>v6.0 Release Features: </PackageReleaseNotes>
+    <PackageReleaseNotes>v6.0 Release</PackageReleaseNotes>
     <Description>An unobtrusive service oriented architecture library  for .NET CORE 6 developed by Diran Ogunlana</Description>
     <Copyright>Copyright 2023</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>

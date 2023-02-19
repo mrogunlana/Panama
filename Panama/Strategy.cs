@@ -1,4 +1,5 @@
 ﻿using Panama.Core.Interfaces;
+using Panama.Core.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;

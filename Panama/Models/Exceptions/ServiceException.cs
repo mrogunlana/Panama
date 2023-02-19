@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Panama.Core
+namespace Panama.Core.Models
 {
     [Serializable]
     public class ServiceException : Exception

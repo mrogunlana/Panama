@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Panama.Core
+namespace Panama.Core.Models
 {
     public class Result : IResult
     {

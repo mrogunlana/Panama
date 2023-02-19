@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Panama.Core
+namespace Panama.Core.Models
 {
     public class Context : IContext
     {

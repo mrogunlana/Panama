@@ -1,6 +1,6 @@
 ﻿using Panama.Core.Interfaces;
 
-namespace Panama.Core
+namespace Panama.Core.Models
 {
     public class Document : IModel
     {
