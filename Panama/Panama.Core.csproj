@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <PackageId>Panama.Core</PackageId>
-    <Version>2.0.8</Version>
+    <Version>6.0</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>Added TransactionOptions in TransactionHandler constructor to allow customizations surrounding the IsolationLevel and Timeouts for distributed transactions. </PackageReleaseNotes>
-    <Description>A simple command architecture for .NET CORE 3+ developed by Diran Ogunlana</Description>
-    <Copyright>Copyright 2021</Copyright>
+    <PackageReleaseNotes>v6.0 Release Features: </PackageReleaseNotes>
+    <Description>An unobtrusive service oriented architecture library  for .NET CORE 6 developed by Diran Ogunlana</Description>
+    <Copyright>Copyright 2023</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama.Core</RepositoryUrl>
     <AssemblyVersion></AssemblyVersion>
