@@ -2,7 +2,7 @@
 using Panama.Core.Interfaces;
 using System;
 
-namespace Panama.Core
+namespace Panama.Core.Configuration
 {
     public class Locator : ILocate
     {
