@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Panama.Core.Interfaces
+namespace Panama.Core.Messaging.Interfaces
 {
     public interface IEvent
     {

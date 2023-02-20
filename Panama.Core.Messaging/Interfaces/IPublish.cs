@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Panama.Core.Interfaces
+namespace Panama.Core.Messaging.Interfaces
 {
-    public interface ISubscribe<T> where T : IBroker
+    public interface IPublish<T> where T : IBroker
     {
         string To { get; }
     }
