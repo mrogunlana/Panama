@@ -5,14 +5,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Panama.Core
+namespace Panama.Core.Invokers
 {
-    public class Actions<T> : IInvoke<T>
+    public class InvokeActions<T> : IInvoke<T>
         where T : IAction
     {
-        private ILog<Actions<T>> _log;
+        private ILog<InvokeActions<T>> _log;
         
-        public Actions(ILog<Actions<T>> log)
+        public InvokeActions(ILog<InvokeActions<T>> log)
         {
             _log = log;
         }

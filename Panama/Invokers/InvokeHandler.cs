@@ -5,17 +5,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Panama.Core
+namespace Panama.Core.Invokers
 {
-    public class Strategy : IInvoke<IHandler> 
+    public class InvokeHandler : IInvoke<IHandler> 
     {
-        private ILog<Strategy> _log;
+        private ILog<InvokeHandler> _log;
         private readonly ILocate _serviceLocator;
 
-        public Strategy(ILocate serviceLocator)
+        public InvokeHandler(ILocate serviceLocator)
         {
             _serviceLocator = serviceLocator;
-            _log = _serviceLocator.Resolve<ILog<Strategy>>(); ;
+            _log = _serviceLocator.Resolve<ILog<InvokeHandler>>(); ;
         }
 
         public async Task<IResult> Invoke(IHandler handler)
@@ -28,10 +28,10 @@ namespace Panama.Core
 
                 _log.LogTrace($"Handler (HID:{handler.HandlerId}) Start: [{handler.Manifest.Count()}] Total Actions Queued.");
 
-                var validators = _serviceLocator.Resolve<Actions<IValidate>>();
-                var queries = _serviceLocator.Resolve<Actions<IQuery>>();
-                var commands = _serviceLocator.Resolve<Actions<ICommand>>();
-                var rollbacks = _serviceLocator.Resolve<Actions<IRollback>>();
+                var validators = _serviceLocator.Resolve<InvokeActions<IValidate>>();
+                var queries = _serviceLocator.Resolve<InvokeActions<IQuery>>();
+                var commands = _serviceLocator.Resolve<InvokeActions<ICommand>>();
+                var rollbacks = _serviceLocator.Resolve<InvokeActions<IRollback>>();
 
                 var valid = await validators.Invoke(handler);
                 if (!valid.Success)

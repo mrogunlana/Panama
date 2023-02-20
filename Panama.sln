@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core", "Panama\Panama.Core.csproj", "{005CE007-CFD8-4D57-BEA6-E94CC05474A4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Security", "Panama.Core.Security\Panama.Core.Security.csproj", "{7FD635D4-9C1D-438A-8C05-614C2A66F50D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Tests", "Panama.Core.Tests\Panama.Core.Tests.csproj", "{8F37003C-2B9F-462B-801A-D106E930C772}"
 	ProjectSection(ProjectDependencies) = postProject
 		{005CE007-CFD8-4D57-BEA6-E94CC05474A4} = {005CE007-CFD8-4D57-BEA6-E94CC05474A4}
@@ -14,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Tests", "Panama
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.TestApi", "Panama.Core.TestApi\Panama.Core.TestApi.csproj", "{037F5BD6-D276-4A6E-8D18-678614ACB7CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Core.Messaging", "Panama.Core.Messaging\Panama.Core.Messaging.csproj", "{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Messaging", "Panama.Core.Messaging\Panama.Core.Messaging.csproj", "{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Security", "Panama.Core.Security\Panama.Core.Security.csproj", "{6A99F621-E049-45F9-998B-567C98E3495A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +26,6 @@ Global
 		{005CE007-CFD8-4D57-BEA6-E94CC05474A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{005CE007-CFD8-4D57-BEA6-E94CC05474A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{005CE007-CFD8-4D57-BEA6-E94CC05474A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FD635D4-9C1D-438A-8C05-614C2A66F50D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FD635D4-9C1D-438A-8C05-614C2A66F50D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FD635D4-9C1D-438A-8C05-614C2A66F50D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FD635D4-9C1D-438A-8C05-614C2A66F50D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F37003C-2B9F-462B-801A-D106E930C772}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8F37003C-2B9F-462B-801A-D106E930C772}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F37003C-2B9F-462B-801A-D106E930C772}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,6 +38,10 @@ Global
 		{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A99F621-E049-45F9-998B-567C98E3495A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A99F621-E049-45F9-998B-567C98E3495A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A99F621-E049-45F9-998B-567C98E3495A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A99F621-E049-45F9-998B-567C98E3495A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
