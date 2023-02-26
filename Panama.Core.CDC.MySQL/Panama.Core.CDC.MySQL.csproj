@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Panama.Core.CDC\Panama.Core.CDC.csproj" />
-    <ProjectReference Include="..\Panama\Panama.Core.csproj" />
+    <ProjectReference Include="..\Panama.Core\Panama.Core.csproj" />
   </ItemGroup>
 
 </Project>

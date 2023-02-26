@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama\Panama.Core.csproj" />
+    <ProjectReference Include="..\Panama.Core\Panama.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
