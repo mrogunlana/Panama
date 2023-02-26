@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Core.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace Panama.Core.Configuration
 {
@@ -15,6 +16,11 @@ namespace Panama.Core.Configuration
         public T Resolve<T>()
         {
             return _serviceProvider.GetService<T>();
+        }
+
+        public IEnumerable<T> ResolveList<T>()
+        {
+            return _serviceProvider.GetServices<T>();
         }
 
         public T Resolve<T>(string name)

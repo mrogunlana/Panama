@@ -11,24 +11,25 @@ namespace Panama.Core
         private Guid _id;
         private Guid _correlationId;
         private CancellationToken _token;
-        private ILocate _serviceLocator;
         private IInvoke<IHandler> _invoker; 
 
-        public Guid HandlerId => _id;
+        public Guid Id => _id;
         public Guid CorrelationId => _correlationId;
         public CancellationToken Token => _token;
         public IList<IModel> Data { get; }
         public IList<IAction> Manifest { get; }
-        
+
+        public ILocate Locator { get; }
+
         public Handler(ILocate serviceLocator)
         {
             _id = Guid.NewGuid();
             _token = CancellationToken.None;
-            _serviceLocator = serviceLocator;
-            _invoker = _serviceLocator.Resolve<IInvoke<IHandler>>();
+            _invoker = serviceLocator.Resolve<IInvoke<IHandler>>();
 
             Data = new List<IModel>();
             Manifest = new List<IAction>();
+            Locator = serviceLocator;
         }
 
         public IHandler Add(IModel data)
@@ -59,25 +60,25 @@ namespace Panama.Core
         }
         public IHandler Command<Command>() where Command : ICommand
         {
-            Manifest.Add(_serviceLocator.Resolve<Command>());
+            Manifest.Add(Locator.Resolve<Command>());
 
             return this;
         }
         public IHandler Query<Query>() where Query : IQuery
         {
-            Manifest.Add(_serviceLocator.Resolve<Query>());
+            Manifest.Add(Locator.Resolve<Query>());
 
             return this;
         }
         public IHandler Rollback<Rollback>() where Rollback : IRollback
         {
-            Manifest.Add(_serviceLocator.Resolve<Rollback>());
+            Manifest.Add(Locator.Resolve<Rollback>());
 
             return this;
         }
         public IHandler Validate<Validate>() where Validate : IValidate
         {
-            Manifest.Add(_serviceLocator.Resolve<Validate>());
+            Manifest.Add(Locator.Resolve<Validate>());
 
             return this;
         }

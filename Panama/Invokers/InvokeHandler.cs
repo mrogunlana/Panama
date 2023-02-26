@@ -26,7 +26,7 @@ namespace Panama.Core.Invokers
             {
                 stopwatch.Start();
 
-                _log.LogTrace($"Handler (HID:{handler.HandlerId}) Start: [{handler.Manifest.Count()}] Total Actions Queued.");
+                _log.LogTrace($"Handler (HID:{handler.Id}) Start: [{handler.Manifest.Count()}] Total Actions Queued.");
 
                 var validators = _serviceLocator.Resolve<InvokeActions<IValidate>>();
                 var queries = _serviceLocator.Resolve<InvokeActions<IQuery>>();
@@ -59,9 +59,9 @@ namespace Panama.Core.Invokers
                                     handler.Token.IsCancellationRequested);
 
                 if (result.Cancelled)
-                    result.AddMessage($"HID:{handler.HandlerId}, Looks like there was a cancellation request that caused your request to end prematurely.");
+                    result.AddMessage($"HID:{handler.Id}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
-                    result.AddMessage($"HID:{handler.HandlerId}, Looks like there was a problem with your request.");
+                    result.AddMessage($"HID:{handler.Id}, Looks like there was a problem with your request.");
 
                 return result;
             }
@@ -69,7 +69,7 @@ namespace Panama.Core.Invokers
             {
                 stopwatch.Stop();
 
-                _log.LogTrace($"Handler (HID:{handler.HandlerId}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                _log.LogTrace($"Handler (HID:{handler.Id}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }
         }
     }
