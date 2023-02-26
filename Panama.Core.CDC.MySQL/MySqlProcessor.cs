@@ -46,7 +46,7 @@ namespace Panama.Core.CDC.MySQL
         }
         public async Task Invoke(IContext context)
         {
-            await foreach (var binlogEvent in _client.Replicate())
+            await foreach (var binlogEvent in _client.Replicate(context.Token))
             {
                 var state = _client.State;
 
