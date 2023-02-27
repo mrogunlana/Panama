@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using Panama.Core.Interfaces;
 
 namespace Panama.Core.Messaging.Interfaces
 {

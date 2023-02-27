@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using Panama.Core.Interfaces;
 
 namespace Panama.Core.Messaging.Interfaces
 {
     public interface ISubscribe<T> where T : IBroker
     {
-        string To { get; }
+        string Topic { get; }
+        Task Execute(IContext context);
     }
 }
