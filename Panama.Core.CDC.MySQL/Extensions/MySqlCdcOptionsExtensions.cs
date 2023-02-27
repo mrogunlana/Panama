@@ -1,12 +1,4 @@
-﻿using MySqlCdc.Events;
-using MySqlConnector;
-using Panama.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MySqlConnector;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {
@@ -26,6 +18,8 @@ namespace Panama.Core.CDC.MySQL.Extensions
                     ORDER BY POS;"
 
                 , connection);
+
+                command.Parameters.Add("@TABLE_ID", MySqlDbType.Int32);
 
                 var result = new Dictionary<int, string>();
                 using var reader = command.ExecuteReader();
