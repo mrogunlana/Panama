@@ -10,7 +10,7 @@ using Panama.Core.Security.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
 {
-    public class MySqlCdcProcessor : IProcess
+    public class LogTailingProcessor : IProcess
     {
         private readonly BinlogClient _client;
         private readonly Dictionary<int, string> _map;
@@ -18,7 +18,7 @@ namespace Panama.Core.CDC.MySQL
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
 
-        public MySqlCdcProcessor(ILocate locator)
+        public LogTailingProcessor(ILocate locator)
         {
             _settings = locator.Resolve<MySqlCdcOptions>();
             _brokers = locator.ResolveList<IBroker>();
