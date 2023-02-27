@@ -2,18 +2,20 @@
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
 using Panama.Core.CDC.Interfaces;
+using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
 {
-    public class MySqlProcessor : IProcess
+    public class MySqlCdcProcessor : IProcess
     {
         private readonly BinlogClient _client;
+        private readonly Dictionary<int, string> _map;
+        private readonly MySqlCdcOptions _settings;
 
-        public MySqlProcessor()
+        public MySqlCdcProcessor(MySqlCdcOptions settings)
         {
-            /*  TODO: get table/column info,
-             *  For example: 
+            /*  NOTES: 
              * 
              *  #Use for MySQL GTID below
              *  select @@gtid_executed;
@@ -30,13 +32,16 @@ namespace Panama.Core.CDC.MySQL
              *  order by POS;
              */
 
+            _settings = settings;
+            _map = settings.GetMap();
             _client = new BinlogClient(options =>
             {
-                options.Port = 3309;
-                options.Username = "<REDACTED>";
-                options.Password = "<REDACTED>";
+                options.Hostname = settings.Host;
+                options.Port = settings.Port;
+                options.Username = settings.Username;
+                options.Password = settings.Password;
                 options.SslMode = SslMode.Disabled;
-                options.HeartbeatInterval = TimeSpan.FromSeconds(30);
+                options.HeartbeatInterval = TimeSpan.FromSeconds(settings.Heartbeat);
                 options.Blocking = true;
 
                 // Start replication from MySQL GTID
@@ -44,32 +49,28 @@ namespace Panama.Core.CDC.MySQL
                 //options.Binlog = BinlogOptions.FromGtid(GtidSet.Parse(gtidSet));
             });
         }
+
         public async Task Invoke(IContext context)
         {
             await foreach (var binlogEvent in _client.Replicate(context.Token))
             {
-                var state = _client.State;
+                //TODO: Handle Other Events e.g: 
+                //if tableMap
+                //if WriteRowsEvent 
+                //if UpdateRowsEvent 
+                //if DeleteRowsEvent 
+                //if PrintEventAsync 
 
-                //TODO: Emit Event 
-
-                //if (binlogEvent is TableMapEvent tableMap)
-                //{
-                //    await HandleTableMapEvent(tableMap);
-                //}
-                //else if (binlogEvent is WriteRowsEvent writeRows)
-                //{
-                //    await HandleWriteRowsEvent(writeRows);
-                //}
-                //else if (binlogEvent is UpdateRowsEvent updateRows)
-                //{
-                //    await HandleUpdateRowsEvent(updateRows);
-                //}
-                //else if (binlogEvent is DeleteRowsEvent deleteRows)
-                //{
-                //    await HandleDeleteRowsEvent(deleteRows);
-                //}
-                //else await PrintEventAsync(binlogEvent);
+                if (binlogEvent is WriteRowsEvent writeRows)
+                    await HandleWriteRowsEvent(writeRows);
             }
+        }
+
+        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows)
+        {
+            var messages = writeRows.GetMessages(_settings, _map);
+
+            // TODO: get the messages to the broker(s) somehow?
         }
     }
 }

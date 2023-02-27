@@ -13,6 +13,8 @@ namespace Panama.Core.CDC
         private IEnumerable<IServer> _servers = default!;
         private bool _disposed;
 
+        public bool IsActive => !_cts?.IsCancellationRequested ?? false;
+
         public Bootstrapper(
               ILocate locator
             , ILog<Bootstrapper> log)

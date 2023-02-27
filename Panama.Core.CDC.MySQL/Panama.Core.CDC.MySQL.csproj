@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MySqlCdc" Version="3.0.1" />
+    <PackageReference Include="MySqlConnector" Version="2.2.5" />
   </ItemGroup>
 
   <ItemGroup>
