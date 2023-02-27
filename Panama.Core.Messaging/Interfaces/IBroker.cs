@@ -1,4 +1,9 @@
-﻿namespace Panama.Core.Messaging.Interfaces
+﻿using Panama.Core.Interfaces;
+
+namespace Panama.Core.Messaging.Interfaces
 {
-    public interface IBroker { }
+    public interface IBroker 
+    {
+        Task Publish(IContext context);
+    }
 }

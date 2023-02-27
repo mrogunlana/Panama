@@ -1,6 +1,6 @@
 ﻿using Panama.Core.CDC.Interfaces;
-using Panama.Core.CDC.Models;
 using Panama.Core.Interfaces;
+using Panama.Core.Models;
 
 namespace Panama.Core.CDC
 {
@@ -11,7 +11,7 @@ namespace Panama.Core.CDC
         private readonly ILogFactory _factory;
 
         private CancellationTokenSource _cts;
-        private ProcessContext _context = default!;
+        private Context _context = default!;
         private Task? _task;
         private bool _disposed;
 
@@ -59,7 +59,7 @@ namespace Panama.Core.CDC
 
             _log.LogDebug("### Panama.Core.CDC Default Server is starting.");
 
-            _context = new ProcessContext(_locator, _cts.Token);
+            _context = new Context(_locator, _cts.Token);
 
             var processors = _locator.ResolveList<IProcess>();
 

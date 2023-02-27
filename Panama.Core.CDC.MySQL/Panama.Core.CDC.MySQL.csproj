@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Panama.Core.CDC\Panama.Core.CDC.csproj" />
     <ProjectReference Include="..\Panama.Core.Messaging\Panama.Core.Messaging.csproj" />
+    <ProjectReference Include="..\Panama.Core.Security\Panama.Core.Security.csproj" />
     <ProjectReference Include="..\Panama.Core\Panama.Core.csproj" />
   </ItemGroup>
 

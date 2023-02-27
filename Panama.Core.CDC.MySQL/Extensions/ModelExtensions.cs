@@ -1,11 +1,5 @@
-﻿using MySqlCdc.Events;
-using Panama.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Panama.Core.Interfaces;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {

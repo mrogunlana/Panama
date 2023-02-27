@@ -16,7 +16,9 @@ use devdb;
 DROP TABLE IF EXISTS `Outbox`;
 
 CREATE TABLE IF NOT EXISTS `Outbox` (
-  `Id` bigint NOT NULL AUTO_INCREMENT,
+  `_Id` bigint NOT NULL AUTO_INCREMENT,
+  `Id` varchar(150) DEFAULT NULL,
+  `CorrelationId` varchar(150) DEFAULT NULL,
   `Version` varchar(20) DEFAULT NULL,
   `Name` varchar(400) NOT NULL,
   `Group` varchar(200) DEFAULT NULL,

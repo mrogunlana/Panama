@@ -4,7 +4,9 @@ namespace Panama.Core.CDC.MySQL
 {
     public class Outbox : IModel
     {
-        public int Id { get; set; }
+        public int _Id { get; set; }
+        public string Id { get; set; } = String.Empty;
+        public string CorrelationId { get; set; } = String.Empty;
         public string Version { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
         public string Group { get; set; } = String.Empty;

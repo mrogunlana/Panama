@@ -1,6 +1,6 @@
 ﻿using Panama.Core.Interfaces;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Panama.Core.Models
@@ -14,28 +14,55 @@ namespace Panama.Core.Models
 
             Locator = locator;
         }
-        
+
         public Context(
-              IList<IModel> data
-            , ILocate locator = null
-            , CancellationToken? token = null
-            , Guid? handlerId = null
-            , Guid? correlationId = null)
+              ILocate locator
+            , CancellationToken? token = null)
             : this(locator)
         {
-            Data = data;
+            if (token.HasValue)
+                Token = token.Value;
+        }
+
+        public Context(
+              IEnumerable<IModel> data
+            , ILocate locator = null
+            , CancellationToken? token = null
+            , string id = null
+            , string correlationId = null)
+            : this(locator)
+        {
+            Data = Data.ToList();
 
             if (token.HasValue)
                 Token = token.Value;
-            if (handlerId.HasValue)
-                Id = handlerId.Value;
-            if (correlationId.HasValue)
-                CorrelationId = correlationId.Value;
+            if (!string.IsNullOrEmpty(id))
+                Id = id;
+            if (!string.IsNullOrEmpty(correlationId))
+                CorrelationId = correlationId;
+        }
+
+        public Context(
+              IModel data
+            , ILocate locator = null
+            , CancellationToken? token = null
+            , string id = null
+            , string correlationId = null)
+            : this(locator)
+        {
+            Data.Add(data);
+
+            if (token.HasValue)
+                Token = token.Value;
+            if (!string.IsNullOrEmpty(id))
+                Id = id;
+            if (!string.IsNullOrEmpty(correlationId))
+                CorrelationId = correlationId;
         }
         public IList<IModel> Data { get; set; }
         public CancellationToken Token { get; set; }
-        public Guid Id { get; }
-        public Guid CorrelationId { get; }
+        public string Id { get; set; }
+        public string CorrelationId { get; set; }
         public ILocate Locator { get; }
     }
 }

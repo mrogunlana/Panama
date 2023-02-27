@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Panama.Core.Invokers
 {
-    public class InvokeActions<T> : IInvoke<T>
+    public class InvokeActions<T> : IInvokeResult<T>
         where T : IAction
     {
         private ILog<InvokeActions<T>> _log;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Panama.Core.Invokers
 {
-    public class InvokeHandler : IInvoke<IHandler> 
+    public class InvokeHandler : IInvokeResult<IHandler> 
     {
         private ILog<InvokeHandler> _log;
         private readonly ILocate _serviceLocator;

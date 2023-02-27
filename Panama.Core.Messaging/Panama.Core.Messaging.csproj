@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Panama.Core\Panama.Core.csproj" />
+  </ItemGroup>
+
 </Project>

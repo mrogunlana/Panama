@@ -5,6 +5,8 @@ using Panama.Core.CDC.Interfaces;
 using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
 using Panama.Core.Messaging.Interfaces;
+using Panama.Core.Security;
+using Panama.Core.Security.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
 {
@@ -14,11 +16,13 @@ namespace Panama.Core.CDC.MySQL
         private readonly Dictionary<int, string> _map;
         private readonly MySqlCdcOptions _settings;
         private readonly IEnumerable<IBroker> _brokers;
+        private readonly IStringEncryptor _encryptor;
 
         public MySqlCdcProcessor(ILocate locator)
         {
             _settings = locator.Resolve<MySqlCdcOptions>();
             _brokers = locator.ResolveList<IBroker>();
+            _encryptor = locator.Resolve<IStringEncryptor>(nameof(Base64Encryptor));
 
             /*  NOTES: 
              * 
@@ -58,7 +62,10 @@ namespace Panama.Core.CDC.MySQL
         {
             await foreach (var binlogEvent in _client.Replicate(context.Token))
             {
-                //TODO: Handle Other Events e.g: 
+                if (context.Token.IsCancellationRequested)
+                    context.Token.ThrowIfCancellationRequested();
+
+                //TODO: Handle Other Events ? e.g: 
                 //if tableMap
                 //if WriteRowsEvent 
                 //if UpdateRowsEvent 
@@ -66,18 +73,22 @@ namespace Panama.Core.CDC.MySQL
                 //if PrintEventAsync 
 
                 if (binlogEvent is WriteRowsEvent writeRows)
-                    await HandleWriteRowsEvent(writeRows);
+                    await HandleWriteRowsEvent(writeRows, context);
             }
         }
 
-        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows)
+        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows, IContext context)
         {
-            var messages = writeRows.GetMessages(_settings, _map);
+            if (context.Token.IsCancellationRequested)
+                context.Token.ThrowIfCancellationRequested();
 
+            var messages = writeRows
+                .GetMessages(_settings, _map)
+                .DecodeContent(_encryptor);
+            
             foreach (var broker in _brokers)
-            {
-                // TODO: get the messages to the broker(s) somehow?
-            }
+                foreach (var message in messages)
+                    await broker.Publish(new OutboxContext(message, context.Locator, context.Token));
         }
     }
 }

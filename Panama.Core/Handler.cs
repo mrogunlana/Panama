@@ -11,7 +11,7 @@ namespace Panama.Core
         private Guid _id;
         private Guid _correlationId;
         private CancellationToken _token;
-        private IInvoke<IHandler> _invoker; 
+        private IInvokeResult<IHandler> _invoker; 
 
         public Guid Id => _id;
         public Guid CorrelationId => _correlationId;
@@ -25,7 +25,7 @@ namespace Panama.Core
         {
             _id = Guid.NewGuid();
             _token = CancellationToken.None;
-            _invoker = serviceLocator.Resolve<IInvoke<IHandler>>();
+            _invoker = serviceLocator.Resolve<IInvokeResult<IHandler>>();
 
             Data = new List<IModel>();
             Manifest = new List<IAction>();
