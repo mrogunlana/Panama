@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace Panama.Core.Interfaces
 {
-    public interface IHandler : IContext
+    public interface IHandler 
     {
         IList<IAction> Manifest { get; }
-        
+        IContext Context { get; }
         IHandler Query<Query>() where Query : IQuery;
         IHandler Command<Command>() where Command : ICommand;
         IHandler Rollback<Rollback>() where Rollback : IRollback;

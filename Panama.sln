@@ -4,8 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Tests", "Panama.Core.Tests\Panama.Core.Tests.csproj", "{8F37003C-2B9F-462B-801A-D106E930C772}"
+	ProjectSection(ProjectDependencies) = postProject
+		{440AF264-97BC-465D-8CA9-A609795242E6} = {440AF264-97BC-465D-8CA9-A609795242E6}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.TestApi", "Panama.Core.TestApi\Panama.Core.TestApi.csproj", "{037F5BD6-D276-4A6E-8D18-678614ACB7CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{440AF264-97BC-465D-8CA9-A609795242E6} = {440AF264-97BC-465D-8CA9-A609795242E6}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Messaging", "Panama.Core.Messaging\Panama.Core.Messaging.csproj", "{0A2CD58D-DCF4-446D-BFA2-E85B6BB8D659}"
 EndProject
@@ -13,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Security", "Pan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.CDC", "Panama.Core.CDC\Panama.Core.CDC.csproj", "{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Core.CDC.MySQL", "Panama.Core.CDC.MySQL\Panama.Core.CDC.MySQL.csproj", "{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.CDC.MySQL", "Panama.Core.CDC.MySQL\Panama.Core.CDC.MySQL.csproj", "{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core", "Panama.Core\Panama.Core.csproj", "{440AF264-97BC-465D-8CA9-A609795242E6}"
 EndProject

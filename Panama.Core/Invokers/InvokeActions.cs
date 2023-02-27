@@ -1,4 +1,5 @@
-﻿using Panama.Core.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Panama.Core.Interfaces;
 using Panama.Core.Models;
 using System;
 using System.Diagnostics;
@@ -7,17 +8,16 @@ using System.Threading.Tasks;
 
 namespace Panama.Core.Invokers
 {
-    public class InvokeActions<T> : IInvokeResult<T>
-        where T : IAction
+    public class InvokeActions : IInvokeAction
     {
-        private ILog<InvokeActions<T>> _log;
+        private readonly ILogger<InvokeActions> _logger;
         
-        public InvokeActions(ILog<InvokeActions<T>> log)
+        public InvokeActions(ILogger<InvokeActions> logger)
         {
-            _log = log;
+            _logger = logger;
         }
 
-        public async Task<IResult> Invoke(IHandler handler)
+        public async Task<IResult> Invoke<T>(IHandler handler) where T:IAction
         {
             var stopwatch = new Stopwatch();
             
@@ -27,37 +27,37 @@ namespace Panama.Core.Invokers
 
                 stopwatch.Start();
 
-                _log.LogTrace($"{nameof(T)} Processing (HID:{handler.Id}) Start: [{manifest.Count()}] Actions Queued.");
+                _logger.LogTrace($"{nameof(T)} Processing (HID:{handler.Context.Id}) Start: [{manifest.Count()}] Actions Queued.");
 
                 foreach (var action in manifest)
                 {
-                    if (handler.Token.IsCancellationRequested)
-                        handler.Token.ThrowIfCancellationRequested();
+                    if (handler.Context.Token.IsCancellationRequested)
+                        handler.Context.Token.ThrowIfCancellationRequested();
 
                     await action
-                        .Execute(handler)
+                        .Execute(handler.Context)
                         .ConfigureAwait(false);
                 }
                 
             }
             catch (Exception ex)
             {
-                _log.LogException(ex);
+                _logger.LogError(ex.ToString());
 
-                var result = new Result() { Success = false, Data = handler.Data };
+                var result = new Result() { Success = false, Data = handler.Context.Data };
 
                 result.Cancelled = (ex is OperationCanceledException ||
                                     ex is TaskCanceledException ||
-                                    handler.Token.IsCancellationRequested);
+                                    handler.Context.Token.IsCancellationRequested);
 
                 if (ex is ValidationException)
                     result.AddMessages(((ValidationException)ex).Messages);
                 else if (ex is ServiceException)
                     result.AddMessages(((ServiceException)ex).Messages);
                 else if (result.Cancelled)
-                    result.AddMessage($"HID:{handler.Id}, Looks like there was a cancellation request that caused your request to end prematurely.");
+                    result.AddMessage($"HID:{handler.Context.Id}, Looks like there was a cancellation request that caused your request to end prematurely.");
                 else
-                    result.AddMessage($"HID:{handler.Id}, Looks like there was a problem with your request.");
+                    result.AddMessage($"HID:{handler.Context.Id}, Looks like there was a problem with your request.");
 
                 return result;
             }
@@ -65,10 +65,10 @@ namespace Panama.Core.Invokers
             {
                 stopwatch.Stop();
 
-                _log.LogTrace($"{nameof(T)} Processing (HID:{handler.Id}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
+                _logger.LogTrace($"{nameof(T)} Processing (HID:{handler.Context.Id}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }
 
-            return new Result() { Success = true, Data = handler.Data };
+            return new Result() { Success = true, Data = handler.Context.Data };
         }
     }
 }

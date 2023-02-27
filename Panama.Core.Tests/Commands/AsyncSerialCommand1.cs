@@ -1,16 +1,17 @@
-﻿using Panama.Core.Commands;
+﻿using Panama.Core.Interfaces;
+using Panama.Core.Models;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using KeyValuePair = Panama.Core.Entities.KeyValuePair;
 
 namespace Panama.Core.Tests.Commands
 {
-    public class AsyncSerialCommand1 : ICommandAsync
+    public class AsyncSerialCommand1 : ICommand
     {
-        public async Task Execute(Subject subject)
+        public async Task Execute(IContext context)
         {
             await Task.Run(() => {
-                subject.Context.Add(new KeyValuePair("test", 1));
+                context.Data.Add(new Kvp<string, int>("test", 1));
 
                 //wait 5 seconds before next command...
                 Thread.Sleep(2000);

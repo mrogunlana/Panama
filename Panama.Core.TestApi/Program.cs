@@ -1,5 +1,4 @@
 using Panama.Core.Service;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

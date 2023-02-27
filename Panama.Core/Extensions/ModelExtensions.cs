@@ -1,4 +1,5 @@
 ﻿using Panama.Core.Interfaces;
+using Panama.Core.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,7 +40,7 @@ namespace Panama.Core.Extensions
         public static List<T> KvpGet<T>(this List<IModel> data, string key)
         {
             return data
-                .DataGet<Document>()
+                .DataGet<Kvp<string,IModel>>()
                 .Where(x => x.Key == key && x.Value is T)
                 .Select(x => (T)x.Value)
                 .ToList();

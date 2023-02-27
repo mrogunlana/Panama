@@ -1,12 +1,5 @@
-﻿using Autofac;
-using Autofac.Features.AttributeFilters;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panama.Core.Commands;
-using Panama.Core.IoC;
-using Panama.Core.IoC.Autofac;
-using Panama.Core.Logger;
-using Panama.Core.MySql.Dapper;
 using Panama.Core.Tests.Commands;
 using System;
 using System.Collections.Generic;
@@ -14,9 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Panama.Core.Service;
-using KeyValuePair = Panama.Core.Entities.KeyValuePair;
-using Panama.Core.MySql.Dapper.Interfaces;
-using DapperExtensions.Sql;
+using Panama.Core.Interfaces;
+using Panama.Core.Models;
 
 namespace Panama.Core.Tests
 {
@@ -42,31 +34,30 @@ namespace Panama.Core.Tests
             var domain = assemblies.ToArray();
             var services = new ServiceCollection();
             services.AddPanama(assemblies);
-            services.AddSingleton<ILog, Logger.NLog>();
             _serviceProvider = services.BuildServiceProvider();
         }
 
         [TestMethod]
         public async Task DoesConcurrentCommandsExecuteSerially()
         {
-            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
+            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
                 .Command<SerialCommand1>()
                 .Command<SerialCommand2>()
                 .Command<SerialCommand3>()
-                .InvokeAsync();
+                .Invoke();
 
-            if (handler.Data.Count == 0)
+            if (result.Data.Count == 0)
                 Assert.Fail();
 
-            var _1 = (handler.Data[0] as KeyValuePair);
-            var _2 = (handler.Data[1] as KeyValuePair);
-            var _3 = (handler.Data[2] as KeyValuePair);
+            var _1 = (result.Data[0] as Kvp<string, int>);
+            var _2 = (result.Data[1] as Kvp<string, int>);
+            var _3 = (result.Data[2] as Kvp<string, int>);
 
-            if (_1.Value.ToString() != "1")
+            if (_1.Value != 1)
                 Assert.Fail();
-            if (_2.Value.ToString() != "2")
+            if (_2.Value != 2)
                 Assert.Fail();
-            if (_3.Value.ToString() != "3")
+            if (_3.Value != 3)
                 Assert.Fail();
 
             Assert.IsTrue(true);
@@ -75,24 +66,24 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentAsyncCommandsExecuteSerially()
         {
-            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
+            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()
-                .InvokeAsync();
+                .Invoke();
 
-            if (handler.Data.Count == 0)
+            if (result.Data.Count == 0)
                 Assert.Fail();
 
-            var _1 = (handler.Data[0] as KeyValuePair);
-            var _2 = (handler.Data[1] as KeyValuePair);
-            var _3 = (handler.Data[2] as KeyValuePair);
+            var _1 = (result.Data[0] as Kvp<string, int>);
+            var _2 = (result.Data[1] as Kvp<string, int>);
+            var _3 = (result.Data[2] as Kvp<string, int>);
 
-            if (_1.Value.ToString() != "1")
+            if (_1.Value != 1)
                 Assert.Fail();
-            if (_2.Value.ToString() != "2")
+            if (_2.Value != 2)
                 Assert.Fail();
-            if (_3.Value.ToString() != "3")
+            if (_3.Value != 3)
                 Assert.Fail();
 
             Assert.IsTrue(true);
@@ -101,32 +92,32 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesAsyncandNonAsyncCommandsPlayNicelyTogether()
         {
-            var handler = await new Handler(_serviceProvider, _serviceProvider.GetService<ILog>())
+            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()
                 .Command<SerialCommand4>()
                 .Command<SerialCommand5>()
-                .InvokeAsync();
+                .Invoke();
 
-            if (handler.Data.Count == 0)
+            if (result.Data.Count == 0)
                 Assert.Fail();
 
-            var _1 = (handler.Data[0] as KeyValuePair);
-            var _2 = (handler.Data[1] as KeyValuePair);
-            var _3 = (handler.Data[2] as KeyValuePair);
-            var _4 = (handler.Data[3] as KeyValuePair);
-            var _5 = (handler.Data[4] as KeyValuePair);
+            var _1 = (result.Data[0] as Kvp<string, int>);
+            var _2 = (result.Data[1] as Kvp<string, int>);
+            var _3 = (result.Data[2] as Kvp<string, int>);
+            var _4 = (result.Data[3] as Kvp<string, int>);
+            var _5 = (result.Data[4] as Kvp<string, int>);
 
-            if (_1.Value.ToString() != "1")
+            if (_1.Value != 1)
                 Assert.Fail();
-            if (_2.Value.ToString() != "2")
+            if (_2.Value != 2)
                 Assert.Fail();
-            if (_3.Value.ToString() != "3")
+            if (_3.Value != 3)
                 Assert.Fail();
-            if (_4.Value.ToString() != "4")
+            if (_4.Value != 4)
                 Assert.Fail();
-            if (_5.Value.ToString() != "5")
+            if (_5.Value != 5)
                 Assert.Fail();
 
             Assert.IsTrue(true);
