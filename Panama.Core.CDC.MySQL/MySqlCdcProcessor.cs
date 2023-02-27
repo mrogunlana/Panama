@@ -4,6 +4,7 @@ using MySqlCdc.Events;
 using Panama.Core.CDC.Interfaces;
 using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
+using Panama.Core.Messaging.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
 {
@@ -12,9 +13,13 @@ namespace Panama.Core.CDC.MySQL
         private readonly BinlogClient _client;
         private readonly Dictionary<int, string> _map;
         private readonly MySqlCdcOptions _settings;
+        private readonly IEnumerable<IBroker> _brokers;
 
-        public MySqlCdcProcessor(MySqlCdcOptions settings)
+        public MySqlCdcProcessor(ILocate locator)
         {
+            _settings = locator.Resolve<MySqlCdcOptions>();
+            _brokers = locator.ResolveList<IBroker>();
+
             /*  NOTES: 
              * 
              *  #Use for MySQL GTID below
@@ -32,16 +37,15 @@ namespace Panama.Core.CDC.MySQL
              *  order by POS;
              */
 
-            _settings = settings;
-            _map = settings.GetMap();
+            _map = _settings.GetMap();
             _client = new BinlogClient(options =>
             {
-                options.Hostname = settings.Host;
-                options.Port = settings.Port;
-                options.Username = settings.Username;
-                options.Password = settings.Password;
+                options.Hostname = _settings.Host;
+                options.Port = _settings.Port;
+                options.Username = _settings.Username;
+                options.Password = _settings.Password;
                 options.SslMode = SslMode.Disabled;
-                options.HeartbeatInterval = TimeSpan.FromSeconds(settings.Heartbeat);
+                options.HeartbeatInterval = TimeSpan.FromSeconds(_settings.Heartbeat);
                 options.Blocking = true;
 
                 // Start replication from MySQL GTID
@@ -70,7 +74,10 @@ namespace Panama.Core.CDC.MySQL
         {
             var messages = writeRows.GetMessages(_settings, _map);
 
-            // TODO: get the messages to the broker(s) somehow?
+            foreach (var broker in _brokers)
+            {
+                // TODO: get the messages to the broker(s) somehow?
+            }
         }
     }
 }
