@@ -13,10 +13,10 @@ namespace Panama.Core.TestApi.Controllers
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<WeatherForecastController> _logger;
         private readonly IHandler _handler;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IHandler handler)
+        public WeatherForecastController(Microsoft.Extensions.Logging.ILogger<WeatherForecastController> logger, IHandler handler)
         {
             _logger = logger;
             _handler = handler;

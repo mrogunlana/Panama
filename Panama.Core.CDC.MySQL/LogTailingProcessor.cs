@@ -1,4 +1,5 @@
-﻿using MySqlCdc;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MySqlCdc;
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
 using Panama.Core.CDC.Interfaces;
@@ -18,11 +19,11 @@ namespace Panama.Core.CDC.MySQL
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
 
-        public LogTailingProcessor(ILocate locator)
+        public LogTailingProcessor(IServiceProvider provider)
         {
-            _settings = locator.Resolve<MySqlCdcOptions>();
-            _brokers = locator.ResolveList<IBroker>();
-            _encryptor = locator.Resolve<IStringEncryptor>(nameof(Base64Encryptor));
+            _settings = provider.GetService<MySqlCdcOptions>()!;
+            _brokers = provider.GetServices<IBroker>();
+            _encryptor = provider.GetServices<IStringEncryptor>().OfType<Base64Encryptor>().FirstOrDefault()!;
 
             /*  NOTES: 
              * 
@@ -88,7 +89,7 @@ namespace Panama.Core.CDC.MySQL
             
             foreach (var broker in _brokers)
                 foreach (var message in messages)
-                    await broker.Publish(new OutboxContext(message, context.Locator, context.Token));
+                    await broker.Publish(new OutboxContext(message, context.Provider, context.Token));
         }
     }
 }

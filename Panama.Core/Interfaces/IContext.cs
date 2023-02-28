@@ -10,6 +10,6 @@ namespace Panama.Core.Interfaces
         string CorrelationId { get; }
         IList<IModel> Data { get; }
         CancellationToken Token { get; set; }
-        ILocate Locator { get; }
+        IServiceProvider Provider { get; }
     }
 }

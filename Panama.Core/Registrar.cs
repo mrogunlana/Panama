@@ -7,6 +7,7 @@ using Panama.Core.Interfaces;
 using Panama.Core.Invokers;
 using Panama.Core.Configuration;
 using Panama.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Panama.Core.Service
 {
@@ -17,23 +18,14 @@ namespace Panama.Core.Service
             services.AddSingleton<IInvokeAction, InvokeActions>();
             services.AddSingleton<IHandler, Handler>();
             services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
-            services.AddSingleton<ILogFactory, LogFactory>();
-            services.AddSingleton<ILocate, Locator>();
-            services.AddSingleton(typeof(ILog<>), typeof(Logger<>));
-            services.AddSingleton<IContext, Context>();
             AddAssembly(services, Assembly.GetEntryAssembly());
         }
         
         public static void AddPanama(this IServiceCollection services, Assembly assembly)
         {
-
             services.AddSingleton<IInvokeAction, InvokeActions>(); 
             services.AddSingleton<IHandler, Handler>();
             services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
-            services.AddSingleton<ILogFactory, LogFactory>();
-            services.AddSingleton<ILocate, Locator>();
-            services.AddSingleton(typeof(ILog<>), typeof(Logger<>));
-            services.AddSingleton<IContext, Context>();
             AddAssembly(services, assembly);            
         }
 
@@ -43,10 +35,6 @@ namespace Panama.Core.Service
             services.AddSingleton<IInvokeAction, InvokeActions>(); 
             services.AddSingleton<IHandler, Handler>();
             services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
-            services.AddSingleton<ILogFactory, LogFactory>();
-            services.AddSingleton<ILocate, Locator>();
-            services.AddSingleton(typeof(ILog<>), typeof(Logger<>));
-            services.AddSingleton<IContext, Context>();
             foreach (var assembly in assembliesToScan)
             {
                 AddAssembly(services, assembly);

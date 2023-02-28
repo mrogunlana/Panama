@@ -1,4 +1,6 @@
-﻿using Panama.Core.CDC.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Panama.Core.CDC.Interfaces;
 using Panama.Core.Interfaces;
 using Panama.Core.Models;
 
@@ -6,9 +8,9 @@ namespace Panama.Core.CDC
 {
     public class Server : IServer
     {
-        private readonly ILog<Server> _log;
-        private readonly ILocate _locator;
-        private readonly ILogFactory _factory;
+        private readonly ILogger<Server> _log;
+        private readonly IServiceProvider _provider;
+        private readonly ILoggerFactory _factory;
 
         private CancellationTokenSource _cts;
         private Context _context = default!;
@@ -16,12 +18,12 @@ namespace Panama.Core.CDC
         private bool _disposed;
 
         public Server(
-            ILog<Server> log,
-            ILogFactory factory,
-            ILocate locator)
+            ILogger<Server> log,
+            ILoggerFactory factory,
+            IServiceProvider provider)
         {
             _log = log;
-            _locator = locator;
+            _provider = provider;
             _factory = factory;
             _cts = new CancellationTokenSource();
         }
@@ -59,12 +61,12 @@ namespace Panama.Core.CDC
 
             _log.LogDebug("### Panama.Core.CDC Default Server is starting.");
 
-            _context = new Context(_locator, _cts.Token);
+            _context = new Context(_provider, _cts.Token);
 
-            var processors = _locator.ResolveList<IProcess>();
+            var processors = _provider.GetService<IProcess>();
 
-            var tasks = _locator
-                .ResolveList<IProcess>()
+            var tasks = _provider
+                .GetServices<IProcess>()
                 .Select(p => new Manager(p, _factory))
                 .Select(m => m.Invoke(_context));
 

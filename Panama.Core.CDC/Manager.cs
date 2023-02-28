@@ -1,4 +1,5 @@
-﻿using Panama.Core.CDC.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Panama.Core.CDC.Interfaces;
 using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC
@@ -6,11 +7,11 @@ namespace Panama.Core.CDC
     public class Manager : IManage
     {
         private readonly IProcess _process;
-        private readonly ILog<Manager> _log;
+        private readonly ILogger<Manager> _log;
 
         public Manager(
               IProcess process
-            , ILogFactory factory)
+            , ILoggerFactory factory)
         {
             _process = process;
             _log = factory.CreateLogger<Manager>();

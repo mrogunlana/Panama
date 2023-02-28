@@ -1,4 +1,5 @@
 ﻿using Panama.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,6 +12,13 @@ namespace Panama.Core.Models
         {
             if (Data == null)
                 Data = new List<IModel>();
+        }
+        public Context(
+              IServiceProvider provider
+            , CancellationToken? token = null)
+            : this(token)
+        {
+            Provider = provider;
         }
 
         public Context(CancellationToken? token = null)
@@ -56,6 +64,6 @@ namespace Panama.Core.Models
         public CancellationToken Token { get; set; }
         public string Id { get; set; }
         public string CorrelationId { get; set; }
-        public ILocate Locator { get; }
+        public IServiceProvider Provider { get; }
     }
 }

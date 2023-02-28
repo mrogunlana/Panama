@@ -11,17 +11,14 @@ namespace Panama.Core.CDC.MySQL
     {
         public OutboxContext(
               Outbox data
-            , ILocate? locator = null
+            , IServiceProvider? provider = null
             , CancellationToken? token = null)
-            : base(locator)
+            : base(provider, token)
         {
             Data.Add(data);
 
             Id = data.Id;
             CorrelationId = data.CorrelationId;
-
-            if (token.HasValue)
-                Token = token.Value;
         }
     }
 }

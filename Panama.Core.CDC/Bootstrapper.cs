@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Panama.Core.CDC.Interfaces;
 using Panama.Core.Interfaces;
 
@@ -6,8 +8,8 @@ namespace Panama.Core.CDC
 {
     public class Bootstrapper : BackgroundService, IBootstrap
     {
-        private readonly ILocate _locator;
-        private readonly ILog<Bootstrapper> _log;
+        private readonly IServiceProvider _provider;
+        private readonly ILogger<Bootstrapper> _log;
 
         private CancellationTokenSource? _cts;
         private IEnumerable<IServer> _servers = default!;
@@ -16,10 +18,10 @@ namespace Panama.Core.CDC
         public bool IsActive => !_cts?.IsCancellationRequested ?? false;
 
         public Bootstrapper(
-              ILocate locator
-            , ILog<Bootstrapper> log)
+              IServiceProvider provider
+            , ILogger<Bootstrapper> log)
         {
-            _locator = locator;
+            _provider = provider;
             _log = log;
         }
 
@@ -39,7 +41,7 @@ namespace Panama.Core.CDC
                 }
                 catch (Exception ex)
                 {
-                    _log.LogException($"Starting {nameof(server)} throws an exception: {ex.Message}");
+                    _log.LogError(ex, $"Starting {nameof(server)} throws an exception: {ex.Message}");
                 }
             }
         }
@@ -79,7 +81,7 @@ namespace Panama.Core.CDC
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _servers = _locator.ResolveList<IServer>();
+            _servers = _provider.GetServices<IServer>();
 
             _cts.Token.Register(() =>
             {
