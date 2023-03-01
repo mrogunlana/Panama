@@ -12,8 +12,8 @@ namespace Panama.Core.CDC.MySQL
         public string Group { get; set; } = String.Empty;
         public string Content { get; set; } = String.Empty;
         public int Retries { get; set; }
-        public DateTime Added { get; set; }
-        public DateTime ExpiresAt { get; set; }
-        public string StatusName { get; set; } = String.Empty;
+        public DateTime Created { get; set; }
+        public DateTime Expires { get; set; }
+        public string Status { get; set; } = String.Empty;
     }
 }

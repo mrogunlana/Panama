@@ -9,7 +9,7 @@ using Panama.Core.Messaging.Interfaces;
 using Panama.Core.Security;
 using Panama.Core.Security.Interfaces;
 
-namespace Panama.Core.CDC.MySQL
+namespace Panama.Core.CDC.MySQL.Processors
 {
     public class LogTailingProcessor : IProcess
     {
@@ -42,7 +42,7 @@ namespace Panama.Core.CDC.MySQL
              *  order by POS;
              */
 
-            _map = _settings.GetMap();
+            _map = _settings.GetSchema();
             _client = new BinlogClient(options =>
             {
                 options.Hostname = _settings.Host;

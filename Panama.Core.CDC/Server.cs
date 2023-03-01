@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Panama.Core.CDC.Interfaces;
-using Panama.Core.Interfaces;
 using Panama.Core.Models;
 
 namespace Panama.Core.CDC

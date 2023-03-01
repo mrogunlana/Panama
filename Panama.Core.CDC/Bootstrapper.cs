@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Panama.Core.CDC.Interfaces;
-using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC
 {
@@ -13,6 +12,7 @@ namespace Panama.Core.CDC
 
         private CancellationTokenSource? _cts;
         private IEnumerable<IServer> _servers = default!;
+        private IEnumerable<IInitialize> _initializers = default!;
         private bool _disposed;
 
         public bool IsActive => !_cts?.IsCancellationRequested ?? false;
@@ -23,6 +23,25 @@ namespace Panama.Core.CDC
         {
             _provider = provider;
             _log = log;
+        }
+
+        private async Task Initialize()
+        {
+            foreach (var initialize in _initializers)
+            {
+                try
+                {
+                    _cts!.Token.ThrowIfCancellationRequested();
+
+                    await initialize.Invoke(_cts!.Token);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is InvalidOperationException) throw;
+
+                    _log.LogError(ex, "Initializing the processors!");
+                }
+            }
         }
 
         private async Task StartProcessors()
@@ -82,6 +101,7 @@ namespace Panama.Core.CDC
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             _servers = _provider.GetServices<IServer>();
+            _initializers = _provider.GetServices<IInitialize>();
 
             _cts.Token.Register(() =>
             {
@@ -100,6 +120,7 @@ namespace Panama.Core.CDC
                 }
             });
 
+            await Initialize().ConfigureAwait(false);
             await StartProcessors().ConfigureAwait(false);
 
             _disposed = false;
