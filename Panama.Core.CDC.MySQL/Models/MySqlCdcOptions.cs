@@ -5,7 +5,8 @@ namespace Panama.Core.CDC.MySQL
     public class MySqlCdcOptions : IModel
     {
         public int Port { get; set; } = 3306;
-        public int OutboxTableId { get; set; } = 0;
+        public int PublishedTableId { get; set; } = 0;
+        public int ReceivedTableId { get; set; } = 0;
         public string Host { get; set; } = String.Empty;
         public string Username { get; set; } = String.Empty;
         public string Password { get; set; } = String.Empty;

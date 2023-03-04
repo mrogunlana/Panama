@@ -1,13 +1,31 @@
-﻿using MySqlConnector;
+﻿using Microsoft.Extensions.Options;
+using MySqlConnector;
+using Panama.Core.CDC.Interfaces;
 using System.Data;
 
-namespace Panama.Core.CDC.MySQL.Extensions
+namespace Panama.Core.CDC.MySQL
 {
-    internal static class MySqlCdcOptionsExtensions
+    internal class Store : IStore
     {
-        internal static Dictionary<int, string> GetSchema(this MySqlCdcOptions settings)
+        private readonly IOptions<MySqlCdcOptions> _options;
+
+        public Store(
+            IOptions<MySqlCdcOptions> options)
         {
-            using (var connection = new MySqlConnection($"Server={settings.Host};User ID={settings.Username};Password={settings.Password};"))
+            _options = options;
+        }
+
+        public Dictionary<int, string> GetSchema(object table)
+        {
+            if (table == null)
+                throw new ArgumentNullException("Table value must be set to retreive schema.");
+
+            int.TryParse(table.ToString(), out var id);
+
+            if (id == 0)
+                throw new ArgumentNullException("Table value must be an integer value to retreive schema.");
+
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};User ID={_options.Value.Username};Password={_options.Value.Password};"))
             {
                 connection.Open();
 
@@ -21,10 +39,11 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@TABLE_ID",
                     DbType = DbType.Int32,
-                    Value = settings.OutboxTableId,
+                    Value = id,
                 });
 
                 var result = new Dictionary<int, string>();
@@ -38,9 +57,9 @@ namespace Panama.Core.CDC.MySQL.Extensions
             }
         }
 
-        internal static async Task InitLocks(this MySqlCdcOptions settings)
+        public async Task InitLocks()
         {
-            using (var connection = new MySqlConnection($"Server={settings.Host};User ID={settings.Username};Password={settings.Password};Database={settings.Database};"))
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};User ID={_options.Value.Username};Password={_options.Value.Password};Database={_options.Value.Database};"))
             {
                 connection.Open();
 
@@ -54,31 +73,34 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@PublishedKey",
                     DbType = DbType.String,
-                    Value = $"published_retry_{settings.Version}",
+                    Value = $"published_retry_{_options.Value.Version}",
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@ReceivedKey",
                     DbType = DbType.String,
-                    Value = $"received_retry_{settings.Version}",
+                    Value = $"received_retry_{_options.Value.Version}",
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
                     Value = DateTime.MinValue,
                 });
 
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                
+
                 connection.Close();
             }
         }
-        
-        internal static async Task<bool> AcquireLock(this MySqlCdcOptions settings, string key, TimeSpan ttl, string instance, CancellationToken token = default)
+
+        public async Task<bool> AcquireLock(string key, TimeSpan ttl, string instance, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={settings.Host};User ID={settings.Username};Password={settings.Password};Database={settings.Database};"))
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};User ID={_options.Value.Username};Password={_options.Value.Password};Database={_options.Value.Database};"))
             {
                 connection.Open();
 
@@ -92,38 +114,42 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Instance",
                     DbType = DbType.String,
                     Value = instance,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
                     Value = DateTime.Now,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Key",
                     DbType = DbType.String,
                     Value = key,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Window",
                     DbType = DbType.DateTime,
                     Value = DateTime.Now.Subtract(ttl),
                 });
 
                 var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                
+
                 connection.Close();
 
                 return result > 0;
             }
         }
 
-        internal static async Task ReleaseLock(this MySqlCdcOptions settings, string key, string instance, CancellationToken token = default)
+        public async Task ReleaseLock(string key, string instance, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={settings.Host};User ID={settings.Username};Password={settings.Password};Database={settings.Database};"))
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};User ID={_options.Value.Username};Password={_options.Value.Password};Database={_options.Value.Database};"))
             {
                 connection.Open();
 
@@ -137,31 +163,34 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Instance",
                     DbType = DbType.String,
                     Value = instance,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
                     Value = DateTime.MinValue,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Key",
                     DbType = DbType.String,
                     Value = key,
                 });
 
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                
+
                 connection.Close();
             }
         }
 
-        internal static async Task RenewLockAsync(this MySqlCdcOptions settings, string key, TimeSpan ttl, string instance, CancellationToken token = default)
+        public async Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={settings.Host};User ID={settings.Username};Password={settings.Password};Database={settings.Database};"))
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};User ID={_options.Value.Username};Password={_options.Value.Password};Database={_options.Value.Database};"))
             {
                 connection.Open();
 
@@ -174,17 +203,20 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Instance",
                     DbType = DbType.String,
                     Value = instance,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Ttl",
                     DbType = DbType.Double,
                     Value = ttl.TotalSeconds,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Key",
                     DbType = DbType.String,
                     Value = key,
@@ -195,6 +227,5 @@ namespace Panama.Core.CDC.MySQL.Extensions
                 connection.Close();
             }
         }
-
     }
 }

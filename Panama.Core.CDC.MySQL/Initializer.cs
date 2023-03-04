@@ -1,24 +1,29 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Options;
 using Panama.Core.CDC.Interfaces;
-using Panama.Core.CDC.MySQL.Extensions;
-using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
 {
     public class Initializer : IInitialize
     {
-        private readonly MySqlCdcOptions _settings;
+        private readonly IOptions<MySqlCdcOptions> _options;
+        private readonly IServiceProvider _provider;
+        private readonly IStore _store;
 
-        public Initializer(IServiceProvider provider)
+        public Initializer(
+             IStore store
+           , IServiceProvider provider
+           , IOptions<MySqlCdcOptions> options)
         {
-            _settings = provider.GetService<MySqlCdcOptions>()!;
+            _store = store;
+            _options = options;
+            _provider = provider;
         }
         public async Task Invoke(CancellationToken token)
         {
             if (token.IsCancellationRequested)
                 token.ThrowIfCancellationRequested();
 
-            await _settings.InitLocks();
+            await _store.InitLocks();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Options;
 using MySqlCdc;
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
@@ -6,7 +6,6 @@ using Panama.Core.CDC.Interfaces;
 using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
 using Panama.Core.Messaging.Interfaces;
-using Panama.Core.Security;
 using Panama.Core.Security.Interfaces;
 using Panama.Core.Security.Resolvers;
 
@@ -15,16 +14,29 @@ namespace Panama.Core.CDC.MySQL.Processors
     public class LogTailingProcessor : IProcess
     {
         private readonly BinlogClient _client;
-        private readonly Dictionary<int, string> _map;
-        private readonly MySqlCdcOptions _settings;
+        private readonly Dictionary<int, string> _published;
+        private readonly Dictionary<int, string> _received;
+        private readonly IStore _store;
+        private readonly IOptions<MySqlCdcOptions> _options;
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
 
-        public LogTailingProcessor(MySqlCdcOptions settings, IEnumerable<IBroker> brokers, StringEncryptorResolver stringEncryptorResolver)
+        public LogTailingProcessor(
+              IStore store
+            , IOptions<MySqlCdcOptions> options
+            , IEnumerable<IBroker> brokers
+            , StringEncryptorResolver stringEncryptorResolver)
         {
-            _settings = settings!;
+            //TODO: check the existance of MySqlCdCOptions in the 
+            //registrar and if it's null, throw an exception as 
+            //its table and database specific values below are required
+
+            _store = store;
+            _options = options;
             _brokers = brokers;
             _encryptor = stringEncryptorResolver(ResolverKey.Base64);
+            _published = _store.GetSchema(_options.Value.PublishedTableId);
+            _received = _store.GetSchema(_options.Value.ReceivedTableId);
 
             /*  NOTES: 
              * 
@@ -43,15 +55,14 @@ namespace Panama.Core.CDC.MySQL.Processors
              *  order by POS;
              */
 
-            _map = _settings.GetSchema();
             _client = new BinlogClient(options =>
             {
-                options.Hostname = _settings.Host;
-                options.Port = _settings.Port;
-                options.Username = _settings.Username;
-                options.Password = _settings.Password;
+                options.Hostname = _options.Value.Host;
+                options.Port = _options.Value.Port;
+                options.Username = _options.Value.Username;
+                options.Password = _options.Value.Password;
                 options.SslMode = SslMode.Disabled;
-                options.HeartbeatInterval = TimeSpan.FromSeconds(_settings.Heartbeat);
+                options.HeartbeatInterval = TimeSpan.FromSeconds(_options.Value.Heartbeat);
                 options.Blocking = true;
 
                 // Start replication from MySQL GTID
@@ -84,13 +95,22 @@ namespace Panama.Core.CDC.MySQL.Processors
             if (context.Token.IsCancellationRequested)
                 context.Token.ThrowIfCancellationRequested();
 
-            var messages = writeRows
-                .GetMessages(_settings, _map)
-                .DecodeContent(_encryptor);
+            // TODO: should we leave the message base64 
+            // encrypted and let the consumer decode?
+            //.DecodeContent(_encryptor);
+            var published = writeRows
+                .GetPublishedMessages(_options.Value, _published);
+
+            var received = writeRows
+                .GetReceivedMessages(_options.Value, _received);
+
             
+            //publish to message broker
             foreach (var broker in _brokers)
-                foreach (var message in messages)
-                    await broker.Publish(new OutboxContext(message, context.Provider, context.Token));
+                foreach (var publish in published)
+                    await broker.Publish(new MessageContext(publish, context.Provider, context.Token));
+
+            //TODO: received to subscribers
         }
     }
 }

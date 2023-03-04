@@ -1,8 +1,9 @@
-﻿using Panama.Core.Interfaces;
+﻿using Panama.Core.Extensions;
+using Panama.Core.Interfaces;
 
-namespace Panama.Core.CDC.MySQL
+namespace Panama.Core.CDC
 {
-    public class Outbox : IModel
+    public class _Message : IModel
     {
         public int _Id { get; set; }
         public string Id { get; set; } = String.Empty;
@@ -15,5 +16,6 @@ namespace Panama.Core.CDC.MySQL
         public DateTime Created { get; set; }
         public DateTime Expires { get; set; }
         public string Status { get; set; } = String.Empty;
+        public MessageStatus StatusEnum => Status.ToEnum<MessageStatus>();
     }
 }
