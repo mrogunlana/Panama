@@ -8,6 +8,7 @@ using Panama.Core.Interfaces;
 using Panama.Core.Messaging.Interfaces;
 using Panama.Core.Security;
 using Panama.Core.Security.Interfaces;
+using Panama.Core.Security.Resolvers;
 
 namespace Panama.Core.CDC.MySQL.Processors
 {
@@ -19,11 +20,11 @@ namespace Panama.Core.CDC.MySQL.Processors
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
 
-        public LogTailingProcessor(IServiceProvider provider)
+        public LogTailingProcessor(MySqlCdcOptions settings, IEnumerable<IBroker> brokers, StringEncryptorResolver stringEncryptorResolver)
         {
-            _settings = provider.GetService<MySqlCdcOptions>()!;
-            _brokers = provider.GetServices<IBroker>();
-            _encryptor = provider.GetServices<IStringEncryptor>().OfType<Base64Encryptor>().FirstOrDefault()!;
+            _settings = settings!;
+            _brokers = brokers;
+            _encryptor = stringEncryptorResolver(ResolverKey.Base64);
 
             /*  NOTES: 
              * 

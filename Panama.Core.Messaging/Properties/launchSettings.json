@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Panama.Core.Messaging": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60568;http://localhost:60572"
+    }
+  }
+}

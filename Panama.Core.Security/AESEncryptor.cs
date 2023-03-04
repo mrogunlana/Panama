@@ -1,4 +1,5 @@
 ﻿using Panama.Core.Security.Interfaces;
+using Panama.Core.Security.Resolvers;
 using System;
 using System.Configuration;
 using System.IO;
@@ -15,7 +16,10 @@ namespace Panama.Core.Security
         private int _iterations = 3;
         private int _keySize = 256;
         private string _hash = "SHA1";
-        
+
+
+        public ResolverKey Key { get { return ResolverKey.AES; } }
+
         public AESEncryptor()
         {
             _secret = ConfigurationManager.AppSettings["Secret"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET");
