@@ -4,6 +4,8 @@ namespace Panama.Core.CDC.MySQL
 {
     public class MySqlSettings : IModel
     {
+        public Version Version { set;  get; } = new Version();
+        public MySqlType Type { set; get; } = MySqlType.None;
         public string PublishedTable { set; get; } = String.Empty;
         public string ReceivedTable { set; get; } = String.Empty;
         public string LockTable { set; get; } = String.Empty;

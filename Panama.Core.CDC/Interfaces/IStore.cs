@@ -10,6 +10,8 @@
         Task<bool> AcquireLock(string key, TimeSpan ttl, string instance, CancellationToken token = default);
         Task ReleaseLock(string key, string instance, CancellationToken token = default);
         Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default);
+        Task ChangePublishedStateToDelayed(int[] ids);
+        Task ChangeReceivedStateToDelayed(int[] ids);
         Task ChangeMessageState(string tableName, _Message message, MessageStatus status, object? transaction = null);
         Task ChangePublishedState(_Message message, MessageStatus status, object? transaction = null);
         Task ChangeReceivedState(_Message message, MessageStatus state, object? transaction = null);
@@ -18,5 +20,8 @@
         Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
+        Task<IEnumerable<_Message>> GetMessagesToRetry(string table);
+        Task<IEnumerable<_Message>> GetPublishedMessagesToRetry();
+        Task<IEnumerable<_Message>> GetReceivedMessagesToRetry();
     }
 }

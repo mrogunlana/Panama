@@ -11,6 +11,7 @@ namespace Panama.Core.CDC.MySQL
         public string Password { get; set; } = String.Empty;
         public string Database { get; set; } = String.Empty;
         public int Heartbeat { get; set; } = 30;
+        public int FailedRetries { get; set; } = 5;
         public int Version { get; set; } = 1;
     }
 }

@@ -1,11 +1,34 @@
-﻿using Panama.Core.Interfaces;
+﻿using MySqlConnector;
+using Panama.Core.Interfaces;
 using Panama.Core.Security.Interfaces;
+using System.Data.Common;
 using System.Reflection;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {
     internal static class ModelExtensions
     {
+        internal static async Task GetModels<T>(this MySqlDataReader reader, MySqlSettings settings)
+            where T : IModel, new()
+        {
+            if (reader == null)
+                return;
+
+            if (settings == null)
+                return;
+
+            var results = new List<T>();
+            var map = settings.GetMap(table);
+
+            while (await reader.ReadAsync().ConfigureAwait(false))
+            {
+                var model = new T();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    model.SetValue<T>(settings.PublishedTableMap[i], reader.GetValue(i));
+
+                results.Add(model);
+            }
+        }
         internal static void SetValue<T>(this IModel model, string name, object? value)
         {
             var property = typeof(T).GetProperty(name, BindingFlags.Public | BindingFlags.Instance);

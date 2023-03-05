@@ -33,6 +33,9 @@ namespace Panama.Core.CDC.MySQL
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
 
+                //1. Initialize MySql version information 
+                _initializer.Settings.Resolve<MySqlSettings>().SetVersion(connection.ServerVersion);
+
                 using var command = new MySqlCommand($@"
                     
                     CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().PublishedTable}` (
@@ -94,25 +97,23 @@ namespace Panama.Core.CDC.MySQL
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter
-                {
+                command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@PublishedKey",
                     DbType = DbType.String,
                     Value = $"published_retry_{_options.Value.Version}",
                 });
-                command.Parameters.Add(new MySqlParameter
-                {
+                command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@ReceivedKey",
                     DbType = DbType.String,
                     Value = $"received_retry_{_options.Value.Version}",
                 });
-                command.Parameters.Add(new MySqlParameter
-                {
+                command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
                     Value = DateTime.MinValue,
                 });
 
+                //2. Initialize Panama tables
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
                 connection.Close();
@@ -447,6 +448,48 @@ namespace Panama.Core.CDC.MySQL
             await ChangeMessageState(_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable, message, status, transaction).ConfigureAwait(false);
         }
 
+        public async Task ChangePublishedStateToDelayed(int[] ids)
+        {
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed) 
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand($@"
+
+                    UPDATE `{_initializer.Settings.Resolve<MySqlSettings>().PublishedTable}` 
+                    SET `Status`='{MessageStatus.Delayed}' 
+                    WHERE `_Id` IN ({string.Join(',', ids)});"
+
+                , connection);
+
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+                connection.Close();
+            }
+        }
+
+        public async Task ChangeReceivedStateToDelayed(int[] ids)
+        {
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand($@"
+
+                    UPDATE `{_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable}` 
+                    SET `Status`='{MessageStatus.Delayed}' 
+                    WHERE `_Id` IN ({string.Join(',', ids)});"
+
+                , connection);
+
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+                connection.Close();
+            }
+        }
+
         public async Task<_Message> StorePublishedMessage(_Message message, object? transaction = null)
         {
             using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
@@ -722,6 +765,81 @@ namespace Panama.Core.CDC.MySQL
         public async Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             return await DeleteExpiredAsync(_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable, timeout, batch, token).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<_Message>> GetMessagesToRetry(string table)
+        {
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand($@"
+                    
+                    SELECT 
+                         `_Id`
+                        ,`Id` 
+                        ,`CorrelationId`
+                        ,`Version`
+                        ,`Name` 
+                        ,`Group` 
+                        ,`Content` 
+                        ,`Retries` 
+                        ,`Created` 
+                        ,`Expires` 
+                        ,`Status` 
+                    FROM `{table}` 
+                    WHERE `Retries` < @Retries
+                    AND `Version` = @Version 
+                    AND `Added` < @Added 
+                    AND (`Status` = '{MessageStatus.Failed}' OR `Status` = '{MessageStatus.Scheduled}') 
+                    LIMIT 200;"
+
+                , connection);
+
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Retries",
+                    DbType = DbType.Int32,
+                    Value = _options.Value.FailedRetries
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Version",
+                    DbType = DbType.String,
+                    Value = _options.Value.Version
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Added",
+                    DbType = DbType.String,
+                    Value = DateTime.Now.AddMinutes(-4)
+                });
+
+                var messages = new List<_Message>();
+                var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                var map = _initializer.Settings.Resolve<MySqlSettings>().GetMap(table);
+
+                while (await reader.ReadAsync().ConfigureAwait(false))
+                {
+                    var model = _initializer.Settings.Resolve<MySqlSettings>().GetModel(table);
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        model.SetValue<_Message>(map[i], reader.GetValue(i));
+
+                    messages.Add(model);
+                }
+                
+                connection.Close();
+
+                return messages;
+            }
+        }
+
+        public async Task<IEnumerable<_Message>> GetPublishedMessagesToRetry()
+        {
+            return await GetMessagesToRetry(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<_Message>> GetReceivedMessagesToRetry()
+        {
+            return await GetMessagesToRetry(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable).ConfigureAwait(false);
         }
     }
 }

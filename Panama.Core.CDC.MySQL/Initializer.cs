@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Panama.Core.CDC.Interfaces;
+using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC.MySQL
