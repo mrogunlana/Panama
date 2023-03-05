@@ -23,5 +23,8 @@
         Task<IEnumerable<_Message>> GetMessagesToRetry(string table);
         Task<IEnumerable<_Message>> GetPublishedMessagesToRetry();
         Task<IEnumerable<_Message>> GetReceivedMessagesToRetry();
+        Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
+        Task GetDelayedPublishedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
+        Task GetDelayedReceivedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
     }
 }

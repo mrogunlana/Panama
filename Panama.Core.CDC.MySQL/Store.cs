@@ -50,12 +50,6 @@ namespace Panama.Core.CDC.MySQL
                       `Created` datetime NOT NULL,
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
-                      `BinaryId` binary(16) NOT NULL,
-                      `BinaryName` binary(16) NOT NULL,
-                      `BinaryStatus` binary(16)  NOT NULL,
-                      `BinaryGroup` binary(16) NOT NULL,
-                      `BinaryCorrelationId` binary(16) DEFAULT NULL,
-                      `BinaryVersion` binary(16) DEFAULT NULL,
                       PRIMARY KEY (`_Id`),
                       INDEX `IX_ExpiresAt`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -72,12 +66,6 @@ namespace Panama.Core.CDC.MySQL
                       `Created` datetime NOT NULL,
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
-                      `BinaryId` binary(16) NOT NULL,
-                      `BinaryName` binary(16) NOT NULL,
-                      `BinaryStatus` binary(16)  NOT NULL,
-                      `BinaryGroup` binary(16) NOT NULL,
-                      `BinaryCorrelationId` binary(16) DEFAULT NULL,
-                      `BinaryVersion` binary(16) DEFAULT NULL,
                       PRIMARY KEY (`_Id`),
                       INDEX `IX_ExpiresAt`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -401,7 +389,6 @@ namespace Panama.Core.CDC.MySQL
                         `Retries`       = @Retries,
                         `Expires`       = @Expires,
                         `Status`        = @Status 
-                        `BinaryStatus`  = unhex(md5(trim(lower(ifnull(@Status, ''))))) 
                     WHERE `_Id`         = @_Id;"
 
                 , connection);
@@ -424,7 +411,7 @@ namespace Panama.Core.CDC.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Expires",
                     DbType = DbType.DateTime,
-                    Value = message.Expires,
+                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Status",
@@ -509,13 +496,7 @@ namespace Panama.Core.CDC.MySQL
                     `Retries`,
                     `Created`,
                     `Expires`,
-                    `Status`,
-                    `BinaryId`,
-                    `BinaryName`,
-                    `BinaryStatus`,
-                    `BinaryGroup`,
-                    `BinaryCorrelationId`,
-                    `BinaryVersion`)
+                    `Status`)
                     VALUES
                     (@Id,
                      @CorrelationId,
@@ -526,13 +507,7 @@ namespace Panama.Core.CDC.MySQL
                      @Retries,
                      NOW(),
                      @Expires,
-                     @Status,
-                     unhex(md5(trim(lower(ifnull(@Id, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Name, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Status, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Group, ''))))), 
-                     unhex(md5(trim(lower(ifnull(@CorrelationId, ''))))), 
-                     unhex(md5(trim(lower(ifnull(@Version, ''))))));
+                     @Status);
 
                      SELECT LAST_INSERT_ID();"
 
@@ -583,7 +558,7 @@ namespace Panama.Core.CDC.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Expires",
                     DbType = DbType.DateTime,
-                    Value = message.Expires,
+                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Status",
@@ -620,13 +595,7 @@ namespace Panama.Core.CDC.MySQL
                     `Retries`,
                     `Created`,
                     `Expires`,
-                    `Status`,
-                    `BinaryId`,
-                    `BinaryName`,
-                    `BinaryStatus`,
-                    `BinaryGroup`,
-                    `BinaryCorrelationId`,
-                    `BinaryVersion`)
+                    `Status`)
                     VALUES
                     (@Id,
                      @CorrelationId,
@@ -637,13 +606,7 @@ namespace Panama.Core.CDC.MySQL
                      @Retries,
                      NOW(),
                      @Expires,
-                     @Status,
-                     unhex(md5(trim(lower(ifnull(@Id, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Name, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Status, ''))))),
-                     unhex(md5(trim(lower(ifnull(@Group, ''))))), 
-                     unhex(md5(trim(lower(ifnull(@CorrelationId, ''))))), 
-                     unhex(md5(trim(lower(ifnull(@Version, ''))))));
+                     @Status);
 
                      SELECT LAST_INSERT_ID();"
 
@@ -694,7 +657,7 @@ namespace Panama.Core.CDC.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Expires",
                     DbType = DbType.DateTime,
-                    Value = message.Expires,
+                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Status",
@@ -840,6 +803,103 @@ namespace Panama.Core.CDC.MySQL
         public async Task<IEnumerable<_Message>> GetReceivedMessagesToRetry()
         {
             return await GetMessagesToRetry(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable).ConfigureAwait(false);
+        }
+
+        public async Task GetDelayedMessagesForScheduling(
+              string table
+            , Func<object, IEnumerable<_Message>, Task> task
+            , CancellationToken token = default)
+        {
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                var append = _initializer.Settings
+                    .Resolve<MySqlSettings>()
+                    .IsSupportSkipLocked() ? "FOR UPDATE SKIP LOCKED" : "FOR UPDATE";
+
+                await using var transaction = await connection.BeginTransactionAsync(IsolationLevel.ReadCommitted, token);
+                using var command = new MySqlCommand($@"
+                    
+                    SELECT 
+                         `_Id`
+                        ,`Id` 
+                        ,`CorrelationId`
+                        ,`Version`
+                        ,`Name` 
+                        ,`Group` 
+                        ,`Content` 
+                        ,`Retries` 
+                        ,`Created` 
+                        ,`Expires` 
+                        ,`Status` 
+                    FROM `{table}` 
+                    WHERE `Retries` < @Retries
+                    AND `Version` = @Version 
+                    AND ((`ExpiresAt`< @TwoMinutesLater AND `StatusName` = '{MessageStatus.Delayed}') 
+                        OR (`ExpiresAt`< @OneMinutesAgo AND `StatusName` = '{MessageStatus.Queued}'))
+                    LIMIT 200 {append};"
+
+                , connection);
+
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Version",
+                    DbType = DbType.String,
+                    Value = _options.Value.Version
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@TwoMinutesLater",
+                    DbType = DbType.String,
+                    Value = DateTime.Now.AddMinutes(2)
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@OneMinutesAgo",
+                    DbType = DbType.String,
+                    Value = DateTime.Now.AddMinutes(-1)
+                });
+
+                var messages = new List<_Message>();
+                var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                var map = _initializer.Settings.Resolve<MySqlSettings>().GetMap(table);
+
+                while (await reader.ReadAsync().ConfigureAwait(false))
+                {
+                    var model = _initializer.Settings.Resolve<MySqlSettings>().GetModel(table);
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        model.SetValue<_Message>(map[i], reader.GetValue(i));
+
+                    messages.Add(model);
+                }
+
+                await task(transaction, messages);
+
+                await transaction.CommitAsync(token);
+            }
+        }
+
+        public async Task GetDelayedPublishedMessagesForScheduling(
+              string table
+            , Func<object, IEnumerable<_Message>, Task> task
+            , CancellationToken token = default)
+        {
+            await GetDelayedMessagesForScheduling(
+                _initializer.Settings.Resolve<MySqlSettings>().PublishedTable
+                , task
+                , token)
+                .ConfigureAwait(false);
+        }
+
+        public async Task GetDelayedReceivedMessagesForScheduling(
+              string table
+            , Func<object, IEnumerable<_Message>, Task> task
+            , CancellationToken token = default)
+        {
+            await GetDelayedMessagesForScheduling(
+                _initializer.Settings.Resolve<MySqlSettings>().ReceivedTable
+                , task
+                , token)
+                .ConfigureAwait(false);
         }
     }
 }

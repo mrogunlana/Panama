@@ -19,7 +19,7 @@ namespace Panama.Core.CDC
         public string Content { get; set; } = String.Empty;
         public int Retries { get; set; }
         public DateTime Created { get; set; }
-        public DateTime Expires { get; set; }
+        public DateTime? Expires { get; set; }
         public string Status { get; set; } = String.Empty;
         public MessageStatus StatusEnum => Status.ToEnum<MessageStatus>();
     }

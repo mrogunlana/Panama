@@ -1,9 +1,4 @@
-﻿using MySqlConnector;
-using Panama.Core.Interfaces;
-using Panama.Core.Security.Interfaces;
-using System.Data.Common;
-using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {
@@ -50,6 +45,19 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
             settings.Version = version;
             settings.Type = type;
+        }
+
+        internal static bool IsSupportSkipLocked(this MySqlSettings settings)
+        {
+            switch (settings.Type)
+            {
+                case MySqlType.MySql when settings.Version.Major >= 8:
+                case MySqlType.MariaDb when settings.Version.Major > 10:
+                case MySqlType.MariaDb when settings.Version.Major == 10 && settings.Version.Minor >= 6:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
