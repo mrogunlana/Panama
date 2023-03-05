@@ -43,5 +43,17 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
             return messages;
         }
+
+        internal static T Resolve<T>(this IModel model)
+            where T : IModel
+        {
+            if (model == null)
+                throw new ArgumentException($"Model must have a value to resolve type: {typeof(T)}.");
+
+            if (model is not T)
+                throw new ArgumentException($"Model must be of type: {typeof(T)} to resolve.");
+
+            return (T)model;
+        }
     }
 }

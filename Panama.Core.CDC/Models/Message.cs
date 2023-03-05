@@ -5,6 +5,11 @@ namespace Panama.Core.CDC
 {
     public class _Message : IModel
     {
+        public _Message()
+        {
+            if (Created == DateTime.MinValue)
+                Created = DateTime.Now;
+        }
         public int _Id { get; set; }
         public string Id { get; set; } = String.Empty;
         public string CorrelationId { get; set; } = String.Empty;

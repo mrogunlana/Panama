@@ -14,16 +14,14 @@ namespace Panama.Core.CDC.MySQL.Processors
     public class LogTailingProcessor : IProcess
     {
         private readonly BinlogClient _client;
-        private readonly Dictionary<int, string> _published;
-        private readonly Dictionary<int, string> _received;
-        private readonly IStore _store;
-        private readonly IOptions<MySqlCdcOptions> _options;
+        private readonly IOptions<MySqlOptions> _options;
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
+        private readonly IInitialize _initializer;
 
         public LogTailingProcessor(
-              IStore store
-            , IOptions<MySqlCdcOptions> options
+              IInitialize initializer
+            , IOptions<MySqlOptions> options
             , IEnumerable<IBroker> brokers
             , StringEncryptorResolver stringEncryptorResolver)
         {
@@ -31,12 +29,10 @@ namespace Panama.Core.CDC.MySQL.Processors
             //registrar and if it's null, throw an exception as 
             //its table and database specific values below are required
 
-            _store = store;
             _options = options;
             _brokers = brokers;
             _encryptor = stringEncryptorResolver(ResolverKey.Base64);
-            _published = _store.GetSchema(_options.Value.PublishedTableId);
-            _received = _store.GetSchema(_options.Value.ReceivedTableId);
+            _initializer = initializer;
 
             /*  NOTES: 
              * 
@@ -99,11 +95,10 @@ namespace Panama.Core.CDC.MySQL.Processors
             // encrypted and let the consumer decode?
             //.DecodeContent(_encryptor);
             var published = writeRows
-                .GetPublishedMessages(_options.Value, _published);
+                .GetPublishedMessages(_initializer.Settings.Resolve<MySqlSettings>());
 
             var received = writeRows
-                .GetReceivedMessages(_options.Value, _received);
-
+                .GetReceivedMessages(_initializer.Settings.Resolve<MySqlSettings>());
             
             //publish to message broker
             foreach (var broker in _brokers)

@@ -15,7 +15,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
             return false;
         }
 
-        internal static List<_Message> GetPublishedMessages(this WriteRowsEvent @event, MySqlCdcOptions settings, Dictionary<int, string> map)
+        internal static List<_Message> GetPublishedMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
             var messages = new List<_Message>();
 
@@ -30,7 +30,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
                 var message = new Published();
 
                 for (int i = 0; i < row.Cells?.Count; i++)
-                    message.SetValue<Published>(map[i], row.Cells[0]);
+                    message.SetValue<Published>(settings.PublishedTableMap[i], row.Cells[i]);
 
                 messages.Add(message);
             }
@@ -38,7 +38,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
             return messages;
         }
         
-        internal static List<_Message> GetReceivedMessages(this WriteRowsEvent @event, MySqlCdcOptions settings, Dictionary<int, string> map)
+        internal static List<_Message> GetReceivedMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
             var messages = new List<_Message>();
 
@@ -53,7 +53,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
                 var message = new Received();
 
                 for (int i = 0; i < row.Cells?.Count; i++)
-                    message.SetValue<Received>(map[i], row.Cells[0]);
+                    message.SetValue<Received>(settings.ReceivedTableMap[i], row.Cells[i]);
 
                 messages.Add(message);
             }
