@@ -1,26 +1,22 @@
-﻿using Panama.Core.Extensions;
-using Panama.Core.Interfaces;
+﻿using Panama.Core.Interfaces;
 
 namespace Panama.Core.CDC
 {
-    public class _Message : IModel
+    public class Message : IModel 
     {
-        public _Message()
+        public Message()
         {
-            if (Created == DateTime.MinValue)
-                Created = DateTime.Now;
+            Headers = new Dictionary<string, string?>();
         }
-        public int _Id { get; set; }
-        public string Id { get; set; } = String.Empty;
-        public string CorrelationId { get; set; } = String.Empty;
-        public string Version { get; set; } = String.Empty;
-        public string Name { get; set; } = String.Empty;
-        public string Group { get; set; } = String.Empty;
-        public string Content { get; set; } = String.Empty;
-        public int Retries { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Expires { get; set; }
-        public string Status { get; set; } = String.Empty;
-        public MessageStatus StatusEnum => Status.ToEnum<MessageStatus>();
+
+        public Message(IDictionary<string, string?> headers, object? value)
+        {
+            Headers = headers ?? throw new ArgumentNullException(nameof(headers));
+            Value = value;
+        }
+
+        public IDictionary<string, string?> Headers { get; set; }
+
+        public object? Value { get; set; }
     }
 }

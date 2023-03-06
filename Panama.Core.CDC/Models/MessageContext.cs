@@ -5,7 +5,7 @@ namespace Panama.Core.CDC
     public class MessageContext : Context
     {
         public MessageContext(
-              _Message data
+              InternalMessage data
             , IServiceProvider? provider = null
             , CancellationToken? token = null)
             : base(provider, token)

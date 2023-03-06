@@ -11,7 +11,7 @@ namespace Panama.Core.CDC
         private readonly ILogger<Bootstrapper> _log;
 
         private CancellationTokenSource? _cts;
-        private IEnumerable<IServer> _servers = default!;
+        private IEnumerable<IService> _servers = default!;
         private IEnumerable<IInitialize> _initializers = default!;
         private bool _disposed;
 
@@ -44,7 +44,7 @@ namespace Panama.Core.CDC
             }
         }
 
-        private async Task StartProcessors()
+        private async Task StartProcesses()
         {
             foreach (var server in _servers)
             {
@@ -100,7 +100,7 @@ namespace Panama.Core.CDC
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _servers = _provider.GetServices<IServer>();
+            _servers = _provider.GetServices<IService>();
             _initializers = _provider.GetServices<IInitialize>();
 
             _cts.Token.Register(() =>
@@ -121,7 +121,7 @@ namespace Panama.Core.CDC
             });
 
             await Initialize().ConfigureAwait(false);
-            await StartProcessors().ConfigureAwait(false);
+            await StartProcesses().ConfigureAwait(false);
 
             _disposed = false;
             _log.LogInformation("### Panama.Core.CDC Server started!");

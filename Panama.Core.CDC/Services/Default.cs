@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Panama.Core.CDC.Interfaces;
+using Panama.Core.CDC.Processors;
 using Panama.Core.Models;
 
-namespace Panama.Core.CDC
+namespace Panama.Core.CDC.Services
 {
-    public class Server : IServer
+    public class _Default : IService
     {
-        private readonly ILogger<Server> _log;
+        private readonly ILogger<_Default> _log;
         private readonly IServiceProvider _provider;
         private readonly ILoggerFactory _factory;
 
@@ -16,8 +17,8 @@ namespace Panama.Core.CDC
         private Task? _task;
         private bool _disposed;
 
-        public Server(
-            ILogger<Server> log,
+        public _Default(
+            ILogger<_Default> log,
             ILoggerFactory factory,
             IServiceProvider provider)
         {
@@ -33,7 +34,7 @@ namespace Panama.Core.CDC
             try
             {
                 _disposed = true;
-                _log.LogInformation("Shutting down the processing server...");
+                _log.LogInformation("Shutting down the Panama.Core.CDC processing server...");
                 _cts.Cancel();
 
                 _task?.Wait((int)TimeSpan.FromSeconds(10).TotalMilliseconds);
@@ -62,10 +63,11 @@ namespace Panama.Core.CDC
 
             _context = new Context(_provider, _cts.Token);
 
-            var processors = _provider.GetService<IProcess>();
-
-            var tasks = _provider
-                .GetServices<IProcess>()
+            var tasks = new List<IProcess> {
+                    _provider.GetRequiredService<DeleteExpiredProcess>(),
+                    _provider.GetRequiredService<PublishedRetryProcess>(),
+                    _provider.GetRequiredService<ReceivedRetryProcess>()
+                }
                 .Select(p => new Manager(p, _factory))
                 .Select(m => m.Invoke(_context));
 

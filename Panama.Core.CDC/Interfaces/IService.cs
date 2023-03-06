@@ -2,7 +2,7 @@
 
 namespace Panama.Core.CDC.Interfaces
 {
-    public interface IServer : IDisposable 
+    public interface IService : IDisposable 
     {
         Task StartAsync(CancellationToken cancellationToken);
     }

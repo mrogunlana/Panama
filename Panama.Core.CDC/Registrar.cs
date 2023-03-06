@@ -1,12 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Core.CDC.Interfaces;
-using Panama.Core.Interfaces;
-using Panama.Core.Invokers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Panama.Core.CDC.Services;
 
 namespace Panama.Core.CDC
 {
@@ -17,7 +11,8 @@ namespace Panama.Core.CDC
             services.AddHostedService<Bootstrapper>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<IManage, Manager>();
-            services.AddSingleton<IServer, Server>();
+            services.AddSingleton<IService, _Default>();
+            services.AddSingleton<IService, Dispatcher>();
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Panama.Core.CDC.Interfaces;
 using Panama.Core.Interfaces;
 
-namespace Panama.Core.CDC.MySQL.Processors
+namespace Panama.Core.CDC.Processors
 {
-    public class DeleteExpiredProcessor : IProcess
+    public class PublishedRetryProcess : IProcess
     {
-        public DeleteExpiredProcessor(IServiceProvider provider)
+        public PublishedRetryProcess(IServiceProvider provider)
         {
             
         }

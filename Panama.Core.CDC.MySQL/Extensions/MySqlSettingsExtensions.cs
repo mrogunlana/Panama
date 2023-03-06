@@ -17,7 +17,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
             throw new Exception($"Table map {table} not found!");
         }
 
-        internal static _Message GetModel(this MySqlSettings settings, string table)
+        internal static InternalMessage GetModel(this MySqlSettings settings, string table)
         {
             if (string.IsNullOrEmpty(table))
                 throw new ArgumentNullException("Table name must have value to get schema map.");

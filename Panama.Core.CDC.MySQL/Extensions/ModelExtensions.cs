@@ -22,7 +22,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
             property.SetValue(model, result, null);
         }
 
-        internal static bool IsContentBase64(this _Message message)
+        internal static bool IsContentBase64(this InternalMessage message)
         {
             //TODO: Do we need to consider padding?
             //Convert.TryFromBase64String(message.Content.PadRight(message.Content.Length / 4 * 4 + (message.Content.Length % 4 == 0 ? 0 : 4), '='), new Span<byte>(new byte[message.Content.Length]), out _);
@@ -33,7 +33,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
 
         internal static IEnumerable<IModel> DecodeContent(this IEnumerable<IModel> models, IStringEncryptor encryptor)
         {
-            var messages = models.OfType<_Message>();
+            var messages = models.OfType<InternalMessage>();
 
             foreach (var message in messages)
             {

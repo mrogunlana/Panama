@@ -375,7 +375,7 @@ namespace Panama.Core.CDC.MySQL
             }
         }
 
-        public async Task ChangeMessageState(string tableName, _Message message, MessageStatus status, object? transaction = null)
+        public async Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null)
         {
             using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
             {
@@ -425,12 +425,12 @@ namespace Panama.Core.CDC.MySQL
             }
         }
 
-        public async Task ChangePublishedState(_Message message, MessageStatus status, object? transaction = null)
+        public async Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
             await ChangeMessageState(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable, message, status, transaction).ConfigureAwait(false);
         }
         
-        public async Task ChangeReceivedState(_Message message, MessageStatus status, object? transaction = null)
+        public async Task ChangeReceivedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
             await ChangeMessageState(_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable, message, status, transaction).ConfigureAwait(false);
         }
@@ -477,7 +477,7 @@ namespace Panama.Core.CDC.MySQL
             }
         }
 
-        public async Task<_Message> StorePublishedMessage(_Message message, object? transaction = null)
+        public async Task<InternalMessage> StorePublishedMessage(InternalMessage message, object? transaction = null)
         {
             using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
             {
@@ -576,7 +576,7 @@ namespace Panama.Core.CDC.MySQL
             }
         }
 
-        public async Task<_Message> StoreReceivedMessage(_Message message, object? transaction = null)
+        public async Task<InternalMessage> StoreReceivedMessage(InternalMessage message, object? transaction = null)
         {
             using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
             {
@@ -730,7 +730,7 @@ namespace Panama.Core.CDC.MySQL
             return await DeleteExpiredAsync(_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable, timeout, batch, token).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<_Message>> GetMessagesToRetry(string table)
+        public async Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table)
         {
             using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
             {
@@ -776,7 +776,7 @@ namespace Panama.Core.CDC.MySQL
                     Value = DateTime.Now.AddMinutes(-4)
                 });
 
-                var messages = new List<_Message>();
+                var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                 var map = _initializer.Settings.Resolve<MySqlSettings>().GetMap(table);
 
@@ -784,7 +784,7 @@ namespace Panama.Core.CDC.MySQL
                 {
                     var model = _initializer.Settings.Resolve<MySqlSettings>().GetModel(table);
                     for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<_Message>(map[i], reader.GetValue(i));
+                        model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
 
                     messages.Add(model);
                 }
@@ -795,19 +795,19 @@ namespace Panama.Core.CDC.MySQL
             }
         }
 
-        public async Task<IEnumerable<_Message>> GetPublishedMessagesToRetry()
+        public async Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry()
         {
             return await GetMessagesToRetry(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<_Message>> GetReceivedMessagesToRetry()
+        public async Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry()
         {
             return await GetMessagesToRetry(_initializer.Settings.Resolve<MySqlSettings>().PublishedTable).ConfigureAwait(false);
         }
 
         public async Task GetDelayedMessagesForScheduling(
               string table
-            , Func<object, IEnumerable<_Message>, Task> task
+            , Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
             using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
@@ -859,7 +859,7 @@ namespace Panama.Core.CDC.MySQL
                     Value = DateTime.Now.AddMinutes(-1)
                 });
 
-                var messages = new List<_Message>();
+                var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                 var map = _initializer.Settings.Resolve<MySqlSettings>().GetMap(table);
 
@@ -867,7 +867,7 @@ namespace Panama.Core.CDC.MySQL
                 {
                     var model = _initializer.Settings.Resolve<MySqlSettings>().GetModel(table);
                     for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<_Message>(map[i], reader.GetValue(i));
+                        model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
 
                     messages.Add(model);
                 }
@@ -880,7 +880,7 @@ namespace Panama.Core.CDC.MySQL
 
         public async Task GetDelayedPublishedMessagesForScheduling(
               string table
-            , Func<object, IEnumerable<_Message>, Task> task
+            , Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(
@@ -892,7 +892,7 @@ namespace Panama.Core.CDC.MySQL
 
         public async Task GetDelayedReceivedMessagesForScheduling(
               string table
-            , Func<object, IEnumerable<_Message>, Task> task
+            , Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(

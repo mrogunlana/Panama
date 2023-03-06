@@ -8,7 +8,7 @@ namespace Panama.Core.CDC.MySQL.Extensions
 {
     internal static class MessageExtensions
     {
-        internal static void ResetMessageMetadata(this _Message message)
+        internal static void ResetMessageMetadata(this InternalMessage message)
         {
             if (message == null)
                 return;

@@ -15,9 +15,9 @@ namespace Panama.Core.CDC.MySQL.Extensions
             return false;
         }
 
-        internal static List<_Message> GetPublishedMessages(this WriteRowsEvent @event, MySqlSettings settings)
+        internal static List<InternalMessage> GetPublishedMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
-            var messages = new List<_Message>();
+            var messages = new List<InternalMessage>();
 
             if (@event.IsEmpty())
                 return messages;
@@ -38,9 +38,9 @@ namespace Panama.Core.CDC.MySQL.Extensions
             return messages;
         }
         
-        internal static List<_Message> GetReceivedMessages(this WriteRowsEvent @event, MySqlSettings settings)
+        internal static List<InternalMessage> GetReceivedMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
-            var messages = new List<_Message>();
+            var messages = new List<InternalMessage>();
 
             if (@event.IsEmpty())
                 return messages;

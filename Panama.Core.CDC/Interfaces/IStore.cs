@@ -12,19 +12,19 @@
         Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default);
         Task ChangePublishedStateToDelayed(int[] ids);
         Task ChangeReceivedStateToDelayed(int[] ids);
-        Task ChangeMessageState(string tableName, _Message message, MessageStatus status, object? transaction = null);
-        Task ChangePublishedState(_Message message, MessageStatus status, object? transaction = null);
-        Task ChangeReceivedState(_Message message, MessageStatus state, object? transaction = null);
-        Task<_Message> StorePublishedMessage(_Message message, object? transaction = null);
-        Task<_Message> StoreReceivedMessage(_Message message, object? transaction = null);
+        Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null);
+        Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null);
+        Task ChangeReceivedState(InternalMessage message, MessageStatus state, object? transaction = null);
+        Task<InternalMessage> StorePublishedMessage(InternalMessage message, object? transaction = null);
+        Task<InternalMessage> StoreReceivedMessage(InternalMessage message, object? transaction = null);
         Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
-        Task<IEnumerable<_Message>> GetMessagesToRetry(string table);
-        Task<IEnumerable<_Message>> GetPublishedMessagesToRetry();
-        Task<IEnumerable<_Message>> GetReceivedMessagesToRetry();
-        Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
-        Task GetDelayedPublishedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
-        Task GetDelayedReceivedMessagesForScheduling(string table, Func<object, IEnumerable<_Message>, Task> task, CancellationToken token = default);
+        Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table);
+        Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry();
+        Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry();
+        Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
+        Task GetDelayedPublishedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
+        Task GetDelayedReceivedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
     }
 }

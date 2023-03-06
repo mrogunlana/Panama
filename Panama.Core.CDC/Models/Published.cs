@@ -2,5 +2,5 @@
 
 namespace Panama.Core.CDC
 {
-    public class Published : _Message { }
+    public class Published : InternalMessage { }
 }

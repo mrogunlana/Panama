@@ -1,13 +1,13 @@
 ﻿using Panama.Core.CDC.Interfaces;
 using Panama.Core.Interfaces;
 
-namespace Panama.Core.CDC.MySQL.Processors
+namespace Panama.Core.CDC.Processors
 {
-    public class PublishedRetryProcessor : IProcess
+    public class ReceivedRetryProcess : IProcess
     {
-        public PublishedRetryProcessor(IServiceProvider provider)
+        public ReceivedRetryProcess(IServiceProvider provider)
         {
-            
+
         }
 
         public async Task Invoke(IContext context)
