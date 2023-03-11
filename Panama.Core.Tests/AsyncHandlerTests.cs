@@ -40,7 +40,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentCommandsExecuteSerially()
         {
-            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider.GetService<IInvokeHandler<IHandler>>(), _serviceProvider)
                 .Command<SerialCommand1>()
                 .Command<SerialCommand2>()
                 .Command<SerialCommand3>()
@@ -66,7 +66,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesConcurrentAsyncCommandsExecuteSerially()
         {
-            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider.GetService<IInvokeHandler<IHandler>>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()
@@ -92,7 +92,7 @@ namespace Panama.Core.Tests
         [TestMethod]
         public async Task DoesAsyncandNonAsyncCommandsPlayNicelyTogether()
         {
-            var result = await new Handler(_serviceProvider.GetService<IInvokeResult<IHandler>>(), _serviceProvider)
+            var result = await new Handler(_serviceProvider.GetService<IInvokeHandler<IHandler>>(), _serviceProvider)
                 .Command<AsyncSerialCommand1>()
                 .Command<AsyncSerialCommand2>()
                 .Command<AsyncSerialCommand3>()

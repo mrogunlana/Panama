@@ -1,7 +1,7 @@
 ﻿using Panama.Core.Interfaces;
 using System.Runtime.InteropServices;
 
-namespace Panama.Core.CDC
+namespace Panama.Core.CDC.Models
 {
     [StructLayout(LayoutKind.Auto)]
     public readonly struct TransientMessage : IModel

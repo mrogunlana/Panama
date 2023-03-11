@@ -1,8 +1,4 @@
-﻿using MySqlConnector;
-using Panama.Core.Interfaces;
-using Panama.Core.Security.Interfaces;
-using System.Data.Common;
-using System.Reflection;
+﻿using Panama.Core.CDC.Models;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {

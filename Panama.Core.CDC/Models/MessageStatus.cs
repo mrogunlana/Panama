@@ -1,4 +1,4 @@
-﻿namespace Panama.Core.CDC
+﻿namespace Panama.Core.CDC.Models
 {
     public enum MessageStatus 
     {

@@ -1,6 +1,6 @@
 ﻿using Panama.Core.Models;
 
-namespace Panama.Core.CDC
+namespace Panama.Core.CDC.Models
 {
     public class MessageContext : Context
     {

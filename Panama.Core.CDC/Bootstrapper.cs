@@ -52,7 +52,7 @@ namespace Panama.Core.CDC
                 {
                     _cts!.Token.ThrowIfCancellationRequested();
 
-                    await server.StartAsync(_cts!.Token);
+                    await server.Start(_cts!.Token);
                 }
                 catch (OperationCanceledException)
                 {

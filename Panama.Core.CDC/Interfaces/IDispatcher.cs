@@ -1,11 +1,13 @@
-﻿namespace Panama.Core.CDC.Interfaces
+﻿using Panama.Core.CDC.Models;
+
+namespace Panama.Core.CDC.Interfaces
 {
     public interface IDispatcher : IService
     {
-        ValueTask EnqueueToPublish(InternalMessage message);
+        ValueTask Publish(InternalMessage message);
 
-        ValueTask EnqueueToExecute(InternalMessage message, object? descriptor = null);
+        ValueTask Execute(InternalMessage message, object? descriptor = null);
 
-        ValueTask EnqueueToScheduler(InternalMessage message, DateTime publishTime, object? transaction = null);
+        ValueTask Schedule(InternalMessage message, DateTime publishTime, object? transaction = null);
     }
 }

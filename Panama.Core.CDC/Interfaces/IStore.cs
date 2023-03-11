@@ -1,4 +1,6 @@
-﻿namespace Panama.Core.CDC.Interfaces
+﻿using Panama.Core.CDC.Models;
+
+namespace Panama.Core.CDC.Interfaces
 {
     public interface IStore
     {

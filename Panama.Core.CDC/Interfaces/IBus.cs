@@ -1,19 +1,62 @@
-﻿namespace Panama.Core.CDC.Interfaces
+﻿using Panama.Core.Interfaces;
+
+namespace Panama.Core.CDC.Interfaces
 {
-    public interface IDispatch
+    public interface IBus
     {
         IServiceProvider ServiceProvider { get; }
 
         AsyncLocal<ITransaction> Transaction { get; }
 
-        Task PublishAsync<T>(string name, T? contentObj, string? callbackName = null,
-            CancellationToken cancellationToken = default);
+        Task PublishAsync<D>(string name
+            , D? data
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel;
 
-        Task PublishAsync<T>(string name, T? contentObj, IDictionary<string, string?> headers,
-            CancellationToken cancellationToken = default);
+        Task PublishAsync<D>(string name
+            , D? data
+            , IDictionary<string, string?> headers
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel;
 
-        Task PublishDelayAsync<T>(TimeSpan delayTime, string name, T? contentObj, IDictionary<string, string?> headers, CancellationToken cancellationToken = default);
+        Task PublishAsync<D, T>(string name
+            , D? data
+            , IDictionary<string, string?> headers
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel
+            where T : ITarget;
 
-        Task PublishDelayAsync<T>(TimeSpan delayTime, string name, T? contentObj, string? callbackName = null, CancellationToken cancellationToken = default);
+        Task PublishDelayAsync<D>(TimeSpan delayTime
+            , string name
+            , D? data
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel;
+
+        Task PublishDelayAsync<D>(TimeSpan delayTime
+            , string name
+            , D? data
+            , IDictionary<string, string?> headers
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel;
+
+        Task PublishDelayAsync<D, T>(TimeSpan delayTime
+            , string name
+            , D? data
+            , IDictionary<string, string?> headers
+            , string? ack = null
+            , string? nack = null
+            , CancellationToken cancellationToken = default)
+            where D : IModel
+            where T : ITarget;
     }
 }

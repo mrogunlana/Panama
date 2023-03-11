@@ -17,7 +17,7 @@ namespace Panama.Core.Service
         {
             services.AddSingleton<IInvokeAction, InvokeActions>();
             services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
+            services.AddSingleton<IInvokeHandler<IHandler>, InvokeHandler>();
             AddAssembly(services, Assembly.GetEntryAssembly());
         }
         
@@ -25,7 +25,7 @@ namespace Panama.Core.Service
         {
             services.AddSingleton<IInvokeAction, InvokeActions>(); 
             services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
+            services.AddSingleton<IInvokeHandler<IHandler>, InvokeHandler>();
             AddAssembly(services, assembly);            
         }
 
@@ -34,7 +34,7 @@ namespace Panama.Core.Service
             var assembliesToScan = assemblies.Distinct();
             services.AddSingleton<IInvokeAction, InvokeActions>(); 
             services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvokeResult<IHandler>, InvokeHandler>();
+            services.AddSingleton<IInvokeHandler<IHandler>, InvokeHandler>();
             foreach (var assembly in assembliesToScan)
             {
                 AddAssembly(services, assembly);

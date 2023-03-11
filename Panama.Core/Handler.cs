@@ -10,13 +10,13 @@ namespace Panama.Core
 {
     public class Handler : IHandler
     {
-        private IInvokeResult<IHandler> Invoker; 
+        private IInvokeHandler<IHandler> Invoker; 
         public IList<IAction> Manifest { get; }
         private IServiceProvider provider { get; set; }
 
         public IContext Context { get; }
         
-        public Handler(IInvokeResult<IHandler> invoker, IServiceProvider serviceProvider)
+        public Handler(IInvokeHandler<IHandler> invoker, IServiceProvider serviceProvider)
         {
             provider = serviceProvider;
             Manifest = new List<IAction>();

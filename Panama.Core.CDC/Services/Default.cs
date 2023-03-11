@@ -55,7 +55,7 @@ namespace Panama.Core.CDC.Services
             }
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task Start(CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _cts.Cancel());
 

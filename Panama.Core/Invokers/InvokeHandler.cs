@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Panama.Core.Invokers
 {
-    public class InvokeHandler : IInvokeResult<IHandler> 
+    public class InvokeHandler : IInvokeHandler<IHandler> 
     {
         private readonly ILogger<InvokeHandler> _logger;
         private IInvokeAction invoker { get; set; }

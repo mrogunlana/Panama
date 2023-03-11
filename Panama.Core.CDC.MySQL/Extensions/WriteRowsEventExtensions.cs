@@ -1,5 +1,5 @@
 ﻿using MySqlCdc.Events;
-using Panama.Core.Interfaces;
+using Panama.Core.CDC.Models;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {

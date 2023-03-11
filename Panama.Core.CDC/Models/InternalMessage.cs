@@ -1,7 +1,7 @@
 ﻿using Panama.Core.Extensions;
 using Panama.Core.Interfaces;
 
-namespace Panama.Core.CDC
+namespace Panama.Core.CDC.Models
 {
     public class InternalMessage : IModel
     {

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Panama.Core.CDC.Models;
+using System.Text.RegularExpressions;
 
 namespace Panama.Core.CDC.MySQL.Extensions
 {

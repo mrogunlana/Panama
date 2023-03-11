@@ -3,9 +3,9 @@ using MySqlCdc;
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
 using Panama.Core.CDC.Interfaces;
+using Panama.Core.CDC.Models;
 using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Interfaces;
-using Panama.Core.Messaging.Interfaces;
 using Panama.Core.Security.Interfaces;
 using Panama.Core.Security.Resolvers;
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Panama.Core.CDC.Interfaces;
+using Panama.Core.CDC.Models;
 using Panama.Core.CDC.MySQL.Extensions;
 using Panama.Core.Extensions;
 using Panama.Core.Security.Interfaces;
@@ -51,7 +52,7 @@ namespace Panama.Core.CDC.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_ExpiresAt`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable}` (
@@ -67,7 +68,7 @@ namespace Panama.Core.CDC.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_ExpiresAt`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().LockTable}` (
@@ -684,7 +685,7 @@ namespace Panama.Core.CDC.MySQL
 
                 using var command = new MySqlCommand($@"
                     DELETE FROM `{table}` 
-                    WHERE ExpiresAt < @Timeout 
+                    WHERE Expires < @Timeout 
                     AND (StatusName = @Succeeded 
                     OR StatusName = @Failed) 
                     limit @Batch;"
@@ -837,8 +838,8 @@ namespace Panama.Core.CDC.MySQL
                     FROM `{table}` 
                     WHERE `Retries` < @Retries
                     AND `Version` = @Version 
-                    AND ((`ExpiresAt`< @TwoMinutesLater AND `StatusName` = '{MessageStatus.Delayed}') 
-                        OR (`ExpiresAt`< @OneMinutesAgo AND `StatusName` = '{MessageStatus.Queued}'))
+                    AND ((`Expires`< @TwoMinutesLater AND `StatusName` = '{MessageStatus.Delayed}') 
+                        OR (`Expires`< @OneMinutesAgo AND `StatusName` = '{MessageStatus.Queued}'))
                     LIMIT 200 {append};"
 
                 , connection);
