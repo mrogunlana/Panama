@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Panama.Core.Interfaces
 {
-    public interface IHandler 
+    public interface IHandler : IInvoke 
     {
-        IList<IAction> Manifest { get; }
-        IContext Context { get; }
         IHandler Query<Query>() where Query : IQuery;
         IHandler Command<Command>() where Command : ICommand;
         IHandler Rollback<Rollback>() where Rollback : IRollback;
@@ -16,7 +13,5 @@ namespace Panama.Core.Interfaces
         IHandler Add(CancellationToken token);
         IHandler Add(params IModel[] data);
         IHandler Add(IEnumerable<IModel> data);
-
-        Task<IResult> Invoke();
     }
 }

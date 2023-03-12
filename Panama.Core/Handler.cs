@@ -10,74 +10,71 @@ namespace Panama.Core
 {
     public class Handler : IHandler
     {
-        private IInvokeHandler<IHandler> Invoker; 
-        public IList<IAction> Manifest { get; }
-        private IServiceProvider provider { get; set; }
-
-        public IContext Context { get; }
+        private readonly IInvoke<IHandler> _invoker; 
+        private readonly IServiceProvider _provider;
+        private readonly IContext _context;
         
-        public Handler(IInvokeHandler<IHandler> invoker, IServiceProvider serviceProvider)
+        public Handler(IInvoke<IHandler> invoker, IServiceProvider provider)
         {
-            provider = serviceProvider;
-            Manifest = new List<IAction>();
-            Invoker = invoker;
-            Context = new Context(CancellationToken.None, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            _provider = provider;
+            _invoker = invoker;
+            _context = new Context(CancellationToken.None, Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), provider);
         }
 
         public IHandler Add(IModel data)
         {
-            Context.Data.Add(data);
+            _context.Data.Add(data);
 
             return this;
         }
         public IHandler Add(CancellationToken token)
         {
-            Context.Token = token;
+            _context.Token = token;
 
             return this;
         }
         public IHandler Add(params IModel[] data)
         {
             foreach (var model in data)
-                Context.Data.Add(model);
+                _context.Data.Add(model);
 
             return this;
         }
         public IHandler Add(IEnumerable<IModel> data)
         {
             foreach (var model in data)
-                Context.Data.Add(model);
+                _context.Data.Add(model);
 
             return this;
         }
         public IHandler Command<Command>() where Command : ICommand
         {
-            Manifest.Add(provider.GetService<Command>());
+            _context.Data.Add(_provider.GetService<Command>());
 
             return this;
         }
         public IHandler Query<Query>() where Query : IQuery
         {
-            Manifest.Add(provider.GetService<Query>());
+            _context.Data.Add(_provider.GetService<Query>());
 
             return this;
         }
         public IHandler Rollback<Rollback>() where Rollback : IRollback
         {
-            Manifest.Add(provider.GetService<Rollback>());
+            _context.Data.Add(_provider.GetService<Rollback>());
 
             return this;
         }
         public IHandler Validate<Validate>() where Validate : IValidate
         {
-            Manifest.Add(provider.GetService<Validate>());
+            _context.Data.Add(_provider.GetService<Validate>());
 
             return this;
         }
         
-        public virtual async Task<IResult> Invoke()
+        public virtual async Task<IResult> Invoke(IContext context = null)
         {
-            return await Invoker.Invoke(this);
+            return await _invoker.Invoke(_context);
         }
     }
 }

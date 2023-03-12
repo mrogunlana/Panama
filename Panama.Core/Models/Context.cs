@@ -30,7 +30,8 @@ namespace Panama.Core.Models
         public Context(
             CancellationToken? token = null
             , string id = null
-            , string correlationId = null)
+            , string correlationId = null
+            , IServiceProvider provider = null)
             : this()
         {
             if (token.HasValue)
@@ -39,13 +40,16 @@ namespace Panama.Core.Models
                 Id = id;
             if (!string.IsNullOrEmpty(correlationId))
                 CorrelationId = correlationId;
+            if (provider != null)
+                Provider = provider;
         }
 
         public Context(IEnumerable<IModel> data
             , CancellationToken? token = null
             , string id = null
-            , string correlationId = null)
-            : this(token, id, correlationId)
+            , string correlationId = null
+            , IServiceProvider provider = null)
+            : this(token, id, correlationId, provider)
         {
             Data = data.ToList();
         }
@@ -54,8 +58,9 @@ namespace Panama.Core.Models
               IModel data
             , CancellationToken? token = null
             , string id = null
-            , string correlationId = null)
-            : this(token, id, correlationId)
+            , string correlationId = null
+            , IServiceProvider provider = null)
+            : this(token, id, correlationId, provider)
         {
             Data.Add(data);
         }
