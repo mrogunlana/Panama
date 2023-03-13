@@ -3,23 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Tests", "Panama.Core.Tests\Panama.Core.Tests.csproj", "{8F37003C-2B9F-462B-801A-D106E930C772}"
-	ProjectSection(ProjectDependencies) = postProject
-		{440AF264-97BC-465D-8CA9-A609795242E6} = {440AF264-97BC-465D-8CA9-A609795242E6}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama", "Panama\Panama.csproj", "{BC941EC5-4FC6-4C01-945B-A83D031C5CD2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.TestApi", "Panama.Core.TestApi\Panama.Core.TestApi.csproj", "{037F5BD6-D276-4A6E-8D18-678614ACB7CD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{440AF264-97BC-465D-8CA9-A609795242E6} = {440AF264-97BC-465D-8CA9-A609795242E6}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal", "Panama.Canal\Panama.Canal.csproj", "{54B83AEA-DE78-4F46-8E52-8949990FBB65}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.Security", "Panama.Core.Security\Panama.Core.Security.csproj", "{6A99F621-E049-45F9-998B-567C98E3495A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.MySQL", "Panama.Canal.MySQL\Panama.Canal.MySQL.csproj", "{D21E65E9-2F05-4435-B897-F44EE5CD7D15}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.CDC", "Panama.Core.CDC\Panama.Core.CDC.csproj", "{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Security", "Panama.Security\Panama.Security.csproj", "{15222817-E9DD-4CAC-8867-C22FE451C910}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core.CDC.MySQL", "Panama.Core.CDC.MySQL\Panama.Core.CDC.MySQL.csproj", "{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Tests", "Panama.Tests\Panama.Tests.csproj", "{79D90681-9EA4-405A-B402-AFE9878AE9F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Core", "Panama.Core\Panama.Core.csproj", "{440AF264-97BC-465D-8CA9-A609795242E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.TestApi", "Panama.TestApi\Panama.TestApi.csproj", "{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,30 +21,29 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F37003C-2B9F-462B-801A-D106E930C772}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F37003C-2B9F-462B-801A-D106E930C772}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F37003C-2B9F-462B-801A-D106E930C772}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F37003C-2B9F-462B-801A-D106E930C772}.Release|Any CPU.Build.0 = Release|Any CPU
-		{037F5BD6-D276-4A6E-8D18-678614ACB7CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{037F5BD6-D276-4A6E-8D18-678614ACB7CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{037F5BD6-D276-4A6E-8D18-678614ACB7CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{037F5BD6-D276-4A6E-8D18-678614ACB7CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A99F621-E049-45F9-998B-567C98E3495A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A99F621-E049-45F9-998B-567C98E3495A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A99F621-E049-45F9-998B-567C98E3495A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A99F621-E049-45F9-998B-567C98E3495A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCD41F4D-8FC8-4E98-88E8-33ADEA627499}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED57C19A-A4A5-47DC-B5CA-990FA485F47F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{440AF264-97BC-465D-8CA9-A609795242E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{440AF264-97BC-465D-8CA9-A609795242E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{440AF264-97BC-465D-8CA9-A609795242E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{440AF264-97BC-465D-8CA9-A609795242E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC941EC5-4FC6-4C01-945B-A83D031C5CD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC941EC5-4FC6-4C01-945B-A83D031C5CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC941EC5-4FC6-4C01-945B-A83D031C5CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC941EC5-4FC6-4C01-945B-A83D031C5CD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54B83AEA-DE78-4F46-8E52-8949990FBB65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B83AEA-DE78-4F46-8E52-8949990FBB65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B83AEA-DE78-4F46-8E52-8949990FBB65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B83AEA-DE78-4F46-8E52-8949990FBB65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D21E65E9-2F05-4435-B897-F44EE5CD7D15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D21E65E9-2F05-4435-B897-F44EE5CD7D15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D21E65E9-2F05-4435-B897-F44EE5CD7D15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D21E65E9-2F05-4435-B897-F44EE5CD7D15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15222817-E9DD-4CAC-8867-C22FE451C910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15222817-E9DD-4CAC-8867-C22FE451C910}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15222817-E9DD-4CAC-8867-C22FE451C910}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15222817-E9DD-4CAC-8867-C22FE451C910}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
