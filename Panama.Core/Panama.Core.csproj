@@ -6,6 +6,8 @@
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>net6.0</TargetFramework>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageReleaseNotes>v6.0 Release</PackageReleaseNotes>

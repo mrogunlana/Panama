@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Panama.Core.Extensions;
 using Panama.Core.Interfaces;
 using Panama.Core.Models;
-using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Panama.Core.Invokers
 {
-    public class HandlerInvoker : IInvoke<IHandler> 
+    public class ScopedInvoker : IInvoke<IHandler> 
     {
-        private readonly ILogger<HandlerInvoker> _logger;
+        private readonly ILogger<DefaultInvoker> _logger;
 
-        public HandlerInvoker(ILogger<HandlerInvoker> logger)
+        public ScopedInvoker(ILogger<DefaultInvoker> logger)
         {
             _logger = logger;
         }
@@ -31,27 +30,39 @@ namespace Panama.Core.Invokers
                 _logger.LogTrace($"Handler (HID:{context.Id}) Start: [{manifest.Count()}] Total Actions Queued.");
 
                 var valid = await context.Provider
-                    .GetService<IInvoke<IValidate>>()
+                    .GetRequiredService<IInvoke<IValidate>>()
                     .Invoke(context);
-                if (!valid.Success)
-                    return valid;
+
+                valid.EnsureSuccess();
 
                 var queried = await context.Provider
-                    .GetService<IInvoke<IQuery>>()
+                    .GetRequiredService<IInvoke<IQuery>>()
                     .Invoke(context);
-                if (!queried.Success)
-                    return queried;
 
-                var performed = await context.Provider
-                    .GetService<IInvoke<ICommand>>()
-                    .Invoke(context);
-                if (performed.Success)
-                    return performed;
+                queried.EnsureSuccess();
 
-                var compensated = await context.Provider
-                    .GetService<IInvoke<IRollback>>()
-                    .Invoke(context);
-                return compensated;
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var commands = await context.Provider
+                        .GetRequiredService<IInvoke<ICommand>>()
+                        .Invoke(context);
+
+                    commands.ContinueWith(_ => scope.Complete());
+                    if (commands.Success)
+                        return commands;
+                }
+
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var compensation = await context.Provider
+                        .GetRequiredService<IInvoke<IRollback>>()
+                        .Invoke(context);
+
+                    compensation.ContinueWith(o => scope.Complete());
+                    compensation.EnsureSuccess();
+
+                    return compensation;
+                }
             }
             catch (Exception ex)
             {

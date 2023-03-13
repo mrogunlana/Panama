@@ -31,7 +31,7 @@ namespace Panama.Core.CDC.MySQL.Processes
 
             _options = options;
             _brokers = brokers;
-            _encryptor = stringEncryptorResolver(ResolverKey.Base64);
+            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
             _initializer = initializer;
 
             /*  NOTES: 

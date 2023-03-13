@@ -18,7 +18,7 @@ namespace Panama.Core.Security
         private string _hash = "SHA1";
 
 
-        public ResolverKey Key { get { return ResolverKey.AES; } }
+        public StringEncryptorResolverKey Key { get { return StringEncryptorResolverKey.AES; } }
 
         public AESEncryptor()
         {

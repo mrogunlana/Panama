@@ -1,5 +1,4 @@
 ﻿using Panama.Core.Interfaces;
-using System.Collections.Generic;
 
 namespace Panama.Core.Extensions
 {
@@ -32,6 +31,24 @@ namespace Panama.Core.Extensions
         public static bool Exist<T>(this IResult result) where T : IModel
         {
             return result.Exist<T>();
+        }
+
+        public static void ContinueWith(this IResult result, Action<IResult> action)
+        {
+            if (result == null)
+                return;
+            if (!result.Success)
+                return;
+
+            action.Invoke(result);
+        }
+
+        public static void EnsureSuccess(this IResult result)
+        {
+            if (result == null)
+                throw new Exception("Results cannot be located.");
+            if (!result.Success)
+                throw new Exception($"Results failed for these reasons: {string.Join(";", result.Messages)}.");
         }
     }
 }

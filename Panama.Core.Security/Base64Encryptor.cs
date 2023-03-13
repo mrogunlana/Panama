@@ -10,7 +10,7 @@ namespace Panama.Core.Security
 {
     public class Base64Encryptor : IStringEncryptor
     {
-        public ResolverKey Key { get { return ResolverKey.Base64; } }
+        public StringEncryptorResolverKey Key { get { return StringEncryptorResolverKey.Base64; } }
 
         public string FromString(string encrypted)
         {

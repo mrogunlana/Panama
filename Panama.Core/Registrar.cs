@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Core.Interfaces;
 using Panama.Core.Invokers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Panama.Core.Resolvers;
 using System.Reflection;
 
 namespace Panama.Core.Service
@@ -13,16 +11,30 @@ namespace Panama.Core.Service
         public static void AddPanama(this IServiceCollection services)
         {
             services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>();
-            services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvoke<IHandler>, HandlerInvoker>();
-            AddAssembly(services, Assembly.GetEntryAssembly());
+            services.AddTransient<IHandler, Handler>();
+            services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
+            services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
+              serviceProvider
+              .GetServices<IInvoke<IHandler>>()
+              .Where(o => o.GetType().Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+              .First()
+            );
+            AddAssembly(services, Assembly.GetEntryAssembly()!);
         }
         
         public static void AddPanama(this IServiceCollection services, Assembly assembly)
         {
             services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>(); 
-            services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvoke<IHandler>, HandlerInvoker>();
+            services.AddTransient<IHandler, Handler>();
+            services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
+            services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
+              serviceProvider
+              .GetServices<IInvoke<IHandler>>()
+              .Where(o => o.GetType().Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+              .First()
+            );
             AddAssembly(services, assembly);            
         }
 
@@ -30,8 +42,15 @@ namespace Panama.Core.Service
         {
             var assembliesToScan = assemblies.Distinct();
             services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>(); 
-            services.AddSingleton<IHandler, Handler>();
-            services.AddSingleton<IInvoke<IHandler>, HandlerInvoker>();
+            services.AddTransient<IHandler, Handler>();
+            services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
+            services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
+              serviceProvider
+              .GetServices<IInvoke<IHandler>>()
+              .Where(o => o.GetType().Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+              .First()
+            );
             foreach (var assembly in assembliesToScan)
             {
                 AddAssembly(services, assembly);

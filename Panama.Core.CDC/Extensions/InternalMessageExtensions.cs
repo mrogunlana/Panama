@@ -103,7 +103,7 @@ namespace Panama.Core.CDC.Extensions
             if (resolver == null)
                 throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
 
-            var encryptor = resolver(ResolverKey.Base64);
+            var encryptor = resolver(StringEncryptorResolverKey.Base64);
             if (encryptor == null)
                 throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
 

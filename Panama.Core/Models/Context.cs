@@ -12,6 +12,11 @@ namespace Panama.Core.Models
         {
             if (Data == null)
                 Data = new List<IModel>();
+
+            if (string.IsNullOrEmpty(Id))
+                Id = Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(CorrelationId))
+                CorrelationId = Guid.NewGuid().ToString();
         }
         public Context(
               IServiceProvider provider
@@ -29,9 +34,9 @@ namespace Panama.Core.Models
         }
         public Context(
             CancellationToken? token = null
-            , string id = null
-            , string correlationId = null
-            , IServiceProvider provider = null)
+            , string? id = null
+            , string? correlationId = null
+            , IServiceProvider? provider = null)
             : this()
         {
             if (token.HasValue)
@@ -46,9 +51,9 @@ namespace Panama.Core.Models
 
         public Context(IEnumerable<IModel> data
             , CancellationToken? token = null
-            , string id = null
-            , string correlationId = null
-            , IServiceProvider provider = null)
+            , string? id = null
+            , string? correlationId = null
+            , IServiceProvider? provider = null)
             : this(token, id, correlationId, provider)
         {
             Data = data.ToList();
@@ -57,9 +62,9 @@ namespace Panama.Core.Models
         public Context(
               IModel data
             , CancellationToken? token = null
-            , string id = null
-            , string correlationId = null
-            , IServiceProvider provider = null)
+            , string? id = null
+            , string? correlationId = null
+            , IServiceProvider? provider = null)
             : this(token, id, correlationId, provider)
         {
             Data.Add(data);
@@ -69,6 +74,6 @@ namespace Panama.Core.Models
         public CancellationToken Token { get; set; }
         public string Id { get; set; }
         public string CorrelationId { get; set; }
-        public IServiceProvider Provider { get; }
+        public IServiceProvider Provider { get; } = default!;
     }
 }

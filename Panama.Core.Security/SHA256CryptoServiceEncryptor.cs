@@ -10,7 +10,7 @@ namespace Panama.Core.Security
 {
     public class SHA256CryptoServiceEncryptor : IStringEncryptor
     {
-        public ResolverKey Key { get { return ResolverKey.SHA256; } }
+        public StringEncryptorResolverKey Key { get { return StringEncryptorResolverKey.SHA256; } }
 
         public string FromString(string encrypted)
         {

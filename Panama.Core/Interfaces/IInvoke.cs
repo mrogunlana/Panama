@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-
-namespace Panama.Core.Interfaces
+﻿namespace Panama.Core.Interfaces
 {
     public interface IInvoke
     {
-        Task<IResult> Invoke(IContext context = null);
+        Task<IResult> Invoke(IContext? context = null);
     }
     public interface IInvoke<T>
     {

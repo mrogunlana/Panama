@@ -24,7 +24,7 @@ namespace Panama.Core.CDC.MySQL
         {
             _options = options;
             _initializer = initializer;
-            _encryptor = stringEncryptorResolver(ResolverKey.Base64); ;
+            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
         }
 
         public async Task Init()
