@@ -10,7 +10,10 @@ namespace Panama.Core.Service
     {
         public static void AddPanama(this IServiceCollection services)
         {
-            services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>();
+            services.AddSingleton<IInvoke<IValidate>, ActionInvoker<IValidate>>();
+            services.AddSingleton<IInvoke<IQuery>, ActionInvoker<IQuery>>();
+            services.AddSingleton<IInvoke<ICommand>, ActionInvoker<ICommand>>();
+            services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
             services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
@@ -20,12 +23,18 @@ namespace Panama.Core.Service
               .Where(o => o.GetType().Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
               .First()
             );
+
+            
+
             AddAssembly(services, Assembly.GetEntryAssembly()!);
         }
         
         public static void AddPanama(this IServiceCollection services, Assembly assembly)
         {
-            services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>(); 
+            services.AddSingleton<IInvoke<IValidate>, ActionInvoker<IValidate>>();
+            services.AddSingleton<IInvoke<IQuery>, ActionInvoker<IQuery>>();
+            services.AddSingleton<IInvoke<ICommand>, ActionInvoker<ICommand>>();
+            services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
             services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
@@ -41,7 +50,10 @@ namespace Panama.Core.Service
         public static void AddPanama(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             var assembliesToScan = assemblies.Distinct();
-            services.AddSingleton<IInvoke<IAction>, ActionInvoker<IAction>>(); 
+            services.AddSingleton<IInvoke<IValidate>, ActionInvoker<IValidate>>();
+            services.AddSingleton<IInvoke<IQuery>, ActionInvoker<IQuery>>();
+            services.AddSingleton<IInvoke<ICommand>, ActionInvoker<ICommand>>();
+            services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
             services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();

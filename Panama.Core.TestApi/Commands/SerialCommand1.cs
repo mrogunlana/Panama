@@ -1,4 +1,5 @@
-﻿using Panama.Core.Interfaces;
+﻿using Panama.Core.Extensions;
+using Panama.Core.Interfaces;
 using Panama.Core.Models;
 
 namespace Panama.Core.Tests.Commands
@@ -7,9 +8,13 @@ namespace Panama.Core.Tests.Commands
     {
         public async Task Execute(IContext context)
         {
-            context.Data.Add(new Kvp<string, int>("test", 1));
+            var test = new Kvp<string, int>("test", 1);
+
+            context.Data.Add(test);
+            context.Data.Snapshot(test);
+
             //wait 5 seconds before next command...
-            Thread.Sleep(2000);
+            await Task.Delay(2000);
         }
     }
 }

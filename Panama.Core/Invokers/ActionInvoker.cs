@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Panama.Core.Interfaces;
 using Panama.Core.Models;
-using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Panama.Core.Invokers
 {
@@ -23,7 +20,7 @@ namespace Panama.Core.Invokers
             
             try
             {
-                var manifest = context.Data.OfType<T>();
+                var manifest = context.Data.OfType<T>().ToList();
 
                 stopwatch.Start();
 

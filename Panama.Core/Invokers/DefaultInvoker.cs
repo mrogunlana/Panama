@@ -22,34 +22,38 @@ namespace Panama.Core.Invokers
          
             try
             {
-                var manifest = context.Data.OfType<IAction>();
+                var manifest = context.Data.OfType<IAction>().Count();
 
                 stopwatch.Start();
 
-                _logger.LogTrace($"Handler (HID:{context.Id}) Start: [{manifest.Count()}] Total Actions Queued.");
+                _logger.LogTrace($"Handler (HID:{context.Id}) Start: [{manifest}] Total Actions Queued.");
 
                 var valid = await context.Provider
                     .GetRequiredService<IInvoke<IValidate>>()
-                    .Invoke(context);
+                    .Invoke(context)
+                    .ConfigureAwait(false);
 
                 valid.EnsureSuccess();
 
                 var queried = await context.Provider
                     .GetRequiredService<IInvoke<IQuery>>()
-                    .Invoke(context);
+                    .Invoke(context)
+                    .ConfigureAwait(false);
 
                 queried.EnsureSuccess();
 
                 var commands = await context.Provider
                     .GetRequiredService<IInvoke<ICommand>>()
-                    .Invoke(context);
+                    .Invoke(context)
+                    .ConfigureAwait(false);
 
                 if (commands.Success)
                     return commands;
 
                 var compensation = await context.Provider
                     .GetRequiredService<IInvoke<IRollback>>()
-                    .Invoke(context);
+                    .Invoke(context)
+                    .ConfigureAwait(false);
 
                 return compensation;
             }
@@ -73,6 +77,8 @@ namespace Panama.Core.Invokers
             finally
             {
                 stopwatch.Stop();
+
+                context.Data.RemoveAll<IAction>();
 
                 _logger.LogTrace($"Handler (HID:{context.Id}) Complete: [{stopwatch.Elapsed.ToString(@"hh\:mm\:ss\:fff")}]");
             }

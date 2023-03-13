@@ -6,7 +6,7 @@ namespace Panama.Core.Extensions
     {
         public static IEnumerable<IAction> GetActions<T>(this IContext context)
         {
-            var list = context.Data.OfType<IAction>();
+            var list = context.Data.OfType<IAction>().ToList();
 
             return list
                 .Where(x => x.GetType()
@@ -16,7 +16,7 @@ namespace Panama.Core.Extensions
         }
         public static IEnumerable<IAction> GetActions(this IContext context, Type type)
         {
-            var list = context.Data.OfType<IAction>();
+            var list = context.Data.OfType<IAction>().ToList();
 
             return list
                 .Where(x => x.GetType()

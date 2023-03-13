@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Panama.Core.Extensions;
 using Panama.Core.Interfaces;
 using Panama.Core.Invokers;
 using Panama.Core.Tests.Commands;
@@ -9,12 +10,7 @@ namespace Panama.Core.TestApi.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
-        private readonly Microsoft.Extensions.Logging.ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<WeatherForecastController> _logger;
         private readonly IServiceProvider _provider;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger
@@ -30,15 +26,21 @@ namespace Panama.Core.TestApi.Controllers
             var result = await _provider
                 .GetRequiredService<IHandler>()
                 .Set<ScopedInvoker>()
+                .AddKvp(1, "Freezing")
+                .AddKvp(2, "Bracing")
+                .AddKvp(3, "Chilly")
+                .AddKvp(4, "Cool")
+                .AddKvp(5, "Mild")
+                .AddKvp(6, "Warm")
+                .AddKvp(7, "Balmy")
+                .AddKvp(8, "Hot")
+                .AddKvp(9, "Sweltering")
+                .AddKvp(10, "Scorching")
                 .Command<SerialCommand1>()
+                .Command<AddRandomWeatherForecast>()
                 .Invoke();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+
+            return result.Data.DataGet<WeatherForecast>();
         }
     }
 }

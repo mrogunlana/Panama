@@ -1,6 +1,8 @@
+using Panama.Core.Interfaces;
+
 namespace Panama.Core.TestApi
 {
-    public class WeatherForecast
+    public class WeatherForecast : IModel
     {
         public DateTime Date { get; set; }
 
