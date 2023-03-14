@@ -1,26 +1,38 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Models;
+using Quartz;
+using Quartz.Spi;
 
 namespace Panama.Canal
 {
-    public class Bootstrapper : BackgroundService, IBootstrap
+    public class Bootstrapper : IHostedService, IBootstrap
     {
-        private readonly IServiceProvider _provider;
-        private readonly ILogger<Bootstrapper> _log;
-
+        private bool _off;
         private CancellationTokenSource? _cts;
-        private IEnumerable<IService> _servers = default!;
+        private IScheduler _scheduler = default!;
         private IEnumerable<IInitialize> _initializers = default!;
-        private bool _disposed;
 
-        public bool IsActive => !_cts?.IsCancellationRequested ?? false;
+        private readonly ILogger<Bootstrapper> _log;
+        private readonly IServiceProvider _provider;
+        private readonly IJobFactory _jobFactory;
+        private readonly IEnumerable<Schedule> _schedules;
+        private readonly ISchedulerFactory _schedulerFactory;
+        
+        public bool Active => !_cts?.IsCancellationRequested ?? false;
+        public IScheduler Scheduler => _scheduler;
 
-        public Bootstrapper(
-              IServiceProvider provider
-            , ILogger<Bootstrapper> log)
+        public Bootstrapper(ISchedulerFactory schedulerFactory
+            , IJobFactory jobFactory
+            , IEnumerable<Schedule> schedules
+            , ILogger<Bootstrapper> log
+            , IServiceProvider provider)
         {
+            _schedulerFactory = schedulerFactory;
+            _jobFactory = jobFactory;
+            _schedules = schedules;
             _provider = provider;
             _log = log;
         }
@@ -44,50 +56,7 @@ namespace Panama.Canal
             }
         }
 
-        private async Task StartProcesses()
-        {
-            foreach (var server in _servers)
-            {
-                try
-                {
-                    _cts!.Token.ThrowIfCancellationRequested();
-
-                    await server.Start(_cts!.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    // ignore
-                }
-                catch (Exception ex)
-                {
-                    _log.LogError(ex, $"Starting {nameof(server)} throws an exception: {ex.Message}");
-                }
-            }
-        }
-
-        public override void Dispose()
-        {
-            if (_disposed) return;
-
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-            _disposed = true;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            await Invoke(stoppingToken).ConfigureAwait(false);
-        }
-
-        public  override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _cts?.Cancel();
-
-            await base.StopAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        public async Task Invoke(CancellationToken cancellationToken)
+        public async Task On(CancellationToken cancellationToken)
         {
             if (_cts != null)
             {
@@ -100,31 +69,67 @@ namespace Panama.Canal
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _servers = _provider.GetServices<IService>();
-            _initializers = _provider.GetServices<IInitialize>();
-
-            _cts.Token.Register(() =>
-            {
-                _log.LogDebug("### Panama.Canal Server is stopping.");
-
-                foreach (var server in _servers)
-                {
-                    try
-                    {
-                        server.Dispose();
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        _log.LogWarning($"Expected an OperationCanceledException, but found '{ex.Message}'.");
-                    }
-                }
-            });
-
             await Initialize().ConfigureAwait(false);
-            await StartProcesses().ConfigureAwait(false);
 
-            _disposed = false;
+            _scheduler = await _schedulerFactory
+                .GetScheduler(cancellationToken)
+                .ConfigureAwait(false);
+
+            _scheduler.JobFactory = _jobFactory;
+
+            foreach (var schedule in _schedules)
+            {
+                var job = schedule.CreateJob();
+                var trigger = schedule.CreateTrigger();
+
+                await _scheduler
+                    .ScheduleJob(job, trigger, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            await _scheduler
+                .Start(cancellationToken)
+                .ConfigureAwait(false);
+
+            _off = false;
             _log.LogInformation("### Panama.Canal Server started!");
+        }
+
+        public async Task Off()
+        {
+            if (_off) 
+                return;
+            if (_scheduler == null)
+                return;
+
+            _cts?.Cancel();
+
+            await _scheduler
+                    .Shutdown(_cts?.Token ?? CancellationToken.None)
+                    .ConfigureAwait(false);
+
+            _cts?.Dispose();
+            _cts = null;
+            _off = true;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await On(cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (_scheduler == null)
+                return;
+
+            _cts?.Cancel();
+
+            await _scheduler
+                .Shutdown(cancellationToken)
+                .ConfigureAwait(false);
+
+            _cts = null;
         }
     }
 }

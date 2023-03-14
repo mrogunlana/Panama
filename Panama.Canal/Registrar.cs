@@ -11,8 +11,8 @@ namespace Panama.Canal
             services.AddHostedService<Bootstrapper>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<IManage, Manager>();
-            services.AddSingleton<IService, _Default>();
-            services.AddSingleton<IService, Dispatcher>();
+            //services.AddSingleton<IService, _Default>();
+            //services.AddSingleton<IService, Dispatcher>();
         }
     }
 }

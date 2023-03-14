@@ -2,7 +2,7 @@
 
 namespace Panama.Canal.Interfaces
 {
-    public interface IDispatcher : IService
+    public interface IDispatcher 
     {
         ValueTask Publish(InternalMessage message);
 

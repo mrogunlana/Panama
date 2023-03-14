@@ -5,13 +5,14 @@ using MySqlCdc.Events;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Extensions;
-using Panama.Interfaces;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
+using Quartz;
 
 namespace Panama.Canal.MySQL.Processes
 {
-    public class LogTailingProcess : IProcess
+    [DisallowConcurrentExecution]
+    public class LogTailingJob : IJob
     {
         private readonly BinlogClient _client;
         private readonly IOptions<MySqlOptions> _options;
@@ -19,7 +20,7 @@ namespace Panama.Canal.MySQL.Processes
         private readonly IStringEncryptor _encryptor;
         private readonly IInitialize _initializer;
 
-        public LogTailingProcess(
+        public LogTailingJob(
               IInitialize initializer
             , IOptions<MySqlOptions> options
             , IEnumerable<IBroker> brokers
@@ -67,12 +68,12 @@ namespace Panama.Canal.MySQL.Processes
             });
         }
 
-        public async Task Invoke(IContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            await foreach (var binlogEvent in _client.Replicate(context.Token))
+            await foreach (var binlogEvent in _client.Replicate(context.CancellationToken))
             {
-                if (context.Token.IsCancellationRequested)
-                    context.Token.ThrowIfCancellationRequested();
+                if (context.CancellationToken.IsCancellationRequested)
+                    context.CancellationToken.ThrowIfCancellationRequested();
 
                 //TODO: Handle Other Events ? e.g: 
                 //if tableMap
@@ -86,10 +87,10 @@ namespace Panama.Canal.MySQL.Processes
             }
         }
 
-        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows, IContext context)
+        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows, IJobExecutionContext context)
         {
-            if (context.Token.IsCancellationRequested)
-                context.Token.ThrowIfCancellationRequested();
+            if (context.CancellationToken.IsCancellationRequested)
+                context.CancellationToken.ThrowIfCancellationRequested();
 
             // TODO: should we leave the message base64 
             // encrypted and let the consumer decode?
@@ -103,7 +104,7 @@ namespace Panama.Canal.MySQL.Processes
             //publish to message broker
             foreach (var broker in _brokers)
                 foreach (var publish in published)
-                    await broker.Publish(new MessageContext(publish, context.Provider, context.Token));
+                    await broker.Publish(new MessageContext(publish, token: context.CancellationToken));
 
             //TODO: received to subscribers
         }

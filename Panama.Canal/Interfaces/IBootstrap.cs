@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Quartz;
 
 namespace Panama.Canal.Interfaces
 {
-    public interface IBootstrap : IHostedService, IDisposable  
+    public interface IBootstrap : IHostedService
     {
-        bool IsActive { get; }
-        Task Invoke(CancellationToken cancellationToken);
+        bool Active { get; }
+        IScheduler Scheduler { get; }
+        Task On(CancellationToken cancellationToken);
+        Task Off();
     }
 }

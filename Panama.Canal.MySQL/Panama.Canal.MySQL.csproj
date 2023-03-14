@@ -10,6 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageReference Include="MySqlCdc" Version="3.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.2.5" />
+    <PackageReference Include="Quartz" Version="3.6.2" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />
   </ItemGroup>
 
   <ItemGroup>
