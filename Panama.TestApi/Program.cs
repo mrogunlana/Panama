@@ -1,3 +1,4 @@
+using Panama.Canal;
 using Panama.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddPanama();
+builder.Services.AddPanamaCanal();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

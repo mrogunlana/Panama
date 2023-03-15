@@ -7,7 +7,6 @@ using Panama.Extensions;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;
-using System.Data.Common;
 
 namespace Panama.Canal.MySQL
 {
@@ -71,6 +70,38 @@ namespace Panama.Canal.MySQL
                       INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+                    CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().OutboxTable}` (
+                      `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `Id` varchar(150) DEFAULT NULL,
+                      `CorrelationId` varchar(150) DEFAULT NULL,
+                      `Version` varchar(20) DEFAULT NULL,
+                      `Name` varchar(400) NOT NULL,
+                      `Group` varchar(200) DEFAULT NULL,
+                      `Content` longtext,
+                      `Retries` int(11) DEFAULT NULL,
+                      `Created` datetime NOT NULL,
+                      `Expires` datetime DEFAULT NULL,
+                      `Status` varchar(40) NOT NULL,
+                      PRIMARY KEY (`_Id`),
+                      INDEX `IX_Expires`(`Expires`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+                    CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().InboxTable}` (
+                      `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `Id` varchar(150) DEFAULT NULL,
+                      `CorrelationId` varchar(150) DEFAULT NULL,
+                      `Version` varchar(20) DEFAULT NULL,
+                      `Name` varchar(400) NOT NULL,
+                      `Group` varchar(200) DEFAULT NULL,
+                      `Content` longtext,
+                      `Retries` int(11) DEFAULT NULL,
+                      `Created` datetime NOT NULL,
+                      `Expires` datetime DEFAULT NULL,
+                      `Status` varchar(40) NOT NULL,
+                      PRIMARY KEY (`_Id`),
+                      INDEX `IX_Expires`(`Expires`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
                     CREATE TABLE IF NOT EXISTS `{_initializer.Settings.Resolve<MySqlSettings>().LockTable}` (
                       `Key` varchar(128) NOT NULL,
                       `Instance` varchar(256) DEFAULT NULL,
@@ -108,8 +139,8 @@ namespace Panama.Canal.MySQL
                 connection.Close();
             }
         }
-        
-        public async Task<Dictionary<int, string>> GetPublishedSchema()
+
+        public async Task<Dictionary<int, string>> GetSchema(string table)
         {
             using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};AllowUserVariables=True;"))
             {
@@ -133,45 +164,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_initializer.Settings.Resolve<MySqlSettings>().PublishedTable}",
-                });
-
-                var result = new Dictionary<int, string>();
-                using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                while (reader.Read())
-                    result.Add(reader.GetInt32(0), reader.GetString(1));
-
-                connection.Close();
-
-                return result;
-            }
-        }
-
-        public async Task<Dictionary<int, string>> GetReceivedSchema()
-        {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};AllowUserVariables=True;"))
-            {
-                if (connection.State == ConnectionState.Closed)
-                    await connection.OpenAsync().ConfigureAwait(false);
-
-                using var command = new MySqlCommand(@"
-                    
-                    SET @TABLE_ID = (SELECT TABLE_ID  
-                    FROM INFORMATION_SCHEMA.INNODB_TABLES 
-                    WHERE `NAME` = @Name limit 1);
-
-                    SELECT TABLE_ID, `NAME`, POS, MTYPE
-                    FROM INFORMATION_SCHEMA.INNODB_COLUMNS 
-                    WHERE TABLE_ID = @TABLE_ID
-                    order by POS;"
-
-                , connection);
-
-                command.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_initializer.Settings.Resolve<MySqlSettings>().ReceivedTable}",
+                    Value = $@"{_options.Value.Database}/{table}",
                 });
 
                 var result = new Dictionary<int, string>();
@@ -204,6 +197,35 @@ namespace Panama.Canal.MySQL
                     ParameterName = "@Name",
                     DbType = DbType.String,
                     Value = $@"{_options.Value.Database}/{_initializer.Settings.Resolve<MySqlSettings>().PublishedTable}",
+                });
+
+                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+                connection.Close();
+
+                return result.ToInt();
+            }
+        }
+
+        public async Task<int> GetTableId(string table)
+        {
+            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand(@"
+                    
+                    SELECT TABLE_ID  
+                    FROM INFORMATION_SCHEMA.INNODB_TABLES 
+                    WHERE `NAME` = @Name limit 1;"
+
+                , connection);
+
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Name",
+                    DbType = DbType.String,
+                    Value = $@"{_options.Value.Database}/{table}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);

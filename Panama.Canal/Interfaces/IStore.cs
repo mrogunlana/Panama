@@ -5,10 +5,8 @@ namespace Panama.Canal.Interfaces
     public interface IStore
     {
         Task Init();
-        Task<Dictionary<int, string>> GetPublishedSchema();
-        Task<Dictionary<int, string>> GetReceivedSchema();
-        Task<int> GetReceivedTableId();
-        Task<int> GetPublishedTableId();
+        Task<Dictionary<int, string>> GetSchema(string table);
+        Task<int> GetTableId(string table);
         Task<bool> AcquireLock(string key, TimeSpan ttl, string instance, CancellationToken token = default);
         Task ReleaseLock(string key, string instance, CancellationToken token = default);
         Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default);

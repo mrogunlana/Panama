@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Panama.Canal.Extensions;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
@@ -25,7 +26,7 @@ namespace Panama.TestApi.Controllers
         {
             var result = await _provider
                 .GetRequiredService<IHandler>()
-                .Set<ScopedInvoker>()
+                .UseCanal()
                 .AddKvp(1, "Freezing")
                 .AddKvp(2, "Bracing")
                 .AddKvp(3, "Chilly")

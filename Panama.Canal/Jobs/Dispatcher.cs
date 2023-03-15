@@ -31,7 +31,7 @@ namespace Panama.Canal.Jobs
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, CancellationToken.None);
 
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public ValueTask Execute(InternalMessage message, object? descriptor = null)

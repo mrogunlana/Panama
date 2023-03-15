@@ -12,7 +12,7 @@ namespace Panama.Canal.Jobs
 
         public Task Execute(IJobExecutionContext context)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
