@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Panama.Canal.Models;
-using Panama.Security.Resolvers;
+﻿using Panama.Canal.Models;
 using Quartz;
 
 namespace Panama.Canal.Extensions
@@ -36,7 +33,8 @@ namespace Panama.Canal.Extensions
             var trigger = TriggerBuilder.Create()
                 .ForJob(key)
                 .WithIdentity($"{schedule.Type.FullName}.trigger")
-                .WithCronSchedule(schedule.CronExpression)
+                .WithCronSchedule(schedule.CronExpression 
+                    , x => x.WithMisfireHandlingInstructionDoNothing())
                 .WithDescription(schedule.CronExpression)
                 .Build();
 
