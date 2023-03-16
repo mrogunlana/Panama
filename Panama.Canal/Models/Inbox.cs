@@ -2,5 +2,5 @@
 
 namespace Panama.Canal.Models
 {
-    public class Published : InternalMessage { }
+    public class Inbox : InternalMessage { }
 }

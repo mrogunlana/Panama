@@ -9,19 +9,21 @@ using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using Quartz;
 
-namespace Panama.Canal.MySQL.Processes
+namespace Panama.Canal.MySQL.Jobs
 {
     [DisallowConcurrentExecution]
     public class LogTailingJob : IJob
     {
         private readonly BinlogClient _client;
+        private readonly MySqlSettings _settings;
         private readonly IOptions<MySqlOptions> _options;
         private readonly IEnumerable<IBroker> _brokers;
         private readonly IStringEncryptor _encryptor;
         private readonly IInitialize _initializer;
 
         public LogTailingJob(
-              IInitialize initializer
+              MySqlSettings settings
+            , IInitialize initializer
             , IOptions<MySqlOptions> options
             , IEnumerable<IBroker> brokers
             , StringEncryptorResolver stringEncryptorResolver)
@@ -30,6 +32,7 @@ namespace Panama.Canal.MySQL.Processes
             //registrar and if it's null, throw an exception as 
             //its table and database specific values below are required
 
+            _settings = settings;
             _options = options;
             _brokers = brokers;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
@@ -95,15 +98,15 @@ namespace Panama.Canal.MySQL.Processes
             // TODO: should we leave the message base64 
             // encrypted and let the consumer decode?
             //.DecodeContent(_encryptor);
-            var published = writeRows
-                .GetPublishedMessages(_initializer.Settings.Resolve<MySqlSettings>());
+            var outbox = writeRows
+                .GetOutboxMessages(_settings);
 
-            var received = writeRows
-                .GetReceivedMessages(_initializer.Settings.Resolve<MySqlSettings>());
+            var inbox = writeRows
+                .GetInboxMessages(_settings);
             
             //publish to message broker
             foreach (var broker in _brokers)
-                foreach (var publish in published)
+                foreach (var publish in outbox)
                     await broker.Publish(new MessageContext(publish, token: context.CancellationToken));
 
             //TODO: received to subscribers

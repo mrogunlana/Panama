@@ -18,18 +18,21 @@ namespace Panama.Canal
 
         private readonly ILogger<Bootstrapper> _log;
         private readonly IServiceProvider _provider;
-        private readonly IEnumerable<Schedule> _schedules;
+        private readonly IJobFactory _jobFactory;
+        private readonly IEnumerable<Job> _schedules;
         private readonly ISchedulerFactory _schedulerFactory;
         
         public bool Active => !_cts?.IsCancellationRequested ?? false;
         public IScheduler Scheduler => _scheduler;
 
         public Bootstrapper(ISchedulerFactory schedulerFactory
-            , IEnumerable<Schedule> schedules
+            , IJobFactory jobFactory
+            , IEnumerable<Job> schedules
             , ILogger<Bootstrapper> log
             , IServiceProvider provider)
         {
             _schedulerFactory = schedulerFactory;
+            _jobFactory = jobFactory;
             _schedules = schedules;
             _provider = provider;
             _log = log;
@@ -73,6 +76,18 @@ namespace Panama.Canal
             _scheduler = await _schedulerFactory
                 .GetScheduler(cancellationToken)
                 .ConfigureAwait(false);
+
+            _scheduler.JobFactory = _jobFactory;
+
+            foreach (var schedule in _schedules)
+            {
+                var job = schedule.CreateJob();
+                var trigger = schedule.CreateTrigger();
+
+                await _scheduler
+                    .ScheduleJob(job, trigger, cancellationToken)
+                    .ConfigureAwait(false);
+            }
 
             await _scheduler
                 .Start(cancellationToken)

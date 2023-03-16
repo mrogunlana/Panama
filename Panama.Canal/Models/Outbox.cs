@@ -2,5 +2,5 @@
 
 namespace Panama.Canal.Models
 {
-    public class Received : InternalMessage { }
+    public class Outbox : InternalMessage { }
 }

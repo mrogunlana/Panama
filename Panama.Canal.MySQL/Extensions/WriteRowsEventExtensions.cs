@@ -15,22 +15,22 @@ namespace Panama.Canal.MySQL.Extensions
             return false;
         }
 
-        internal static List<InternalMessage> GetPublishedMessages(this WriteRowsEvent @event, MySqlSettings settings)
+        internal static List<InternalMessage> GetOutboxMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
             var messages = new List<InternalMessage>();
 
             if (@event.IsEmpty())
                 return messages;
 
-            if (@event.TableId != settings.PublishedTableId)
+            if (@event.TableId != settings.OutboxTableId)
                 return messages;
 
             foreach (var row in @event.Rows)
             {
-                var message = new Published();
+                var message = new Outbox();
 
                 for (int i = 0; i < row.Cells?.Count; i++)
-                    message.SetValue<Published>(settings.PublishedTableMap[i], row.Cells[i]);
+                    message.SetValue<Outbox>(settings.OutboxTableMap[i], row.Cells[i]);
 
                 messages.Add(message);
             }
@@ -38,22 +38,22 @@ namespace Panama.Canal.MySQL.Extensions
             return messages;
         }
         
-        internal static List<InternalMessage> GetReceivedMessages(this WriteRowsEvent @event, MySqlSettings settings)
+        internal static List<InternalMessage> GetInboxMessages(this WriteRowsEvent @event, MySqlSettings settings)
         {
             var messages = new List<InternalMessage>();
 
             if (@event.IsEmpty())
                 return messages;
 
-            if (@event.TableId != settings.ReceivedTableId)
+            if (@event.TableId != settings.InboxTableId)
                 return messages;
 
             foreach (var row in @event.Rows)
             {
-                var message = new Received();
+                var message = new Inbox();
 
                 for (int i = 0; i < row.Cells?.Count; i++)
-                    message.SetValue<Received>(settings.ReceivedTableMap[i], row.Cells[i]);
+                    message.SetValue<Inbox>(settings.InboxTableMap[i], row.Cells[i]);
 
                 messages.Add(message);
             }

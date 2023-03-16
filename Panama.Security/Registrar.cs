@@ -7,7 +7,7 @@ namespace Panama.Security
 {
     public static class Registrar
     {
-        public static void AddPanamaCoreSecurity(this IServiceCollection services)
+        public static void AddPanamaSecurity(this IServiceCollection services)
         {
             services.AddSingleton<IStringEncryptor, Base64Encryptor>();
             services.AddSingleton<IStringEncryptor, SHA256CryptoServiceEncryptor>();

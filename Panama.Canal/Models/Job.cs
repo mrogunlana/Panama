@@ -2,20 +2,20 @@
 
 namespace Panama.Canal.Models
 {
-    public class Schedule : IModel 
+    public class Job : IModel 
     {
-        public Schedule(Type job
+        public Job(Type type
             , string expression
             , string? group = null
             , bool active = true)
         {
-            JobType = job;
+            Type = type;
             Group = group;
             Active = active;
             CronExpression = expression;
         }
 
-        public Type JobType { get; }
+        public Type Type { get; }
         public string CronExpression { get; }
         public string? Group { get; }
         public bool Active { get; set; }

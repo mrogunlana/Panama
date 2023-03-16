@@ -8,31 +8,34 @@ namespace Panama.Canal.Extensions
 {
     internal static class ScheduleExtensions
     {
-        public static IJobDetail CreateJob(this Schedule schedule)
+        public static JobKey GetJobKey(this Job schedule)
         {
-            var jobBuilder = JobBuilder.Create(schedule.JobType);
+            var name = $"{schedule.Type.FullName}-job";
+         
+            return new JobKey(name, schedule.Group);
+        }
 
-            if (string.IsNullOrEmpty(schedule.Group))
-                jobBuilder.WithIdentity($"{schedule.JobType.FullName}");
-            else
-                jobBuilder.WithIdentity($"{schedule.JobType.FullName}", schedule.Group);
+        public static IJobDetail CreateJob(this Job schedule)
+        {
+            var key = schedule.GetJobKey();
+            var jobBuilder = JobBuilder.Create(schedule.Type);
+
+            jobBuilder.WithIdentity(key);
 
             var job = jobBuilder
-                .WithDescription(schedule.JobType.Name)
+                .WithDescription(schedule.Type.Name)
                 .Build();
 
             return job;
         }
 
-        public static ITrigger CreateTrigger(this Schedule schedule)
+        public static ITrigger CreateTrigger(this Job schedule)
         {
-            var triggerBuilder = TriggerBuilder.Create();
-            if (string.IsNullOrEmpty(schedule.Group))
-                triggerBuilder.WithIdentity($"{schedule.JobType.FullName}.trigger");
-            else
-                triggerBuilder.WithIdentity($"{schedule.JobType.FullName}.trigger", schedule.Group);
+            var key = schedule.GetJobKey();
 
-            var trigger = triggerBuilder
+            var trigger = TriggerBuilder.Create()
+                .ForJob(key)
+                .WithIdentity($"{schedule.Type.FullName}.trigger")
                 .WithCronSchedule(schedule.CronExpression)
                 .WithDescription(schedule.CronExpression)
                 .Build();
