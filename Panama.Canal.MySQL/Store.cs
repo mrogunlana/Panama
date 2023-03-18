@@ -13,11 +13,11 @@ namespace Panama.Canal.MySQL
     internal class Store : IStore
     {
         private readonly IOptions<MySqlOptions> _options;
-        private readonly IOptions<MySqlSettings> _settings;
+        private readonly MySqlSettings _settings;
         private readonly IStringEncryptor _encryptor;
 
         public Store(
-              IOptions<MySqlSettings> settings
+              MySqlSettings settings
             , IOptions<MySqlOptions> options
             , StringEncryptorResolver stringEncryptorResolver)
         {
@@ -34,11 +34,11 @@ namespace Panama.Canal.MySQL
                     await connection.OpenAsync().ConfigureAwait(false);
 
                 //1. Initialize MySql version information 
-                _settings.Value.SetVersion(connection.ServerVersion);
+                _settings.SetVersion(connection.ServerVersion);
 
                 using var command = new MySqlCommand($@"
                     
-                    CREATE TABLE IF NOT EXISTS `{_settings.Value.PublishedTable}` (
+                    CREATE TABLE IF NOT EXISTS `{_settings.PublishedTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
@@ -54,7 +54,7 @@ namespace Panama.Canal.MySQL
                       INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                    CREATE TABLE IF NOT EXISTS `{_settings.Value.ReceivedTable}` (
+                    CREATE TABLE IF NOT EXISTS `{_settings.ReceivedTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
@@ -70,7 +70,7 @@ namespace Panama.Canal.MySQL
                       INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                    CREATE TABLE IF NOT EXISTS `{_settings.Value.OutboxTable}` (
+                    CREATE TABLE IF NOT EXISTS `{_settings.OutboxTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
@@ -86,7 +86,7 @@ namespace Panama.Canal.MySQL
                       INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                    CREATE TABLE IF NOT EXISTS `{_settings.Value.InboxTable}` (
+                    CREATE TABLE IF NOT EXISTS `{_settings.InboxTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
@@ -102,17 +102,17 @@ namespace Panama.Canal.MySQL
                       INDEX `IX_Expires`(`Expires`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                    CREATE TABLE IF NOT EXISTS `{_settings.Value.LockTable}` (
+                    CREATE TABLE IF NOT EXISTS `{_settings.LockTable}` (
                       `Key` varchar(128) NOT NULL,
                       `Instance` varchar(256) DEFAULT NULL,
                       `LastLockTime` datetime DEFAULT NULL,
                       PRIMARY KEY (`Key`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                    INSERT IGNORE INTO `{_settings.Value.LockTable}` (`Key`,`Instance`,`LastLockTime`) 
+                    INSERT IGNORE INTO `{_settings.LockTable}` (`Key`,`Instance`,`LastLockTime`) 
                     VALUES (@PublishedKey, '', @LastLockTime);
                     
-                    INSERT IGNORE INTO `{_settings.Value.LockTable}` (`Key`,`Instance`,`LastLockTime`) 
+                    INSERT IGNORE INTO `{_settings.LockTable}` (`Key`,`Instance`,`LastLockTime`) 
                     VALUES (@ReceivedKey, '', @LastLockTime);"
 
                 , connection);
@@ -199,7 +199,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_settings.Value.PublishedTable}",
+                    Value = $@"{_options.Value.Database}/{_settings.PublishedTable}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -257,7 +257,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_settings.Value.ReceivedTable}",
+                    Value = $@"{_options.Value.Database}/{_settings.ReceivedTable}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -277,7 +277,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
                     
-                    UPDATE `{_settings.Value.LockTable}` 
+                    UPDATE `{_settings.LockTable}` 
                     SET  `Instance`= @Instance
                         ,`LastLockTime`= @LastLockTime 
                     WHERE `Key`= @Key
@@ -327,7 +327,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
                     
-                    UPDATE `{_settings.Value.LockTable}` 
+                    UPDATE `{_settings.LockTable}` 
                     SET  `Instance` = ''
                         ,`LastLockTime` = @LastLockTime 
                     WHERE `Key` = @Key
@@ -369,7 +369,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
                     
-                    UPDATE `{_settings.Value.LockTable}` 
+                    UPDATE `{_settings.LockTable}` 
                     SET `LastLockTime` = date_add(`LastLockTime`, interval @Ttl second) 
                     WHERE `Key` = @Key
                     AND `Instance` = @Instance;"
@@ -453,12 +453,12 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            await ChangeMessageState(_settings.Value.PublishedTable, message, status, transaction).ConfigureAwait(false);
+            await ChangeMessageState(_settings.PublishedTable, message, status, transaction).ConfigureAwait(false);
         }
         
         public async Task ChangeReceivedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            await ChangeMessageState(_settings.Value.ReceivedTable, message, status, transaction).ConfigureAwait(false);
+            await ChangeMessageState(_settings.ReceivedTable, message, status, transaction).ConfigureAwait(false);
         }
 
         public async Task ChangePublishedStateToDelayed(int[] ids)
@@ -470,7 +470,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
 
-                    UPDATE `{_settings.Value.PublishedTable}` 
+                    UPDATE `{_settings.PublishedTable}` 
                     SET `Status`='{MessageStatus.Delayed}' 
                     WHERE `_Id` IN ({string.Join(',', ids)});"
 
@@ -491,7 +491,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
 
-                    UPDATE `{_settings.Value.ReceivedTable}` 
+                    UPDATE `{_settings.ReceivedTable}` 
                     SET `Status`='{MessageStatus.Delayed}' 
                     WHERE `_Id` IN ({string.Join(',', ids)});"
 
@@ -512,7 +512,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
 
-                    INSERT INTO `{_options.Value.Database}`.`{_settings.Value.PublishedTable}`
+                    INSERT INTO `{_options.Value.Database}`.`{_settings.PublishedTable}`
                     (`Id`,
                     `CorrelationId`,
                     `Version`,
@@ -611,7 +611,7 @@ namespace Panama.Canal.MySQL
 
                 using var command = new MySqlCommand($@"
 
-                    INSERT INTO `{_options.Value.Database}`.`{_settings.Value.ReceivedTable}`
+                    INSERT INTO `{_options.Value.Database}`.`{_settings.ReceivedTable}`
                     (`Id`,
                     `CorrelationId`,
                     `Version`,
@@ -748,12 +748,12 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
-            return await DeleteExpiredAsync(_settings.Value.PublishedTable, timeout, batch, token).ConfigureAwait(false);
+            return await DeleteExpiredAsync(_settings.PublishedTable, timeout, batch, token).ConfigureAwait(false);
         }
 
         public async Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
-            return await DeleteExpiredAsync(_settings.Value.ReceivedTable, timeout, batch, token).ConfigureAwait(false);
+            return await DeleteExpiredAsync(_settings.ReceivedTable, timeout, batch, token).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table)
@@ -804,11 +804,11 @@ namespace Panama.Canal.MySQL
 
                 var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                var map = _settings.Value.GetMap(table);
+                var map = _settings.GetMap(table);
 
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
-                    var model = _settings.Value.GetModel(table);
+                    var model = _settings.GetModel(table);
                     for (int i = 0; i < reader.FieldCount; i++)
                         model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
 
@@ -823,12 +823,12 @@ namespace Panama.Canal.MySQL
 
         public async Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry()
         {
-            return await GetMessagesToRetry(_settings.Value.PublishedTable).ConfigureAwait(false);
+            return await GetMessagesToRetry(_settings.PublishedTable).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry()
         {
-            return await GetMessagesToRetry(_settings.Value.PublishedTable).ConfigureAwait(false);
+            return await GetMessagesToRetry(_settings.PublishedTable).ConfigureAwait(false);
         }
 
         public async Task GetDelayedMessagesForScheduling(
@@ -841,7 +841,7 @@ namespace Panama.Canal.MySQL
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
 
-                var append = _settings.Value
+                var append = _settings
                     .Resolve<MySqlSettings>()
                     .IsSupportSkipLocked() ? "FOR UPDATE SKIP LOCKED" : "FOR UPDATE";
 
@@ -887,11 +887,11 @@ namespace Panama.Canal.MySQL
 
                 var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                var map = _settings.Value.GetMap(table);
+                var map = _settings.GetMap(table);
 
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
-                    var model = _settings.Value.GetModel(table);
+                    var model = _settings.GetModel(table);
                     for (int i = 0; i < reader.FieldCount; i++)
                         model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
 
@@ -910,7 +910,7 @@ namespace Panama.Canal.MySQL
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(
-                _settings.Value.PublishedTable
+                _settings.PublishedTable
                 , task
                 , token)
                 .ConfigureAwait(false);
@@ -922,7 +922,7 @@ namespace Panama.Canal.MySQL
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(
-                _settings.Value.ReceivedTable
+                _settings.ReceivedTable
                 , task
                 , token)
                 .ConfigureAwait(false);

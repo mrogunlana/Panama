@@ -1,9 +1,15 @@
 using Panama.Canal;
 using Panama.Canal.MySQL;
-using Panama.Service;
 using Panama.Security;
+using Panama.Service;
 
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{env}.json", true, true);
+
 
 // Add services to the container.
 

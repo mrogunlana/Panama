@@ -61,12 +61,12 @@ namespace Panama.Canal
         {
             if (_cts != null)
             {
-                _log.LogInformation("### Panama.Canal background task is already started!");
+                _log.LogInformation("### Panama Canal background task is already started!");
 
                 return;
             }
 
-            _log.LogDebug("### Panama.Canal Server is starting.");
+            _log.LogDebug("### Panama Canal Server is starting.");
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _initializers = _provider.GetServices<IInitialize>();
@@ -94,7 +94,7 @@ namespace Panama.Canal
                 .ConfigureAwait(false);
 
             _off = false;
-            _log.LogInformation("### Panama.Canal Server started!");
+            _log.LogInformation("### Panama Canal Server started!");
         }
 
         public async Task Off()

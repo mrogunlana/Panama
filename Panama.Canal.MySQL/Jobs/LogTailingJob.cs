@@ -63,7 +63,7 @@ namespace Panama.Canal.MySQL.Jobs
                 options.Password = _options.Value.Password;
                 options.SslMode = SslMode.Disabled;
                 options.HeartbeatInterval = TimeSpan.FromSeconds(_options.Value.Heartbeat);
-                options.Blocking = true;
+                options.Blocking = _options.Value.StreamBinlog;
 
                 // Start replication from MySQL GTID
                 //var gtidSet = "4805a37c-b600-11ed-91dc-0242ac1a0002:1-19";

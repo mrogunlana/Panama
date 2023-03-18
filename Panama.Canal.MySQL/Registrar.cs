@@ -20,6 +20,11 @@ namespace Panama.Canal.MySQL
             services.AddSingleton(new Job(
                 type: typeof(LogTailingJob),
                 expression: "0/1 * * * * ?"));
+
+            services.Configure<MySqlOptions>(options =>
+                config.GetSection(MySqlOptions.Name).Bind(options));
+
+            var options = config.GetSection(MySqlOptions.Name).Get<MySqlOptions>();
         }
     }
 }
