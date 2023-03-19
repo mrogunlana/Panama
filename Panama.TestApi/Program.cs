@@ -19,7 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddPanama();
 builder.Services.AddPanamaSecurity();
-builder.Services.AddPanamaCanal();
+builder.Services.AddPanamaCanal(builder.Configuration);
 builder.Services.AddPanamaCanalMySQL(builder.Configuration);
 
 

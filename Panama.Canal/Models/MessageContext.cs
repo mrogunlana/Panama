@@ -6,7 +6,18 @@ namespace Panama.Canal.Models
     {
         public MessageContext(
               InternalMessage data
-            , IServiceProvider? provider = null
+            , CancellationToken? token = null)
+            : base(token)
+        {
+            Data.Add(data);
+
+            Id = data.Id;
+            CorrelationId = data.CorrelationId;
+        }
+
+        public MessageContext(
+              InternalMessage data
+            , IServiceProvider provider
             , CancellationToken? token = null)
             : base(provider, token)
         {

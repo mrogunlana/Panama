@@ -10,7 +10,7 @@ namespace Panama.Canal
 {
     public static class Registrar
     {
-        public static void AddPanamaCanal(this IServiceCollection services)
+        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<Bootstrapper>();
             //services.AddSingleton<IJobFactory, SingletonFactory>();
@@ -28,13 +28,13 @@ namespace Panama.Canal
                 expression: "0/1 * * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(PublishedRetry),
-                expression: "0/5 * * * * ?"));
+                expression: "0/0 1 * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(ReceivedRetry),
-                expression: "0/5 * * * * ?"));
+                expression: "0/0 1 * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(DeleteExpired),
-                expression: "0/5 * * * * ?"));
+                expression: "0/0 5 * * * ?"));
 
             services.AddQuartz(q => {
                 q.SchedulerName = "panama-canal-services";
@@ -43,6 +43,10 @@ namespace Panama.Canal
 
             services.AddQuartzHostedService(
                 q => q.WaitForJobsToComplete = true);
+
+            services.Configure<CanalOptions>(options =>
+                config.GetSection(CanalOptions.Section).Bind(options));
+
         }
     }
 }

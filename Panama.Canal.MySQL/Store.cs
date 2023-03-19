@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Extensions;
@@ -12,23 +14,29 @@ namespace Panama.Canal.MySQL
 {
     internal class Store : IStore
     {
-        private readonly IOptions<MySqlOptions> _options;
+        private readonly ILogger<Store> _log;
+        private readonly IOptions<MySqlOptions> _mysqlOptions;
+        private readonly IOptions<CanalOptions> _canalOptions;
         private readonly MySqlSettings _settings;
         private readonly IStringEncryptor _encryptor;
 
         public Store(
-              MySqlSettings settings
-            , IOptions<MySqlOptions> options
+              ILogger<Store> log
+            , MySqlSettings settings
+            , IOptions<MySqlOptions> mysqlOptions
+            , IOptions<CanalOptions> canalOptions
             , StringEncryptorResolver stringEncryptorResolver)
         {
-            _options = options;
+            _log = log;
             _settings = settings;
+            _mysqlOptions = mysqlOptions;
+            _canalOptions = canalOptions;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
         }
 
         public async Task Init()
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -121,13 +129,13 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@PublishedKey",
                     DbType = DbType.String,
-                    Value = $"published_retry_{_options.Value.Version}",
+                    Value = _canalOptions.Value.GetPublishedRetryKey(),
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
                     ParameterName = "@ReceivedKey",
                     DbType = DbType.String,
-                    Value = $"received_retry_{_options.Value.Version}",
+                    Value = _canalOptions.Value.GetReceivedRetryKey(),
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
@@ -145,7 +153,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<Dictionary<int, string>> GetSchema(string table)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};AllowUserVariables=True;"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};AllowUserVariables=True;"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -167,7 +175,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{table}",
+                    Value = $@"{_mysqlOptions.Value.Database}/{table}",
                 });
 
                 var result = new Dictionary<int, string>();
@@ -183,7 +191,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> GetPublishedTableId()
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -199,7 +207,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_settings.PublishedTable}",
+                    Value = $@"{_mysqlOptions.Value.Database}/{_settings.PublishedTable}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -212,7 +220,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> GetTableId(string table)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -228,7 +236,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{table}",
+                    Value = $@"{_mysqlOptions.Value.Database}/{table}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -241,7 +249,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> GetReceivedTableId()
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -257,7 +265,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Name",
                     DbType = DbType.String,
-                    Value = $@"{_options.Value.Database}/{_settings.ReceivedTable}",
+                    Value = $@"{_mysqlOptions.Value.Database}/{_settings.ReceivedTable}",
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -268,9 +276,9 @@ namespace Panama.Canal.MySQL
             }
         }
 
-        public async Task<bool> AcquireLock(string key, TimeSpan ttl, string instance, CancellationToken token = default)
+        public async Task<bool> AcquireLock(string key, TimeSpan ttl, string? instance = null, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -289,7 +297,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Instance",
                     DbType = DbType.String,
-                    Value = instance,
+                    Value = instance ?? _canalOptions.Value.Instance,
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
@@ -317,10 +325,18 @@ namespace Panama.Canal.MySQL
                 return result > 0;
             }
         }
-
-        public async Task ReleaseLock(string key, string instance, CancellationToken token = default)
+        public async Task<bool> AcquirePublishedRetryLock(TimeSpan ttl, string? instance = null, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            return await AcquireLock(_canalOptions.Value.GetPublishedRetryKey(), ttl, instance, token).ConfigureAwait(false);
+        }
+        public async Task<bool> AcquireReceivedRetryLock(TimeSpan ttl, string? instance = null, CancellationToken token = default)
+        {
+            return await AcquireLock(_canalOptions.Value.GetReceivedRetryKey(), ttl, instance, token).ConfigureAwait(false);
+        }
+
+        public async Task ReleaseLock(string key, string? instance = null, CancellationToken token = default)
+        {
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -339,7 +355,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Instance",
                     DbType = DbType.String,
-                    Value = instance,
+                    Value = instance ?? _canalOptions.Value.Instance,
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
@@ -359,10 +375,18 @@ namespace Panama.Canal.MySQL
                 connection.Close();
             }
         }
+        public async Task ReleasePublishedLock(string? instance = null, CancellationToken token = default)
+        {
+            await ReleaseLock(_canalOptions.Value.GetPublishedRetryKey(), instance, token).ConfigureAwait(false);
+        }
+        public async Task ReleaseReceivedLock(string? instance = null, CancellationToken token = default)
+        {
+            await ReleaseLock(_canalOptions.Value.GetReceivedRetryKey(), instance, token).ConfigureAwait(false);
+        }
 
         public async Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -403,7 +427,7 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed) 
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -463,7 +487,7 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangePublishedStateToDelayed(int[] ids)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed) 
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -484,7 +508,7 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangeReceivedStateToDelayed(int[] ids)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -505,14 +529,14 @@ namespace Panama.Canal.MySQL
 
         public async Task<InternalMessage> StorePublishedMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed) 
                     await connection.OpenAsync().ConfigureAwait(false);
 
                 using var command = new MySqlCommand($@"
 
-                    INSERT INTO `{_options.Value.Database}`.`{_settings.PublishedTable}`
+                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.PublishedTable}`
                     (`Id`,
                     `CorrelationId`,
                     `Version`,
@@ -604,14 +628,14 @@ namespace Panama.Canal.MySQL
 
         public async Task<InternalMessage> StoreReceivedMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed) 
                     await connection.OpenAsync().ConfigureAwait(false);
 
                 using var command = new MySqlCommand($@"
 
-                    INSERT INTO `{_options.Value.Database}`.`{_settings.ReceivedTable}`
+                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.ReceivedTable}`
                     (`Id`,
                     `CorrelationId`,
                     `Version`,
@@ -703,7 +727,9 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            _log.LogDebug($"Deleting expired data from table: {table}.");
+
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -742,6 +768,8 @@ namespace Panama.Canal.MySQL
 
                 connection.Close();
 
+                _log.LogDebug($"Deletion of expired data from table: {table} complete.");
+
                 return result;
             }
         }
@@ -756,9 +784,19 @@ namespace Panama.Canal.MySQL
             return await DeleteExpiredAsync(_settings.ReceivedTable, timeout, batch, token).ConfigureAwait(false);
         }
 
+        public async Task<int> DeleteExpiredInboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
+        {
+            return await DeleteExpiredAsync(_settings.InboxTable, timeout, batch, token).ConfigureAwait(false);
+        }
+
+        public async Task<int> DeleteExpiredOutboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
+        {
+            return await DeleteExpiredAsync(_settings.OutboxTable, timeout, batch, token).ConfigureAwait(false);
+        }
+
         public async Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -789,12 +827,12 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Retries",
                     DbType = DbType.Int32,
-                    Value = _options.Value.FailedRetries
+                    Value = _mysqlOptions.Value.FailedRetries
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Version",
                     DbType = DbType.String,
-                    Value = _options.Value.Version
+                    Value = _canalOptions.Value.Version
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Added",
@@ -836,7 +874,7 @@ namespace Panama.Canal.MySQL
             , Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_options.Value.Host};Port={_options.Value.Port};Database={_options.Value.Database};Uid={_options.Value.Username};Pwd={_options.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
@@ -872,7 +910,7 @@ namespace Panama.Canal.MySQL
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Version",
                     DbType = DbType.String,
-                    Value = _options.Value.Version
+                    Value = _canalOptions.Value.Version
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@TwoMinutesLater",

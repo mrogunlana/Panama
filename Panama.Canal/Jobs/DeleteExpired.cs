@@ -1,18 +1,27 @@
-﻿using Quartz;
+﻿using Microsoft.Extensions.Logging;
+using Panama.Canal.Interfaces;
+using Quartz;
 
 namespace Panama.Canal.Jobs
 {
     [DisallowConcurrentExecution]
     public class DeleteExpired : IJob
     {
-        public DeleteExpired(IServiceProvider provider)
+        private readonly IStore _store;
+
+        public DeleteExpired(IStore store)
         {
-            
+            _store = store;
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            return Task.CompletedTask;
+            var date = DateTime.UtcNow;
+
+            await _store.DeleteExpiredPublishedAsync(date, token: context.CancellationToken);
+            await _store.DeleteExpiredOutboxAsync(date, token: context.CancellationToken);
+            await _store.DeleteExpiredInboxAsync(date, token: context.CancellationToken);
+            await _store.DeleteExpiredOutboxAsync(date, token: context.CancellationToken);
         }
     }
 }

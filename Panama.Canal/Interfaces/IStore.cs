@@ -7,8 +7,12 @@ namespace Panama.Canal.Interfaces
         Task Init();
         Task<Dictionary<int, string>> GetSchema(string table);
         Task<int> GetTableId(string table);
-        Task<bool> AcquireLock(string key, TimeSpan ttl, string instance, CancellationToken token = default);
-        Task ReleaseLock(string key, string instance, CancellationToken token = default);
+        Task<bool> AcquireLock(string key, TimeSpan ttl, string? instance = null, CancellationToken token = default);
+        Task<bool> AcquirePublishedRetryLock(TimeSpan ttl, string? instance = null, CancellationToken token = default);
+        Task<bool> AcquireReceivedRetryLock(TimeSpan ttl, string? instance = null, CancellationToken token = default);
+        Task ReleaseLock(string key, string? instance = null, CancellationToken token = default);
+        Task ReleasePublishedLock(string? instance = null, CancellationToken token = default);
+        Task ReleaseReceivedLock(string? instance = null, CancellationToken token = default);
         Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default);
         Task ChangePublishedStateToDelayed(int[] ids);
         Task ChangeReceivedStateToDelayed(int[] ids);
@@ -20,6 +24,8 @@ namespace Panama.Canal.Interfaces
         Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
+        Task<int> DeleteExpiredInboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
+        Task<int> DeleteExpiredOutboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table);
         Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry();
         Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry();

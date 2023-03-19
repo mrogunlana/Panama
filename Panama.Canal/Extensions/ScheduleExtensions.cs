@@ -5,11 +5,25 @@ namespace Panama.Canal.Extensions
 {
     internal static class ScheduleExtensions
     {
+        public static string GetKey(this Job schedule)
+        {
+            var name = $"{schedule.Type.FullName}";
+
+            return name;
+        }
+
         public static JobKey GetJobKey(this Job schedule)
         {
-            var name = $"{schedule.Type.FullName}-job";
+            var name = $"{schedule.GetKey()}-job";
          
             return new JobKey(name, schedule.Group);
+        }
+
+        public static TriggerKey GetTriggerKey(this Job schedule)
+        {
+            var name = $"{schedule.GetKey()}-trigger";
+
+            return new TriggerKey(name);
         }
 
         public static IJobDetail CreateJob(this Job schedule)
@@ -28,17 +42,26 @@ namespace Panama.Canal.Extensions
 
         public static ITrigger CreateTrigger(this Job schedule)
         {
-            var key = schedule.GetJobKey();
-
             var trigger = TriggerBuilder.Create()
-                .ForJob(key)
-                .WithIdentity($"{schedule.Type.FullName}.trigger")
+                .ForJob(schedule.GetJobKey())
+                .WithIdentity(schedule.GetTriggerKey())
                 .WithCronSchedule(schedule.CronExpression 
                     , x => x.WithMisfireHandlingInstructionDoNothing())
                 .WithDescription(schedule.CronExpression)
                 .Build();
 
             return trigger;
+        }
+
+        public static TimeSpan GetScheduledInterval(this Job schedule)
+        {
+            var cron = new CronExpression(schedule.CronExpression);
+            
+            var interval = cron.GetNextValidTimeAfter(DateTime.UtcNow) - DateTime.UtcNow;
+            if (interval == null)
+                throw new InvalidOperationException($"Scheduled interval for job schedule: {schedule.GetKey()} cannot be parsed: {schedule.CronExpression}");
+
+            return interval.Value;
         }
     }
 }

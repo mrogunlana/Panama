@@ -104,7 +104,7 @@ namespace Panama.Canal.MySQL.Jobs
             var inbox = writeRows
                 .GetInboxMessages(_settings);
             
-            //publish to message broker
+            //publish to message brokers
             foreach (var broker in _brokers)
                 foreach (var publish in outbox)
                     await broker.Publish(new MessageContext(publish, token: context.CancellationToken));

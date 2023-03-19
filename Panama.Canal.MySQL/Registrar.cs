@@ -22,9 +22,7 @@ namespace Panama.Canal.MySQL
                 expression: "0/1 * * * * ?"));
 
             services.Configure<MySqlOptions>(options =>
-                config.GetSection(MySqlOptions.Name).Bind(options));
-
-            var options = config.GetSection(MySqlOptions.Name).Get<MySqlOptions>();
+                config.GetSection(MySqlOptions.Section).Bind(options));
         }
     }
 }
