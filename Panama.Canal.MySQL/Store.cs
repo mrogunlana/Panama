@@ -52,6 +52,7 @@ namespace Panama.Canal.MySQL
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
                       `Name` varchar(400) NOT NULL,
+                      `Broker` varchar(200) DEFAULT NULL,
                       `Group` varchar(200) DEFAULT NULL,
                       `Content` longtext,
                       `Retries` int(11) DEFAULT NULL,
@@ -68,6 +69,7 @@ namespace Panama.Canal.MySQL
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
                       `Name` varchar(400) NOT NULL,
+                      `Broker` varchar(200) DEFAULT NULL,
                       `Group` varchar(200) DEFAULT NULL,
                       `Content` longtext,
                       `Retries` int(11) DEFAULT NULL,
@@ -84,6 +86,7 @@ namespace Panama.Canal.MySQL
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
                       `Name` varchar(400) NOT NULL,
+                      `Broker` varchar(200) DEFAULT NULL,
                       `Group` varchar(200) DEFAULT NULL,
                       `Content` longtext,
                       `Retries` int(11) DEFAULT NULL,
@@ -100,6 +103,7 @@ namespace Panama.Canal.MySQL
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
                       `Name` varchar(400) NOT NULL,
+                      `Broker` varchar(200) DEFAULT NULL,
                       `Group` varchar(200) DEFAULT NULL,
                       `Content` longtext,
                       `Retries` int(11) DEFAULT NULL,
@@ -541,6 +545,7 @@ namespace Panama.Canal.MySQL
                     `CorrelationId`,
                     `Version`,
                     `Name`,
+                    `Broker`,
                     `Group`,
                     `Content`,
                     `Retries`,
@@ -552,6 +557,7 @@ namespace Panama.Canal.MySQL
                      @CorrelationId,
                      @Version,
                      @Name,
+                     @Broker,
                      @Group,
                      @Content,
                      @Retries,
@@ -582,6 +588,11 @@ namespace Panama.Canal.MySQL
                     ParameterName = "@Name",
                     DbType = DbType.String,
                     Value = message.Name,
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Broker",
+                    DbType = DbType.String,
+                    Value = message.Broker,
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Group",
@@ -640,6 +651,7 @@ namespace Panama.Canal.MySQL
                     `CorrelationId`,
                     `Version`,
                     `Name`,
+                    `Broker`,
                     `Group`,
                     `Content`,
                     `Retries`,
@@ -651,6 +663,7 @@ namespace Panama.Canal.MySQL
                      @CorrelationId,
                      @Version,
                      @Name,
+                     @Broker,
                      @Group,
                      @Content,
                      @Retries,
@@ -681,6 +694,11 @@ namespace Panama.Canal.MySQL
                     ParameterName = "@Name",
                     DbType = DbType.String,
                     Value = message.Name,
+                });
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Broker",
+                    DbType = DbType.String,
+                    Value = message.Broker,
                 });
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Group",

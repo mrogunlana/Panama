@@ -2,7 +2,6 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Interfaces;
 
 namespace Panama.Canal
 {
@@ -10,145 +9,45 @@ namespace Panama.Canal
     {
         private readonly ILogger<Bus> _log;
         private readonly IDispatcher _dispatcher;
+        private readonly IBootstrap _bootstrapper;
         public IServiceProvider ServiceProvider { get; }
-        public AsyncLocal<ITransaction> Transaction { get; }
+        public BusContext Context { get; }
 
         public Bus(
               IServiceProvider provider
+            , IBootstrap bootstrapper
             , IDispatcher dispatcher
             , ILogger<Bus> log)
         {
             _log = log;
             _dispatcher = dispatcher;
+            _bootstrapper = bootstrapper;
 
             ServiceProvider = provider;
-            Transaction = new AsyncLocal<ITransaction>();
+            Context = new BusContext(this, provider);
         }
 
-        public async Task PublishAsync<D>(string name
-            , D? data
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "") 
-            where D : IModel
+        public async Task Publish(CancellationToken? token = null)
         {
+            if (!_bootstrapper.Online)
+                throw new InvalidOperationException("Panama Canal has not been started.");
+
             var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
+                .AddMessageId(Context.Id)
+                .AddMessageName(Context.Name)
+                .AddCorrelationId(Context.CorrelationId)
+                .AddMessageGroup(Context.Group)
+                .AddMessageBroker(nameof(Context.Broker))
+                .AddMessageType(nameof(Context.Data))
+                .AddCreatedTime()
+                .AddDelayTime(Context.Delay)
+                .AddHeaders(Context.Headers)
+                .AddData(Context.Data)
+                .AddAck(Context.Ack)
+                .AddNack(Context.Nack)
                 .ToInternal(ServiceProvider);
 
-            await _dispatcher.Publish(message).ConfigureAwait(false);
-        }
-
-        public async Task PublishAsync<D>(string name
-            , D? data
-            , IDictionary<string, string?> headers
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "") 
-            where D : IModel
-        {
-            var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddHeaders(headers)
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
-                .ToInternal(ServiceProvider);
-
-            await _dispatcher.Publish(message).ConfigureAwait(false);
-        }
-
-        public async Task PublishAsync<D, T>(string name
-            , D? data
-            , IDictionary<string, string?> headers
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "")
-            where D : IModel
-            where T : ITarget
-        {
-            var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddHeaders(headers)
-                .AddMessageGroup(nameof(T))
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
-                .ToInternal(ServiceProvider);
-
-            await _dispatcher.Publish(message).ConfigureAwait(false);
-        }
-
-        public async Task PublishDelayAsync<D>(TimeSpan delay
-            , string name
-            , D? data
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "") 
-            where D : IModel
-        {
-            var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddDelayTime(delay)
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
-                .ToInternal(ServiceProvider);
-
-            await _dispatcher.Publish(message).ConfigureAwait(false);
-        }
-
-        public async Task PublishDelayAsync<D>(TimeSpan delay
-            , string name
-            , D? data
-            , IDictionary<string, string?> headers
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "") 
-            where D : IModel
-        {
-            var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddHeaders(headers)
-                .AddDelayTime(delay)
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
-                .ToInternal(ServiceProvider);
-
-            await _dispatcher.Publish(message).ConfigureAwait(false);
-        }
-
-        public async Task PublishDelayAsync<D, T>(TimeSpan delay
-            , string name
-            , D? data
-            , IDictionary<string, string?> headers
-            , string? ack = null
-            , string? nack = null
-            , CancellationToken cancellationToken = default
-            , string correlationId = "")
-            where D : IModel
-            where T : ITarget
-        {
-            var message = new Message()
-                .AddCorrelationId(correlationId)
-                .AddHeaders(headers)
-                .AddMessageGroup(nameof(T))
-                .AddDelayTime(delay)
-                .AddData(data)
-                .AddAck(ack)
-                .AddNack(nack)
-                .ToInternal(ServiceProvider);
-
-            await _dispatcher.Publish(message).ConfigureAwait(false);
+            await _dispatcher.Publish(message, token: token).ConfigureAwait(false);
         }
     }
 }

@@ -61,7 +61,25 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddMessageTopic(this InternalMessage message, Message value)
+        internal static InternalMessage AddMessageBroker(this InternalMessage message, Message value)
+        {
+            if (value == null)
+                return message;
+            if (value.Headers == null)
+                return message;
+            if (value.Headers.Count == 0)
+                return message;
+
+            var result = value.Headers[Headers.Broker];
+
+            if (string.IsNullOrEmpty(result))
+                return message;
+
+            message.Broker = result;
+
+            return message;
+        }
+        internal static InternalMessage AddMessageName(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -121,8 +139,9 @@ namespace Panama.Canal.Extensions
             return new InternalMessage()
                 .AddCorrelationId(message)
                 .AddMessageId(message)
-                .AddMessageTopic(message)
+                .AddMessageName(message)
                 .AddMessageGroup(message)
+                .AddMessageBroker(message)
                 .AddCreatedTime(message)
                 .AddData(message, provider);
         }

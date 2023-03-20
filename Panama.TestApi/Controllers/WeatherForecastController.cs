@@ -5,6 +5,7 @@ using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Tests.Commands;
 
+
 namespace Panama.TestApi.Controllers
 {
     [ApiController]
@@ -39,6 +40,7 @@ namespace Panama.TestApi.Controllers
                 .AddKvp(10, "Scorching")
                 .Command<SerialCommand1>()
                 .Command<AddRandomWeatherForecast>()
+                .Command<PublishWeatherForecast>()
                 .Invoke();
 
             return result.Data.DataGet<WeatherForecast>();

@@ -34,17 +34,17 @@ namespace Panama.Canal.Jobs
             return Task.CompletedTask;
         }
 
-        public ValueTask Execute(InternalMessage message, object? descriptor = null)
+        public ValueTask Publish(InternalMessage message, CancellationToken? token = null)
         {
             throw new NotImplementedException();
         }
 
-        public ValueTask Publish(InternalMessage message)
+        public ValueTask Execute(InternalMessage message, object? descriptor = null, CancellationToken? token = null)
         {
             throw new NotImplementedException();
         }
 
-        public ValueTask Schedule(InternalMessage message, DateTime publishTime, object? transaction = null)
+        public ValueTask Schedule(InternalMessage message, DateTime publishTime, object? transaction = null, CancellationToken? token = null)
         {
             throw new NotImplementedException();
         }

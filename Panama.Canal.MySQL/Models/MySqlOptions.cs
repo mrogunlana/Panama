@@ -13,6 +13,6 @@ namespace Panama.Canal.MySQL
         public string Database { get; set; } = String.Empty;
         public int Heartbeat { get; set; } = 30;
         public int FailedRetries { get; set; } = 5;
-        public bool StreamBinlog { get; set; }
+        public bool StreamBinlog { get; set; } = true;
     }
 }

@@ -22,7 +22,7 @@ namespace Panama.Canal
         private readonly IEnumerable<Job> _schedules;
         private readonly ISchedulerFactory _schedulerFactory;
         
-        public bool Active => !_cts?.IsCancellationRequested ?? false;
+        public bool Online => !_cts?.IsCancellationRequested ?? false;
         public IScheduler Scheduler => _scheduler;
 
         public Bootstrapper(ISchedulerFactory schedulerFactory

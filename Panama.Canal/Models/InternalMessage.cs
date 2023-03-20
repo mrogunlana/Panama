@@ -16,6 +16,7 @@ namespace Panama.Canal.Models
         public string Version { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
         public string Group { get; set; } = String.Empty;
+        public string Broker { get; set; } = String.Empty;
         public string Content { get; set; } = String.Empty;
         public int Retries { get; set; }
         public DateTime Created { get; set; }

@@ -5,7 +5,7 @@ namespace Panama.Canal.Interfaces
 {
     public interface IBootstrap : IHostedService
     {
-        bool Active { get; }
+        bool Online { get; }
         IScheduler Scheduler { get; }
         Task On(CancellationToken cancellationToken);
         Task Off();

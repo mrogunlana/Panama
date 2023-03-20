@@ -5,6 +5,7 @@
         public const string CorrelationId = "panama-correlation-id";
         public const string Id = "panama-message-id";
         public const string Name = "panama-message-name";
+        public const string Broker = "panama-message-broker";
         public const string Group = "panama-message-group";
         public const string Type = "panama-message-type";
         public const string Ack = "panama-callback-ack";

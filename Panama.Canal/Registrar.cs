@@ -13,6 +13,7 @@ namespace Panama.Canal
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<Bootstrapper>();
+            services.AddTransient<IBus, Bus>();
             //services.AddSingleton<IJobFactory, SingletonFactory>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<IInvokeBrokers, Brokers>();

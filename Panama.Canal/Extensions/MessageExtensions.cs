@@ -54,6 +54,15 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+        internal static Message AddMessageBroker(this Message message, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return message;
+
+            message.Headers.Add(Headers.Broker, value);
+
+            return message;
+        }
         internal static Message AddMessageTopic(this Message message, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -108,9 +117,9 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static Message AddCreatedTime(this Message message)
+        internal static Message AddCreatedTime(this Message message, DateTime? value = null)
         {
-            message.Headers.Add(Headers.Created, DateTime.UtcNow.ToString());
+            message.Headers.Add(Headers.Created, value?.ToString() ?? DateTime.UtcNow.ToString());
 
             return message;
         }
