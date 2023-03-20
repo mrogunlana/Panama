@@ -30,7 +30,7 @@ namespace Panama.Canal.Interfaces
         Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry();
         Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry();
         Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
-        Task GetDelayedPublishedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
-        Task GetDelayedReceivedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
+        Task GetDelayedPublishedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
+        Task GetDelayedReceivedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
     }
 }

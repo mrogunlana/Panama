@@ -943,8 +943,7 @@ namespace Panama.Canal.MySQL
         }
 
         public async Task GetDelayedPublishedMessagesForScheduling(
-              string table
-            , Func<object, IEnumerable<InternalMessage>, Task> task
+              Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(
@@ -955,8 +954,7 @@ namespace Panama.Canal.MySQL
         }
 
         public async Task GetDelayedReceivedMessagesForScheduling(
-              string table
-            , Func<object, IEnumerable<InternalMessage>, Task> task
+              Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
             await GetDelayedMessagesForScheduling(

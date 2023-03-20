@@ -19,13 +19,21 @@ namespace Panama.Canal
             services.AddSingleton<IInvokeSubscriptions, Subscriptions>();
 
             services.AddSingleton<Dispatcher>();
-            services.AddSingleton<PublishedRetry>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
+            services.AddSingleton<PublishedRetry>();
+            services.AddSingleton<DelayedReceived>();
+            services.AddSingleton<DelayedPublished>();
 
             services.AddSingleton(new Job(
                 type: typeof(Dispatcher),
                 expression: "0/1 * * * * ?"));
+            services.AddSingleton(new Job(
+                type: typeof(DelayedPublished),
+                expression: "0/0 1 * * * ?"));
+            services.AddSingleton(new Job(
+                type: typeof(DelayedReceived),
+                expression: "0/0 1 * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(PublishedRetry),
                 expression: "0/0 1 * * * ?"));
@@ -35,7 +43,7 @@ namespace Panama.Canal
             services.AddSingleton(new Job(
                 type: typeof(DeleteExpired),
                 expression: "0/0 5 * * * ?"));
-
+            
             services.AddQuartz(q => {
                 q.SchedulerName = "panama-canal-services";
                 q.UseMicrosoftDependencyInjectionJobFactory();
@@ -46,7 +54,6 @@ namespace Panama.Canal
 
             services.Configure<CanalOptions>(options =>
                 config.GetSection(CanalOptions.Section).Bind(options));
-
         }
     }
 }
