@@ -50,5 +50,38 @@ namespace Panama.Extensions
             if (!result.Success)
                 throw new Exception($"Results failed for these reasons: {string.Join(";", result.Messages)}.");
         }
+
+        public static IResult Success(this IResult result)
+        {
+            result.Success = true;
+
+            return result;
+        }
+        public static IResult Fail(this IResult result)
+        {
+            result.Success = false;
+
+            return result;
+        }
+        public static IResult Add(this IResult result, IModel model)
+        {
+            result.Data.Add(model);
+
+            return result;
+        }
+        public static IResult Add(this IResult result, params IModel[] models)
+        {
+            foreach (var model in models)
+                result.Data.Add(model);
+
+            return result;
+        }
+        public static IResult Add(this IResult result, IEnumerable<IModel> models)
+        {
+            foreach (var model in models)
+                result.Data.Add(model);
+
+            return result;
+        }
     }
 }

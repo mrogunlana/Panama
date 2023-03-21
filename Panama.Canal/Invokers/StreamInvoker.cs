@@ -2,6 +2,8 @@
 using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
+using Panama.Models;
+using System.Transactions;
 
 namespace Panama.Canal.Invokers
 {
@@ -20,7 +22,7 @@ namespace Panama.Canal.Invokers
             _dispatcher = dispatcher;
             _bootstrapper = bootstrapper;
         }
-        public Task<IResult> Invoke(IContext? context = null)
+        public async Task<IResult> Invoke(IContext? context = null)
         {
             if (context == null)
                 throw new ArgumentNullException("Context cannot be located.");
@@ -32,8 +34,16 @@ namespace Panama.Canal.Invokers
             if (!_bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
+            var outbox = await _store.StoreOutboxMessage(
+                message: message, 
+                transaction: Transaction.Current)
+                .ConfigureAwait(false);
 
-            throw new NotImplementedException();
+            var result = new Result()
+                .Success()
+                .Add(outbox);
+
+            return result;
         }
     }
 }

@@ -17,15 +17,15 @@ namespace Panama.Canal.MySQL.Jobs
         private readonly BinlogClient _client;
         private readonly MySqlSettings _settings;
         private readonly IOptions<MySqlOptions> _options;
-        private readonly IEnumerable<IBroker> _brokers;
+        private readonly IDispatcher _dispatcher;
         private readonly IStringEncryptor _encryptor;
         private readonly IInitialize _initializer;
 
         public LogTailingJob(
               MySqlSettings settings
+            , IDispatcher dispatcher
             , IInitialize initializer
             , IOptions<MySqlOptions> options
-            , IEnumerable<IBroker> brokers
             , StringEncryptorResolver stringEncryptorResolver)
         {
             //TODO: check the existance of MySqlCdCOptions in the 
@@ -34,7 +34,7 @@ namespace Panama.Canal.MySQL.Jobs
 
             _settings = settings;
             _options = options;
-            _brokers = brokers;
+            _dispatcher = dispatcher;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
             _initializer = initializer;
 
@@ -97,7 +97,6 @@ namespace Panama.Canal.MySQL.Jobs
 
             // TODO: should we leave the message base64 
             // encrypted and let the consumer decode?
-            //.DecodeContent(_encryptor);
             var outbox = writeRows
                 .GetOutboxMessages(_settings);
 
@@ -105,11 +104,16 @@ namespace Panama.Canal.MySQL.Jobs
                 .GetInboxMessages(_settings);
             
             //publish to message brokers
-            foreach (var broker in _brokers)
-                foreach (var publish in outbox)
-                    await broker.Publish(new MessageContext(publish, token: context.CancellationToken));
+            foreach (var publish in outbox)
+                await _dispatcher.Publish(
+                    message: publish,
+                    token: context.CancellationToken);
 
-            //TODO: received to subscribers
+            //received to subscribers
+            foreach (var received in inbox)
+                await _dispatcher.Execute(
+                    message: received,
+                    token: context.CancellationToken);
         }
     }
 }
