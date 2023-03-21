@@ -1,4 +1,5 @@
-﻿using Panama.Canal.Interfaces;
+﻿using Panama.Canal.Extensions;
+using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -33,6 +34,8 @@ namespace Panama.Canal.Invokers
 
             if (!_bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
+
+            message.SetStatus(MessageStatus.Scheduled);
 
             var outbox = await _store.StoreOutboxMessage(
                 message: message, 

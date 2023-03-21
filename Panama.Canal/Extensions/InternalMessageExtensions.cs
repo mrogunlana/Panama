@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Panama.Canal.Models;
+using Panama.Extensions;
 using Panama.Security.Resolvers;
 
 namespace Panama.Canal.Extensions
@@ -134,6 +135,23 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+        internal static T GetData<T>(this InternalMessage message, IServiceProvider provider)
+        {
+            var resolver = provider.GetService<StringEncryptorResolver>();
+            if (resolver == null)
+                throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
+
+            var encryptor = resolver(StringEncryptorResolverKey.Base64);
+            if (encryptor == null)
+                throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
+
+            var value = encryptor.FromString(message.Content);
+            var result = JsonConvert.DeserializeObject<T>(value);
+            if (result == null)
+                throw new InvalidOperationException($"Message context could not be decoded.");
+
+            return result;
+        }
         internal static InternalMessage ToInternal(this Message message, IServiceProvider provider)
         {
             return new InternalMessage()
@@ -144,6 +162,15 @@ namespace Panama.Canal.Extensions
                 .AddMessageBroker(message)
                 .AddCreatedTime(message)
                 .AddData(message, provider);
+        }
+        internal static InternalMessage SetStatus<T>(this InternalMessage message, T value)
+            where T : struct
+        {
+            var result = nameof(value).ToString();
+
+            message.Status = result;
+
+            return message;
         }
     }
 }

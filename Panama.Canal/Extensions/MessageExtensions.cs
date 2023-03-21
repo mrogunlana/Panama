@@ -119,13 +119,13 @@ namespace Panama.Canal.Extensions
         }
         internal static Message AddCreatedTime(this Message message, DateTime? value = null)
         {
-            message.Headers.Add(Headers.Created, value?.ToString() ?? DateTime.UtcNow.ToString());
+            message.Headers.Add(Headers.Created, value?.ToUniversalTime().ToString() ?? DateTime.UtcNow.ToString());
 
             return message;
         }
-        internal static Message AddDelayTime(this Message message, TimeSpan value)
+        internal static Message AddDelayTime(this Message message, DateTime value)
         {
-            message.Headers.Add(Headers.Delay, value.ToString());
+            message.Headers.Add(Headers.Delay, value.ToUniversalTime().ToString());
 
             return message;
         }

@@ -58,7 +58,7 @@ namespace Panama.Canal.Jobs
             throw new NotImplementedException();
         }
 
-        public ValueTask Schedule(InternalMessage message, DateTime publishTime, object? transaction = null, CancellationToken? token = null)
+        public ValueTask Schedule(InternalMessage message, DateTime delay, object? transaction = null, CancellationToken? token = null)
         {
             throw new NotImplementedException();
         }

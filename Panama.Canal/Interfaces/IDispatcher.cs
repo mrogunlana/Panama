@@ -8,6 +8,6 @@ namespace Panama.Canal.Interfaces
 
         ValueTask Execute(InternalMessage message, object? descriptor = null, CancellationToken? token = null);
 
-        ValueTask Schedule(InternalMessage message, DateTime publishTime, object? transaction = null, CancellationToken? token = null);
+        ValueTask Schedule(InternalMessage message, DateTime delay, object? transaction = null, CancellationToken? token = null);
     }
 }
