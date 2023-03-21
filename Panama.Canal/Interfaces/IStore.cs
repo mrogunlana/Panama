@@ -21,6 +21,8 @@ namespace Panama.Canal.Interfaces
         Task ChangeReceivedState(InternalMessage message, MessageStatus state, object? transaction = null);
         Task<InternalMessage> StorePublishedMessage(InternalMessage message, object? transaction = null);
         Task<InternalMessage> StoreReceivedMessage(InternalMessage message, object? transaction = null);
+        Task<InternalMessage> StoreInboxMessage(InternalMessage message, object? transaction = null);
+        Task<InternalMessage> StoreOutboxMessage(InternalMessage message, object? transaction = null);
         Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);
         Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default);

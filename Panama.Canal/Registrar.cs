@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
+using Panama.Interfaces;
 using Quartz;
-using Quartz.Spi;
 
 namespace Panama.Canal
 {
@@ -14,7 +15,8 @@ namespace Panama.Canal
         {
             services.AddHostedService<Bootstrapper>();
             services.AddTransient<IBus, Bus>();
-            //services.AddSingleton<IJobFactory, SingletonFactory>();
+            services.AddTransient<IInvoke, PollingInvoker>();
+            services.AddTransient<IInvoke, StreamInvoker>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<IInvokeBrokers, Brokers>();
             services.AddSingleton<IInvokeSubscriptions, Subscriptions>();

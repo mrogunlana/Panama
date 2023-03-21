@@ -18,6 +18,7 @@ namespace Panama.Tests.Commands
                 .Data(models)
                 .Ack("")
                 .Nack("")
+                .Polling()
                 .Publish();
         }
     }

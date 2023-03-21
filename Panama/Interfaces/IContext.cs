@@ -6,8 +6,8 @@ namespace Panama.Interfaces
 {
     public interface IContext
     {
-        string Id { get; }
-        string CorrelationId { get; }
+        string Id { get; set; }
+        string CorrelationId { get; set; }
         IList<IModel> Data { get; }
         CancellationToken Token { get; set; }
         IServiceProvider Provider { get; }

@@ -2,7 +2,7 @@
 {
     public static class ObjectExtensions
     {
-        public static int ToInt(this object value)
+        public static int ToInt(this object? value)
         {
             if (value == null)
                 return default(int);

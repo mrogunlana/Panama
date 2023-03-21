@@ -2,35 +2,27 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Models;
 
 namespace Panama.Canal
 {
     public class Bus : IBus
     {
         private readonly ILogger<Bus> _log;
-        private readonly IDispatcher _dispatcher;
-        private readonly IBootstrap _bootstrapper;
-        public IServiceProvider ServiceProvider { get; }
+        
         public BusContext Context { get; }
 
         public Bus(
               IServiceProvider provider
-            , IBootstrap bootstrapper
-            , IDispatcher dispatcher
             , ILogger<Bus> log)
         {
             _log = log;
-            _dispatcher = dispatcher;
-            _bootstrapper = bootstrapper;
-
-            ServiceProvider = provider;
             Context = new BusContext(this, provider);
         }
 
         public async Task Publish(CancellationToken? token = null)
         {
-            if (!_bootstrapper.Online)
-                throw new InvalidOperationException("Panama Canal has not been started.");
+            var source = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, Context.Token);
 
             var message = new Message()
                 .AddMessageId(Context.Id)
@@ -45,9 +37,16 @@ namespace Panama.Canal
                 .AddData(Context.Data)
                 .AddAck(Context.Ack)
                 .AddNack(Context.Nack)
-                .ToInternal(ServiceProvider);
+                .ToInternal(Context.Provider);
 
-            await _dispatcher.Publish(message, token: token).ConfigureAwait(false);
+            var context = new Context(
+                id: Context.Id,
+                data: message,
+                token: source.Token,
+                provider: Context.Provider,
+                correlationId: Context.CorrelationId);
+
+            await Context.Invoker.Invoke(context).ConfigureAwait(false);
         }
     }
 }
