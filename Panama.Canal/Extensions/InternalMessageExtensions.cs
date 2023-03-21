@@ -6,9 +6,9 @@ using Panama.Security.Resolvers;
 
 namespace Panama.Canal.Extensions
 {
-    internal static class InternalMessageExtensions
+    public static class InternalMessageExtensions
     {
-        internal static InternalMessage AddCorrelationId(this InternalMessage message, Message value)
+        public static InternalMessage AddCorrelationId(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -26,7 +26,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddMessageId(this InternalMessage message, Message value)
+        public static InternalMessage AddMessageId(this InternalMessage message, Message value)
         {
             if (value ==  null)
                 return message;
@@ -44,7 +44,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddMessageGroup(this InternalMessage message, Message value)
+        public static InternalMessage AddMessageGroup(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -62,7 +62,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddMessageBroker(this InternalMessage message, Message value)
+        public static InternalMessage AddMessageBroker(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -80,7 +80,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddMessageName(this InternalMessage message, Message value)
+        public static InternalMessage AddMessageName(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -98,7 +98,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddCreatedTime(this InternalMessage message, Message value)
+        public static InternalMessage AddCreatedTime(this InternalMessage message, Message value)
         {
             if (value == null)
                 return message;
@@ -116,7 +116,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static InternalMessage AddData(this InternalMessage message, Message value, IServiceProvider provider)
+        public static InternalMessage AddData(this InternalMessage message, Message value, IServiceProvider provider)
         {
             var resolver = provider.GetService<StringEncryptorResolver>();
             if (resolver == null)
@@ -135,7 +135,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        internal static T GetData<T>(this InternalMessage message, IServiceProvider provider)
+        public static T GetData<T>(this InternalMessage message, IServiceProvider provider)
         {
             var resolver = provider.GetService<StringEncryptorResolver>();
             if (resolver == null)
@@ -152,7 +152,16 @@ namespace Panama.Canal.Extensions
 
             return result;
         }
-        internal static InternalMessage ToInternal(this Message message, IServiceProvider provider)
+        public static IEnumerable<T> GetData<T>(this IEnumerable<InternalMessage> messages, IServiceProvider provider)
+        {
+            var result = new List<T>();
+
+            foreach (var message in messages)
+                result.Add(message.GetData<T>(provider));
+
+            return result;
+        }
+        public static InternalMessage ToInternal(this Message message, IServiceProvider provider)
         {
             return new InternalMessage()
                 .AddCorrelationId(message)
@@ -163,7 +172,7 @@ namespace Panama.Canal.Extensions
                 .AddCreatedTime(message)
                 .AddData(message, provider);
         }
-        internal static InternalMessage SetStatus<T>(this InternalMessage message, T value)
+        public static InternalMessage SetStatus<T>(this InternalMessage message, T value)
             where T : struct
         {
             var result = nameof(value).ToString();

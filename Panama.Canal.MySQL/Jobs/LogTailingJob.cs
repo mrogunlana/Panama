@@ -4,6 +4,7 @@ using MySqlCdc.Constants;
 using MySqlCdc.Events;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Extensions;
 using Panama.Canal.MySQL.Extensions;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
@@ -16,28 +17,31 @@ namespace Panama.Canal.MySQL.Jobs
     {
         private readonly BinlogClient _client;
         private readonly MySqlSettings _settings;
-        private readonly IOptions<MySqlOptions> _options;
         private readonly IDispatcher _dispatcher;
-        private readonly IStringEncryptor _encryptor;
         private readonly IInitialize _initializer;
+        private readonly IStringEncryptor _encryptor;
+        private readonly IOptions<MySqlOptions> _options;
+        private readonly IServiceProvider _provider;
 
         public LogTailingJob(
               MySqlSettings settings
             , IDispatcher dispatcher
             , IInitialize initializer
             , IOptions<MySqlOptions> options
+            , IServiceProvider serviceProvider
             , StringEncryptorResolver stringEncryptorResolver)
         {
             //TODO: check the existance of MySqlCdCOptions in the 
             //registrar and if it's null, throw an exception as 
             //its table and database specific values below are required
 
-            _settings = settings;
             _options = options;
+            _settings = settings;
             _dispatcher = dispatcher;
-            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
             _initializer = initializer;
-
+            _provider = serviceProvider;
+            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
+            
             /*  NOTES: 
              * 
              *  #Use for MySQL GTID below
@@ -102,18 +106,36 @@ namespace Panama.Canal.MySQL.Jobs
 
             var inbox = writeRows
                 .GetInboxMessages(_settings);
-            
-            //publish to message brokers
-            foreach (var publish in outbox)
-                await _dispatcher.Publish(
-                    message: publish,
-                    token: context.CancellationToken);
+
+            var data = outbox.GetData<Message>(_provider);
 
             //received to subscribers
             foreach (var received in inbox)
                 await _dispatcher.Execute(
                     message: received,
                     token: context.CancellationToken);
+
+            //publish to message brokers
+            foreach (var publish in outbox)
+            { 
+                var metadata = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
+                if (metadata == null)
+                    throw new InvalidOperationException("Message headers cannot be found.");
+
+                DateTime.TryParse(metadata.Headers[Headers.Delay], out var delay);
+
+                if (delay == DateTime.MinValue)
+                    await _dispatcher.Publish(
+                        message: publish,
+                        token: context.CancellationToken)
+                        .ConfigureAwait(false);
+                else
+                    await _dispatcher.Schedule(
+                        message: publish,
+                        delay: delay,
+                        token: context.CancellationToken)
+                        .ConfigureAwait(false);
+            }
         }
     }
 }
