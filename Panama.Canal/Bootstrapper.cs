@@ -27,15 +27,15 @@ namespace Panama.Canal
 
         public Bootstrapper(ISchedulerFactory schedulerFactory
             , IJobFactory jobFactory
-            , IEnumerable<Job> schedules
             , ILogger<Bootstrapper> log
-            , IServiceProvider provider)
+            , IServiceProvider provider
+            , IEnumerable<Job> schedules)
         {
-            _schedulerFactory = schedulerFactory;
-            _jobFactory = jobFactory;
-            _schedules = schedules;
-            _provider = provider;
             _log = log;
+            _provider = provider;
+            _schedules = schedules;
+            _jobFactory = jobFactory;
+            _schedulerFactory = schedulerFactory;
         }
 
         private async Task Initialize()
