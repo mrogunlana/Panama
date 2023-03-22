@@ -21,6 +21,7 @@ namespace Panama.Canal.Jobs
         private readonly CancellationTokenSource _delay = new();
         private readonly PriorityQueue<InternalMessage, DateTime> _scheduled;
 
+        private DateTime _next = DateTime.MaxValue;
         private Channel<InternalMessage> _published = default!;
         private ConcurrentDictionary<string, Channel<(InternalMessage, SubscriptionDescriptor?)>> _received = default!;
 
@@ -151,11 +152,11 @@ namespace Panama.Canal.Jobs
 
                         var ids = _scheduled.UnorderedItems.Select(x => x.Element._Id).ToArray();
                         _store.ChangePublishedStateToDelayed(ids).GetAwaiter().GetResult();
-                        _log.LogDebug("Update storage to delayed success of delayed message in memory queue!");
+                        _log.LogDebug("Scheduled messages stored as delayed successfully.");
                     }
                     catch (Exception e)
                     {
-                        _log.LogWarning(e, "Update storage fails of delayed message in memory queue!");
+                        _log.LogWarning(e, "Scheduled messages stored as delayed failed.");
                     }
                 });
 
@@ -163,14 +164,12 @@ namespace Panama.Canal.Jobs
                 {
                     try
                     {
-                        var next = DateTime.MaxValue;
-
-                        while (_scheduled.TryPeek(out _, out next))
+                        while (_scheduled.TryPeek(out _, out _next))
                         {
-                            var delayTime = next - DateTime.Now;
+                            var delayTime = _next - DateTime.UtcNow;
 
                             if (delayTime > new TimeSpan(500000)) //50ms
-                                await Task.Delay(delayTime, _cts.Token);
+                                await Task.Delay(delayTime, _delay.Token);
 
                             _cts.Token.ThrowIfCancellationRequested();
 
