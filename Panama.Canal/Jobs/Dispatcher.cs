@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Quartz;
@@ -16,6 +17,7 @@ namespace Panama.Canal.Jobs
         private readonly IStore _store;
         private readonly IInvokeBrokers _brokers;
         private readonly ILogger<Dispatcher> _log;
+        private readonly IServiceProvider _provider;
         private readonly IOptions<CanalOptions> _options;
         private readonly IInvokeSubscriptions _subscriptions;
         private readonly CancellationTokenSource _delay = new();
@@ -29,6 +31,7 @@ namespace Panama.Canal.Jobs
               IStore store
             , IInvokeBrokers brokers
             , ILogger<Dispatcher> log
+            , IServiceProvider provider
             , IInvokeSubscriptions subscriptions
             , IOptions<CanalOptions> options)
         {
@@ -38,6 +41,7 @@ namespace Panama.Canal.Jobs
             _store = store;
             _brokers = brokers;
             _options = options;
+            _provider = provider;
             _subscriptions = subscriptions;
             _scheduled = new PriorityQueue<InternalMessage, DateTime>();
             _received = new ConcurrentDictionary<string, Channel<(InternalMessage, SubscriptionDescriptor?)>>(1, 2);
@@ -50,7 +54,23 @@ namespace Panama.Canal.Jobs
                 });
         }
 
-        public async Task Publish()
+        private void Delayed()
+        {
+            try
+            {
+                if (_scheduled.Count == 0) return;
+
+                var ids = _scheduled.UnorderedItems.Select(x => x.Element._Id).ToArray();
+                _store.ChangePublishedStateToDelayed(ids).GetAwaiter().GetResult();
+                _log.LogDebug("Scheduled messages stored as delayed successfully.");
+            }
+            catch (Exception e)
+            {
+                _log.LogWarning(e, "Scheduled messages stored as delayed failed.");
+            }
+        }
+
+        private async Task Publish()
         {
             try
             {
@@ -74,7 +94,35 @@ namespace Panama.Canal.Jobs
             }
         }
 
-        public async Task Received(string group, Channel<(InternalMessage, SubscriptionDescriptor?)> channel)
+        private async Task Dequeue()
+        {
+            _cts!.Token.Register(() => Delayed());
+
+            while (!_cts.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    while (_scheduled.TryPeek(out _, out _next))
+                    {
+                        var delayTime = _next - DateTime.UtcNow;
+
+                        if (delayTime > new TimeSpan(500000)) //50ms
+                            await Task.Delay(delayTime, _delay.Token);
+
+                        _cts.Token.ThrowIfCancellationRequested();
+
+                        //await _sender.SendAsync(_scheduled.Dequeue()).ConfigureAwait(false);
+                    }
+                    _cts.Token.WaitHandle.WaitOne(100);
+                }
+                catch (OperationCanceledException)
+                {
+                    //Ignore
+                }
+            }
+        }
+
+        private async Task Received(string group, Channel<(InternalMessage, SubscriptionDescriptor?)> channel)
         {
             try
             {
@@ -143,66 +191,67 @@ namespace Panama.Canal.Jobs
 
             GetOrAddReceiver(_options.Value.DefaultGroupName);
 
-            var task = await Task.Factory.StartNew(async () => {
-
-                _cts.Token.Register(() => {
-                    try
-                    {
-                        if (_scheduled.Count == 0) return;
-
-                        var ids = _scheduled.UnorderedItems.Select(x => x.Element._Id).ToArray();
-                        _store.ChangePublishedStateToDelayed(ids).GetAwaiter().GetResult();
-                        _log.LogDebug("Scheduled messages stored as delayed successfully.");
-                    }
-                    catch (Exception e)
-                    {
-                        _log.LogWarning(e, "Scheduled messages stored as delayed failed.");
-                    }
-                });
-
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    try
-                    {
-                        while (_scheduled.TryPeek(out _, out _next))
-                        {
-                            var delayTime = _next - DateTime.UtcNow;
-
-                            if (delayTime > new TimeSpan(500000)) //50ms
-                                await Task.Delay(delayTime, _delay.Token);
-
-                            _cts.Token.ThrowIfCancellationRequested();
-
-                            //await _sender.SendAsync(_scheduled.Dequeue()).ConfigureAwait(false);
-                        }
-                        _cts.Token.WaitHandle.WaitOne(100);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        //Ignore
-                    }
-                }
-
-            }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+            var task = await Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
 
             results.Add(task);
 
             Task.WaitAll(tasks);
         }
         
-        public ValueTask Publish(InternalMessage message, CancellationToken? token = null)
+        public async ValueTask Publish(InternalMessage message, CancellationToken? token = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!_published.Writer.TryWrite(message))
+                    while (await _published.Writer.WaitToWriteAsync(_cts!.Token).ConfigureAwait(false))
+                        if (_published.Writer.TryWrite(message))
+                            return;
+            }
+            catch (OperationCanceledException)
+            {
+                //Ignore
+            }
         }
 
-        public ValueTask Execute(InternalMessage message, object? descriptor = null, CancellationToken? token = null)
+        public async ValueTask Execute(InternalMessage message, SubscriptionDescriptor? descriptor = null, CancellationToken? token = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var data = message.GetData<Message>(_provider);
+                var group = data.GetGroup();
+
+                var channel = GetOrAddReceiver(group);
+
+                if (!channel.Writer.TryWrite((message, descriptor)))
+                    while (await channel.Writer.WaitToWriteAsync(_cts!.Token).ConfigureAwait(false))
+                        if (channel.Writer.TryWrite((message, descriptor)))
+                            return;
+            }
+            catch (OperationCanceledException)
+            {
+                //Ignore
+            }
         }
 
-        public ValueTask Schedule(InternalMessage message, DateTime delay, object? transaction = null, CancellationToken? token = null)
+        public async ValueTask Schedule(InternalMessage message, DateTime delay, object? transaction = null, CancellationToken? token = null)
         {
-            throw new NotImplementedException();
+            message.Expires = delay;
+
+            var timeSpan = delay - DateTime.Now;
+
+            if (timeSpan <= TimeSpan.FromMinutes(1))
+            {
+                await _store.ChangePublishedState(message, MessageStatus.Queued, transaction);
+
+                _scheduled.Enqueue(message, delay);
+
+                if (delay < _next)
+                    _delay.Cancel();
+            }
+            else
+            {
+                await _store.ChangePublishedState(message, MessageStatus.Delayed, transaction);
+            }
         }
     }
 }

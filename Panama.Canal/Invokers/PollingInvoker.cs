@@ -39,8 +39,7 @@ namespace Panama.Canal.Invokers
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
             var data = message.GetData<Message>(_provider);
-
-            DateTime.TryParse(data.Headers[Headers.Delay], out var delay);
+            var delay = data.GetDelay();
             
             message.SetStatus(MessageStatus.Scheduled);
 

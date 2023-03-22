@@ -118,11 +118,11 @@ namespace Panama.Canal.MySQL.Jobs
             //publish to message brokers
             foreach (var publish in outbox)
             { 
-                var metadata = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
-                if (metadata == null)
+                var message = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
+                if (message == null)
                     throw new InvalidOperationException("Message headers cannot be found.");
-
-                DateTime.TryParse(metadata.Headers[Headers.Delay], out var delay);
+                
+                var delay = message.GetDelay();
 
                 if (delay == DateTime.MinValue)
                     await _dispatcher.Publish(
