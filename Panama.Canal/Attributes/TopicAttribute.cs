@@ -8,14 +8,13 @@ namespace Panama.Canal.Attributes
         public string Group { get; set; } = string.Empty;
         public string Name { get; } = string.Empty;
         public string Topic { get; }
-        public ITarget? Broker { get; }
+        public ITarget? Target { get; }
 
         public TopicAttribute(string topic
             , ITarget? broker = null)
         {
-            Broker = broker;
+            Target = broker;
             Topic = topic;
-
         }
 
         public TopicAttribute(string topic

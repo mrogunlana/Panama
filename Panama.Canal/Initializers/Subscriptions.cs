@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Panama.Canal.Attributes;
-using Panama.Canal.Comparers;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 
@@ -32,38 +31,17 @@ namespace Panama.Canal.Intializers
             if (token.IsCancellationRequested)
                 token.ThrowIfCancellationRequested();
 
-            var subscribers = _provider.GetServices<ISubscribe>();
-            if (subscribers == null)
+            var subscriptions = _provider
+                .GetServices<ISubscribe>()
+                .GetSubscriptions(_log)
+                .ToDictionary();
+
+            if (subscriptions == null)
                 return Task.CompletedTask;
-            if (subscribers.Count() == 0)
+            if (subscriptions.Count() == 0)
                 return Task.CompletedTask;
 
-            foreach (var subscriber in subscribers)
-            {
-                var attribute = Attribute
-                    .GetCustomAttribute(
-                        subscriber.GetType(), 
-                        typeof(TopicAttribute));
-
-                if (attribute == null)
-                    throw new InvalidOperationException($"Topic attribute could not be found on Subscription: {subscriber.GetType().Name}.");
-
-                var topic = (TopicAttribute)attribute;
-                if (topic == null)
-                    throw new InvalidOperationException($"Subscription: {subscriber.GetType().Name} needs a Topic attribute.");
-
-                var subscription = new Subscription(
-                    topic: topic.Topic,
-                    group: topic.Group,
-                    subscriber: subscriber.GetType(),
-                    broker: topic.Broker);
-
-                _subscriptions.Subscribers.Add(subscription);
-            }
-
-            _subscriptions.Subscribers = _subscriptions.Subscribers
-                .Distinct(new SubscriptionComparer(_log))
-                .ToList();
+            _subscriptions.Set(subscriptions);
 
             return Task.CompletedTask;
         }

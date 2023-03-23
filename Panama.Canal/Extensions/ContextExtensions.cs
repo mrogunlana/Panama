@@ -21,17 +21,18 @@ namespace Panama.Canal.Extensions
 
             bus.Context.CorrelationId = context.CorrelationId;
             bus.Context.Token = context.Token;
+            bus.Context.Target = typeof(DefaultTarget);
 
             return bus;
         }
-        public static IBus Bus<B>(this IContext context)
-            where B : IBroker
+        public static IBus Bus<T>(this IContext context)
+            where T : ITarget
         {
             if (context.Provider == null)
                 throw new InvalidOperationException("Service provider cannot be located.");
 
             var bus = context.Provider.GetRequiredService<IBus>();
-            var broker = context.Provider.GetRequiredService<B>();
+            var target = context.Provider.GetRequiredService<T>();
 
             bus.CorrelationId(context.CorrelationId);
             bus.Token(context.Token);
@@ -40,7 +41,7 @@ namespace Panama.Canal.Extensions
 
             bus.Context.CorrelationId = context.CorrelationId;
             bus.Context.Token = context.Token;
-            bus.Context.Broker = broker;
+            bus.Context.Target = typeof(T);
 
             return bus;
         }

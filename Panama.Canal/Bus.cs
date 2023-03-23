@@ -29,7 +29,7 @@ namespace Panama.Canal
                 .AddMessageName(Context.Name)
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group)
-                .AddMessageBroker(nameof(Context.Broker))
+                .AddMessageBroker(Context.Target?.FullName)
                 .AddMessageType(nameof(Context.Data))
                 .AddCreatedTime()
                 .AddDelayTime(Context.Delay)
@@ -38,7 +38,7 @@ namespace Panama.Canal
                 .AddAck(Context.Ack)
                 .AddNack(Context.Nack)
                 .ToInternal(Context.Provider);
-
+            
             var context = new Context(
                 id: Context.Id,
                 data: message,

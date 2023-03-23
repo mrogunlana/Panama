@@ -5,21 +5,21 @@ namespace Panama.Canal.Models
 {
     public class Subscription : IModel
     {
-        public Type Subscriber { get; set; }
         public string Topic { get; set; }
         public string Group { get; set; }
-        public ITarget? Broker { get; set; }
+        public Type Subscriber { get; set; }
+        public Type Target { get; set; }
 
         public Subscription(
               string topic
             , string group
             , Type subscriber
-            , ITarget? broker = null)
+            , Type target)
         {
             Topic = topic;
             Group = group;
             Subscriber = subscriber;
-            Broker = broker;
+            Target = target;
         }
     }
 }

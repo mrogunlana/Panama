@@ -1,4 +1,6 @@
-﻿namespace Panama.Canal.Interfaces
+﻿using Panama.Interfaces;
+
+namespace Panama.Canal.Interfaces
 {
-    public interface ITarget { }
+    public interface ITarget : IModel { }
 }

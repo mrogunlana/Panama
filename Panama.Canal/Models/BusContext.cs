@@ -15,7 +15,7 @@ namespace Panama.Canal.Models
         public string Group { get; set; } = String.Empty;
         public string Instance { get; set; } = String.Empty;
         public DateTime Delay { get; set; }
-        public IBroker? Broker { get; set; }
+        public Type? Target { get; set; }
         public AsyncLocal<ITransaction> Transaction { get; set; }
         public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }

@@ -54,12 +54,14 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageBroker(this Message message, string value)
+        public static Message AddMessageBroker(this Message message, string? value = null)
         {
-            if (string.IsNullOrEmpty(value))
-                return message;
+            var text = value?.ToString() ?? string.Empty;
 
-            message.Headers.Add(Headers.Broker, value);
+            if (string.IsNullOrEmpty(text))
+                text = typeof(DefaultTarget).FullName;
+
+            message.Headers.Add(Headers.Broker, text);
 
             return message;
         }
@@ -167,6 +169,17 @@ namespace Panama.Canal.Extensions
                 throw new InvalidOperationException($"Header: {Headers.Delay} could not be parsed.");
 
             return delay;
+        }
+        public static string GetBroker(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.Broker];
+            if (result == null)
+                throw new InvalidOperationException($"Header: {Headers.Broker} cannot be found.");
+
+            return result;
         }
     }
 }

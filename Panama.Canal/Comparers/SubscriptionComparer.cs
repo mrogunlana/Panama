@@ -16,19 +16,21 @@ namespace Panama.Canal.Comparers
         {
             if (ReferenceEquals(_this, _that))
             {
-                _log.LogWarning($"There are duplicate subscribers ({_this!.Topic}) in same group ({_this.Group}), this may cause unintended results.");
-                
+                _log.LogWarning(
+                    $"There are duplicate subscribers ({_this!.Topic}) in same group ({_this.Group}) and broker ({_this?.Target?.GetType()?.Name}), this may cause unintended results.");
+
                 return true;
             }
 
             if (_this is null || _that is null) return false;
 
-            var result = _this.Topic.Equals(_that.Topic, StringComparison.OrdinalIgnoreCase) &&
-                         _this.Group.Equals(_that.Group, StringComparison.OrdinalIgnoreCase);
-
+            var result = string.Equals(_this?.Topic, _that?.Topic, StringComparison.OrdinalIgnoreCase) &&
+                         string.Equals(_this?.Group, _that?.Group, StringComparison.OrdinalIgnoreCase) &&
+                         _this?.Target == _that?.Target;
+            
             if (result)
                 _log.LogWarning(
-                    $"There are duplicate subscribers ({_this!.Topic}) in same group ({_this.Group}), this may cause unintended results.");
+                    $"There are duplicate subscribers ({_this!.Topic}) in same group ({_this.Group}) and broker ({_this?.Target?.GetType()?.Name}), this may cause unintended results.");
 
             return result;
         }
@@ -37,11 +39,13 @@ namespace Panama.Canal.Comparers
         {
             if (obj is null) return 0;
 
-            var hashGroup = obj.Group == null ? 0 : obj.Group.GetHashCode();
-
             var hashTopic = obj.Topic.GetHashCode();
 
-            return hashGroup ^ hashTopic;
+            var hashGroup = obj.Group == null ? 0 : obj.Group.GetHashCode();
+
+            var hashBroker = obj.Target == null ? 0 : obj.Target.GetHashCode();
+
+            return hashGroup ^ hashTopic ^ hashBroker;
         }
     }
 }
