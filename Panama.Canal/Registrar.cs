@@ -21,6 +21,7 @@ namespace Panama.Canal
             services.AddSingleton<IInvokeBrokers, Brokers>();
             services.AddSingleton<IInvokeSubscriptions, Subscriptions>();
 
+            services.AddSingleton<Subscriptions>();
             services.AddSingleton<Dispatcher>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();

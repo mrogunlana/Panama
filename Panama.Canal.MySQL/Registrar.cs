@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.MySQL.Intializers;
 using Panama.Canal.MySQL.Jobs;
 
 namespace Panama.Canal.MySQL
@@ -15,7 +16,7 @@ namespace Panama.Canal.MySQL
 
             services.AddSingleton(settings);
             services.AddSingleton<IStore, Store>();
-            services.AddSingleton<IInitialize, Initializer>();
+            services.AddSingleton<IInitialize, Intializers.Default>();
             services.AddSingleton<LogTailingJob>();
             services.AddSingleton(new Job(
                 type: typeof(LogTailingJob),

@@ -6,7 +6,7 @@ namespace Panama.Canal.Interfaces
     {
         ValueTask Publish(InternalMessage message, CancellationToken? token = null);
 
-        ValueTask Execute(InternalMessage message, SubscriptionDescriptor? descriptor = null, CancellationToken? token = null);
+        ValueTask Execute(InternalMessage message, CancellationToken? token = null);
 
         ValueTask Schedule(InternalMessage message, DateTime delay, object? transaction = null, CancellationToken? token = null);
     }

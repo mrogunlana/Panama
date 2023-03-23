@@ -25,7 +25,7 @@ namespace Panama.Canal.Jobs
 
         private DateTime _next = DateTime.MaxValue;
         private Channel<InternalMessage> _published = default!;
-        private ConcurrentDictionary<string, Channel<(InternalMessage, SubscriptionDescriptor?)>> _received = default!;
+        private ConcurrentDictionary<string, Channel<InternalMessage>> _received = default!;
 
         public Dispatcher(
               IStore store
@@ -35,7 +35,7 @@ namespace Panama.Canal.Jobs
             , IInvokeSubscriptions subscriptions
             , IOptions<CanalOptions> options)
         {
-            var capacity = 500;
+            var capacity = options.Value.ProducerThreads * 500;
 
             _log = log;
             _store = store;
@@ -44,11 +44,12 @@ namespace Panama.Canal.Jobs
             _provider = provider;
             _subscriptions = subscriptions;
             _scheduled = new PriorityQueue<InternalMessage, DateTime>();
-            _received = new ConcurrentDictionary<string, Channel<(InternalMessage, SubscriptionDescriptor?)>>(1, 2);
+            _received = new ConcurrentDictionary<string, Channel<InternalMessage>>(
+                options.Value.ConsumerThreads, options.Value.ConsumerThreads * 2);
             _published = Channel.CreateBounded<InternalMessage>(
                 new BoundedChannelOptions(capacity > 5000 ? 5000 : capacity) {
                     AllowSynchronousContinuations = true,
-                    SingleReader = true,
+                    SingleReader = options.Value.ProducerThreads == 1,
                     SingleWriter = true,
                     FullMode = BoundedChannelFullMode.Wait
                 });
@@ -122,7 +123,7 @@ namespace Panama.Canal.Jobs
             }
         }
 
-        private async Task Received(string group, Channel<(InternalMessage, SubscriptionDescriptor?)> channel)
+        private async Task Receive(string group, Channel<InternalMessage> channel)
         {
             try
             {
@@ -142,7 +143,7 @@ namespace Panama.Canal.Jobs
                         catch (Exception e)
                         {
                             _log.LogError(e,
-                                $"An exception occurred when invoke subscriber. MessageId:{message.Item1.Id}");
+                                $"An exception occurred when invoke subscriber. MessageId:{message.Id}");
                         }
             }
             catch (OperationCanceledException)
@@ -151,14 +152,14 @@ namespace Panama.Canal.Jobs
             }
         }
 
-        private Channel<(InternalMessage, SubscriptionDescriptor?)> GetOrAddReceiver(string key)
+        private Channel<InternalMessage> GetOrAddReceiver(string key)
         {
             return _received.GetOrAdd(key, group =>
             {
                 _log.LogInformation($"Creating receiver channel for group {group} with thread count {1}");
 
                 var capacity = 300;
-                var channel = Channel.CreateBounded<(InternalMessage, SubscriptionDescriptor?)>(
+                var channel = Channel.CreateBounded<InternalMessage>(
                     new BoundedChannelOptions(capacity > 3000 ? 3000 : capacity) {
                         AllowSynchronousContinuations = true,
                         SingleReader = true,
@@ -167,7 +168,7 @@ namespace Panama.Canal.Jobs
                     });
 
                 Task.WhenAll(Enumerable.Range(0, 1)
-                    .Select(_ => Task.Factory.StartNew(() => Received(group, channel), _cts!.Token,
+                    .Select(_ => Task.Factory.StartNew(() => Receive(group, channel), _cts!.Token,
                         TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray());
 
                 return channel;
@@ -183,13 +184,13 @@ namespace Panama.Canal.Jobs
 
             var results = new List<Task>();
 
-            var tasks = await Task.WhenAll(Enumerable.Range(0, 1)
+            var tasks = await Task.WhenAll(Enumerable.Range(0, _options.Value.ProducerThreads)
             .Select(_ => Task.Factory.StartNew(Publish, context.CancellationToken,
                 TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray());
 
             results.AddRange(tasks);
 
-            GetOrAddReceiver(_options.Value.DefaultGroupName);
+            GetOrAddReceiver(_options.Value.DefaultGroup);
 
             var task = await Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
 
@@ -213,7 +214,7 @@ namespace Panama.Canal.Jobs
             }
         }
 
-        public async ValueTask Execute(InternalMessage message, SubscriptionDescriptor? descriptor = null, CancellationToken? token = null)
+        public async ValueTask Execute(InternalMessage message, CancellationToken? token = null)
         {
             try
             {
@@ -222,9 +223,9 @@ namespace Panama.Canal.Jobs
 
                 var channel = GetOrAddReceiver(group);
 
-                if (!channel.Writer.TryWrite((message, descriptor)))
+                if (!channel.Writer.TryWrite(message))
                     while (await channel.Writer.WaitToWriteAsync(_cts!.Token).ConfigureAwait(false))
-                        if (channel.Writer.TryWrite((message, descriptor)))
+                        if (channel.Writer.TryWrite(message))
                             return;
             }
             catch (OperationCanceledException)
