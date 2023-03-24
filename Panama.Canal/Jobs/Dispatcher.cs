@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Invokers;
 using Panama.Canal.Models;
+using Panama.Interfaces;
+using Panama.Models;
 using Quartz;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
@@ -19,7 +23,7 @@ namespace Panama.Canal.Jobs
         private readonly ILogger<Dispatcher> _log;
         private readonly IServiceProvider _provider;
         private readonly IOptions<CanalOptions> _options;
-        private readonly IInvokeSubscriptions _subscriptions;
+        private readonly IInvoke _subscriptionInvoker;
         private readonly CancellationTokenSource _delay = new();
         private readonly PriorityQueue<InternalMessage, DateTime> _scheduled;
 
@@ -32,7 +36,6 @@ namespace Panama.Canal.Jobs
             , IInvokeBrokers brokers
             , ILogger<Dispatcher> log
             , IServiceProvider provider
-            , IInvokeSubscriptions subscriptions
             , IOptions<CanalOptions> options)
         {
             var capacity = options.Value.ProducerThreads * 500;
@@ -42,7 +45,7 @@ namespace Panama.Canal.Jobs
             _brokers = brokers;
             _options = options;
             _provider = provider;
-            _subscriptions = subscriptions;
+            _subscriptionInvoker = _provider.GetRequiredService<SubscriptionInvoker>(); ;
             _scheduled = new PriorityQueue<InternalMessage, DateTime>();
             _received = new ConcurrentDictionary<string, Channel<InternalMessage>>(
                 options.Value.ConsumerThreads, options.Value.ConsumerThreads * 2);
@@ -132,9 +135,15 @@ namespace Panama.Canal.Jobs
                         try
                         {
                             if (_log.IsEnabled(LogLevel.Debug))
-                                _log.LogDebug("Dispatching message for group {ConsumerGroup}", group);
+                                _log.LogDebug($"Dispatching message for group {group}");
 
-                            //await _executor.ExecuteAsync(message.Item1, message.Item2, _tasksCts.Token).ConfigureAwait(false);
+                            await _subscriptionInvoker
+                                .Invoke(new Context(message,
+                                    id: message.Id,
+                                    correlationId: message.CorrelationId,
+                                    provider: _provider,
+                                    token: _cts.Token))
+                                .ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {

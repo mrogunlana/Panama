@@ -8,6 +8,14 @@ namespace Panama.Canal.Extensions
 {
     public static class InternalMessageExtensions
     {
+        public static bool IsContentBase64(this InternalMessage message)
+        {
+            //TODO: Do we need to consider padding?
+            //Convert.TryFromBase64String(message.Content.PadRight(message.Content.Length / 4 * 4 + (message.Content.Length % 4 == 0 ? 0 : 4), '='), new Span<byte>(new byte[message.Content.Length]), out _);
+
+            var buffer = new Span<byte>(new byte[message.Content.Length]);
+            return Convert.TryFromBase64String(message.Content, buffer, out int _);
+        }
         public static InternalMessage AddCorrelationId(this InternalMessage message, Message value)
         {
             if (value == null)

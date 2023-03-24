@@ -75,17 +75,22 @@ namespace Panama.Canal.Extensions
             return results;
         }
 
-        public static IReadOnlyCollection<Subscription> GetSubscriptions<T>(this Models.Subscriptions subscriptions, string group)
-            where T : ITarget
+        public static IReadOnlyCollection<Subscription> GetSubscriptions(this Models.Subscriptions subscriptions, string group, Type type)
         {
             if (subscriptions.Entries == null)
                 throw new InvalidOperationException("Subscriptions are not initialized.");
 
-            var results = subscriptions.Entries[typeof(T)];
+            var results = subscriptions.Entries[type];
             if (results == null)
                 throw new InvalidOperationException($"Subscriptions for group {group} cannot be located.");
 
             return results[group];
+        }
+
+        public static IReadOnlyCollection<Subscription> GetSubscriptions<T>(this Models.Subscriptions subscriptions, string group)
+            where T : ITarget
+        {
+            return GetSubscriptions(subscriptions, group, typeof(T));
         }
     }
 }

@@ -4,24 +4,25 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
+using Panama.Extensions;
 using Panama.Interfaces;
 using Quartz;
+using System.Reflection;
 
 namespace Panama.Canal
 {
     public static class Registrar
     {
-        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config)
+        private static void AddPanamaCanalBase(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<Bootstrapper>();
             services.AddTransient<IBus, Bus>();
             services.AddTransient<IInvoke, PollingInvoker>();
             services.AddTransient<IInvoke, StreamInvoker>();
+            services.AddTransient<IInvoke, SubscriptionInvoker>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<IInvokeBrokers, Brokers>();
-            services.AddSingleton<IInvokeSubscriptions, Subscriptions>();
 
-            services.AddSingleton<Subscriptions>();
             services.AddSingleton<ITarget, DefaultTarget>();
 
             services.AddSingleton<Dispatcher>();
@@ -49,7 +50,7 @@ namespace Panama.Canal
             services.AddSingleton(new Job(
                 type: typeof(DeleteExpired),
                 expression: "0/0 5 * * * ?"));
-            
+
             services.AddQuartz(q => {
                 q.SchedulerName = "panama-canal-services";
                 q.UseMicrosoftDependencyInjectionJobFactory();
@@ -60,6 +61,23 @@ namespace Panama.Canal
 
             services.Configure<CanalOptions>(options =>
                 config.GetSection(CanalOptions.Section).Bind(options));
+
+        }
+        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config)
+        {
+            AddPanamaCanalBase(services, config);
+
+            services.AddAssemblyType(typeof(ISubscribe), Assembly.GetEntryAssembly()!, false);
+        }
+
+        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
+        {
+            var assembliesToScan = assemblies.Distinct();
+
+            AddPanamaCanalBase(services, config);
+
+            foreach (var assembly in assembliesToScan)
+                services.AddAssemblyType(typeof(ISubscribe), assembly, false);
         }
     }
 }

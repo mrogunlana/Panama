@@ -30,6 +30,7 @@ namespace Panama.Canal
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group)
                 .AddMessageBroker(Context.Target?.FullName)
+                .AddMessageInstance(Context.Instance)
                 .AddMessageType(nameof(Context.Data))
                 .AddCreatedTime()
                 .AddDelayTime(Context.Delay)

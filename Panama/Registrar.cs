@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Resolvers;
@@ -69,24 +70,10 @@ namespace Panama.Service
 
         private static void AddAssembly(IServiceCollection services, Assembly assembly)
         {
-            AddAssemblyType(services, typeof(ICommand), assembly, singleton: false);
-            AddAssemblyType(services, typeof(IQuery), assembly, singleton: false);
-            AddAssemblyType(services, typeof(IValidate), assembly, singleton: false);
-            AddAssemblyType(services, typeof(IRollback), assembly, singleton: false);
-        }
-
-        private static void AddAssemblyType(IServiceCollection services, Type type, Assembly assembly, bool singleton = true)
-        {
-            var commandTypes = from t in assembly.GetTypes()
-                               where type.IsAssignableFrom(t) && type.Name != t.Name
-                               select t;
-            foreach (var commandType in commandTypes)
-            {
-                if (singleton)
-                    services.AddSingleton(commandType);
-                else
-                    services.AddTransient(commandType);
-            }
+            services.AddAssemblyType(typeof(ICommand), assembly, false);
+            services.AddAssemblyType(typeof(IQuery), assembly, false);
+            services.AddAssemblyType(typeof(IValidate), assembly, false);
+            services.AddAssemblyType(typeof(IRollback), assembly, false);
         }
     }
 }

@@ -65,6 +65,15 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+        public static Message AddMessageInstance(this Message message, string? value = null)
+        {
+            if (string.IsNullOrEmpty(value))
+                return message;
+
+            message.Headers.Add(Headers.Instance, value);
+
+            return message;
+        }
         public static Message AddMessageTopic(this Message message, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -155,7 +164,44 @@ namespace Panama.Canal.Extensions
 
             return result;
         }
+        public static string GetAck(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
 
+            var result = message.Headers[Headers.Ack];
+            
+            return result ?? string.Empty;
+        }
+        public static string GetNack(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.Nack];
+            
+            return result ?? string.Empty;
+        }
+        public static string GetName(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.Name];
+            if (result == null)
+                throw new InvalidOperationException($"Header: {Headers.Name} cannot be found.");
+
+            return result;
+        }
+        public static string GetInstance(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.Instance];
+
+            return result ?? string.Empty;
+        }
         public static DateTime GetDelay(this Message message)
         {
             if (message.Headers == null)
