@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Panama.Canal.Models;
 using Panama.Security.Resolvers;
+using System.Text;
 
 namespace Panama.Canal.Extensions
 {
@@ -226,6 +227,26 @@ namespace Panama.Canal.Extensions
                 throw new InvalidOperationException($"Header: {Headers.Broker} cannot be found.");
 
             return result;
+        }
+
+        public static TransientMessage ToTransient(this Message message, IServiceProvider provider)
+        {
+            if (message == null)
+                throw new ArgumentNullException("Message could not be located.");
+
+            var resolver = provider.GetService<StringEncryptorResolver>();
+            if (resolver == null)
+                throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
+
+            var encryptor = resolver(StringEncryptorResolverKey.Base64);
+            if (encryptor == null)
+                throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
+
+            var serialized = JsonConvert.SerializeObject(message.Value);
+            var encrypted = encryptor.ToString(serialized) ?? string.Empty;
+            var bytes = Encoding.UTF8.GetBytes(encrypted);
+
+            return new TransientMessage(message.Headers, bytes);
         }
     }
 }

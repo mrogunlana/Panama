@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Security.Resolvers;
+using System.Text;
 
 namespace Panama.Canal.Extensions
 {
@@ -188,6 +189,29 @@ namespace Panama.Canal.Extensions
             message.Status = result;
 
             return message;
+        }
+
+        public static TransientMessage ToTransient(this InternalMessage message, IServiceProvider provider)
+        {
+            if (message == null) 
+                throw new ArgumentNullException("Internal message could not be located.");
+
+            var metadata = message.GetData<Message>(provider);
+            if (metadata == null)
+                throw new ArgumentNullException("Message not be built from internal message.");
+
+            var resolver = provider.GetService<StringEncryptorResolver>();
+            if (resolver == null)
+                throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
+
+            var encryptor = resolver(StringEncryptorResolverKey.Base64);
+            if (encryptor == null)
+                throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
+
+            var encrypted = encryptor.ToString(message.Content) ?? string.Empty;
+            var bytes = Encoding.UTF8.GetBytes(encrypted);
+
+            return new TransientMessage(metadata.Headers, bytes);
         }
     }
 }

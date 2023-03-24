@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
@@ -12,23 +11,23 @@ namespace Panama.Canal.Invokers
     public class BrokerInvoker : IInvoke
     {
         private readonly IBus _bus;
-        private readonly ILogger<SubscriptionInvoker> _log;
+        private readonly ILogger<BrokerInvoker> _log;
+        private readonly IEnumerable<IBroker> _brokers;
         private readonly IBootstrap _bootstrapper;
         private readonly IServiceProvider _provider;
-        private readonly Subscriptions _subscriptions;
 
         public BrokerInvoker(
               IBus bus
             , IBootstrap bootstrapper
             , IServiceProvider provider
-            , Subscriptions subscriptions
-            , ILogger<SubscriptionInvoker> log)
+            , IEnumerable<IBroker> brokers
+            , ILogger<BrokerInvoker> log)
         {
             _bus = bus;
             _log = log;
+            _brokers = brokers;
             _provider = provider;
             _bootstrapper = bootstrapper;
-            _subscriptions = subscriptions;
         }
         public async Task<IResult> Invoke(IContext? context = null)
         {
