@@ -9,7 +9,7 @@ using Panama.Models;
 
 namespace Panama.Canal.Invokers
 {
-    public class SubscriptionInvoker : IInvoke
+    public class BrokerInvoker : IInvoke
     {
         private readonly IBus _bus;
         private readonly ILogger<SubscriptionInvoker> _log;
@@ -17,7 +17,7 @@ namespace Panama.Canal.Invokers
         private readonly IServiceProvider _provider;
         private readonly Subscriptions _subscriptions;
 
-        public SubscriptionInvoker(
+        public BrokerInvoker(
               IBus bus
             , IBootstrap bootstrapper
             , IServiceProvider provider
@@ -55,53 +55,17 @@ namespace Panama.Canal.Invokers
 
             try
             {
-                var subscriptions = _subscriptions.GetSubscriptions(group, target);
-
-                foreach (var subscription in subscriptions)
-                {
-                    var subscriber = (ISubscribe)_provider.GetRequiredService(subscription.Subscriber);
-                    if (subscriber == null)
-                        throw new InvalidOperationException($"Subscriber: {subscription.Subscriber.Name} could not be located.");
-
-                    var local = new Context(data.AsEnumerable(),
-                        id: message.Id,
-                        correlationId: message.CorrelationId,
-                        provider: _provider,
-                        token: context.Token);
-
-                    await subscriber.Event(local).ConfigureAwait(false);
-                }
+                
             }
             catch (Exception ex)
             {
-                var reason = $"Subscription target: {metadata.GetBroker()} failed processing in subscribers.";
-                
-                _log.LogError(ex, reason);
-
-                if (!string.IsNullOrEmpty(nack))
-                    await context.Bus(target)
-                        .Instance(instance)
-                        .Topic(nack)
-                        .Group(group)
-                        .Data(data)
-                        .Publish()
-                        .ConfigureAwait(false);
-
-                return new Result()
-                    .Fail(reason);
+                _log.LogError(ex, $"Broker target: {metadata.GetBroker()} failed sending message.");
             }
 
-            if (!string.IsNullOrEmpty(ack))
-                await context.Bus(target)
-                    .Instance(instance)
-                    .Topic(ack)
-                    .Group(group)
-                    .Data(data)
-                    .Publish()
-                    .ConfigureAwait(false);
-
-            return new Result()
+            var result = new Result()
                 .Success();
+
+            return result;
         }
     }
 }

@@ -63,6 +63,21 @@ namespace Panama.Extensions
 
             return result;
         }
+        public static IResult Fail(this IResult result, params string[] messages)
+        {
+            result.Success = false;
+
+            foreach (var message in messages)
+                result.AddMessage(message);
+
+            return result;
+        }
+
+        public static IResult Fail(this IResult result, IEnumerable<string> messages)
+        {
+            return result.Fail(messages.ToArray());
+        }
+
         public static IResult Add(this IResult result, IModel model)
         {
             result.Data.Add(model);

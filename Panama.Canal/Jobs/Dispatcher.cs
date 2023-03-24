@@ -19,11 +19,9 @@ namespace Panama.Canal.Jobs
         private CancellationTokenSource? _cts;
 
         private readonly IStore _store;
-        private readonly IInvokeBrokers _brokers;
         private readonly ILogger<Dispatcher> _log;
         private readonly IServiceProvider _provider;
         private readonly IOptions<CanalOptions> _options;
-        private readonly IInvoke _subscriptionInvoker;
         private readonly CancellationTokenSource _delay = new();
         private readonly PriorityQueue<InternalMessage, DateTime> _scheduled;
 
@@ -31,9 +29,11 @@ namespace Panama.Canal.Jobs
         private Channel<InternalMessage> _published = default!;
         private ConcurrentDictionary<string, Channel<InternalMessage>> _received = default!;
 
+        public IInvoke Brokers { get; set; }
+        public IInvoke Subscriptions { get; set; }
+
         public Dispatcher(
               IStore store
-            , IInvokeBrokers brokers
             , ILogger<Dispatcher> log
             , IServiceProvider provider
             , IOptions<CanalOptions> options)
@@ -42,10 +42,8 @@ namespace Panama.Canal.Jobs
 
             _log = log;
             _store = store;
-            _brokers = brokers;
             _options = options;
             _provider = provider;
-            _subscriptionInvoker = _provider.GetRequiredService<SubscriptionInvoker>(); ;
             _scheduled = new PriorityQueue<InternalMessage, DateTime>();
             _received = new ConcurrentDictionary<string, Channel<InternalMessage>>(
                 options.Value.ConsumerThreads, options.Value.ConsumerThreads * 2);
@@ -56,6 +54,9 @@ namespace Panama.Canal.Jobs
                     SingleWriter = true,
                     FullMode = BoundedChannelFullMode.Wait
                 });
+
+            Brokers = _provider.GetRequiredService<BrokerInvoker>();
+            Subscriptions = _provider.GetRequiredService<SubscriptionInvoker>();
         }
 
         private void Delayed()
@@ -82,9 +83,13 @@ namespace Panama.Canal.Jobs
                     while (_published.Reader.TryRead(out var message))
                         try
                         {
-                            //var result = await _sender.SendAsync(message).ConfigureAwait(false);
-                            //if (!result.Succeeded)
-                            //    _logger.MessagePublishException(message.Origin.GetId(), result.ToString(), result.Exception);
+                            var result = await Brokers.Invoke(new MessageContext(message,
+                                    provider: _provider,
+                                    token: _cts.Token))
+                                .ConfigureAwait(false);
+                            
+                            if (!result.Success)
+                                _log.LogError($"An exception occurred while publishing a message, reason(s):{string.Join(",", result.Messages)}. message id:{message.Id}");
                         }
                         catch (Exception ex)
                         {
@@ -115,7 +120,13 @@ namespace Panama.Canal.Jobs
 
                         _cts.Token.ThrowIfCancellationRequested();
 
-                        //await _sender.SendAsync(_scheduled.Dequeue()).ConfigureAwait(false);
+                        var result = await Brokers.Invoke(new MessageContext(_scheduled.Dequeue(),
+                                    provider: _provider,
+                                    token: _cts.Token))
+                                .ConfigureAwait(false);
+
+                        if (!result.Success)
+                            _log.LogError($"An exception occurred while publishing a message, reason(s):{string.Join(",", result.Messages)}.");
                     }
                     _cts.Token.WaitHandle.WaitOne(100);
                 }
@@ -137,10 +148,8 @@ namespace Panama.Canal.Jobs
                             if (_log.IsEnabled(LogLevel.Debug))
                                 _log.LogDebug($"Dispatching message for group {group}");
 
-                            await _subscriptionInvoker
-                                .Invoke(new Context(message,
-                                    id: message.Id,
-                                    correlationId: message.CorrelationId,
+                            await Subscriptions
+                                .Invoke(new MessageContext(message,
                                     provider: _provider,
                                     token: _cts.Token))
                                 .ConfigureAwait(false);
