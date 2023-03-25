@@ -8,17 +8,17 @@ using System.Reflection;
 
 namespace Panama.Canal.RabbitMQ
 {
-    public class Policy : IPooledObjectPolicy<IModel>
+    public class RabbitMQPolicy : IPooledObjectPolicy<IModel>
     {
-        private readonly ILogger<Policy> _log;
+        private readonly ILogger<RabbitMQPolicy> _log;
         private readonly CanalOptions _canal;
         private readonly RabbitMQOptions _options;
         private readonly string _exchange;
 
         private readonly IConnection _connection;
 
-        public Policy(
-              ILogger<Policy> log
+        public RabbitMQPolicy(
+              ILogger<RabbitMQPolicy> log
             , IOptions<CanalOptions> canal
             , IOptions<RabbitMQOptions> options)
         {

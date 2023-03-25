@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Panama.Models
+﻿namespace Panama.Models.Exceptions
 {
     [Serializable]
-    public class ValidationException : Exception
+    public class ServiceException : Exception
     {
         public IList<string> Messages { get; set; }
 
-        public ValidationException(string message)
+        public ServiceException(string message)
             : base(message)
         {
             if (Messages == null)
@@ -17,8 +14,8 @@ namespace Panama.Models
             Messages.Add(message);
         }
 
-        public ValidationException(IEnumerable<string> messages)
-            : base($"Validation Exception: {string.Join("; ", messages).Trim()}.")
+        public ServiceException(IEnumerable<string> messages)
+            : base($"Service Exception: {string.Join("; ", messages).Trim()}.")
         {
             if (Messages == null)
                 Messages = new List<string>();

@@ -12,11 +12,11 @@ using RabbitMQ.Client;
 
 namespace Panama.Canal.RabbitMQ
 {
-    public class Broker : IBroker
+    public class RabbitMQBroker : IBroker
     {
         private readonly string _exchange;
         private readonly CanalOptions _canal;
-        private readonly ILogger<Broker> _log;
+        private readonly ILogger<RabbitMQBroker> _log;
         private readonly RabbitMQOptions _options;
         private readonly IServiceProvider _provider;
 
@@ -24,8 +24,8 @@ namespace Panama.Canal.RabbitMQ
 
         IPooledObjectPolicy<Panama.Interfaces.IModel> IBroker.ConnectionPool => throw new NotImplementedException();
 
-        public Broker(
-              ILogger<Broker> log
+        public RabbitMQBroker(
+              ILogger<RabbitMQBroker> log
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , IOptions<RabbitMQOptions> options)
@@ -36,7 +36,7 @@ namespace Panama.Canal.RabbitMQ
             _options = options.Value;
             _exchange = $"{_options.Exchange}.{_canal.Version}";
 
-            ConnectionPool = provider.GetRequiredService<Policy>();
+            ConnectionPool = provider.GetRequiredService<RabbitMQPolicy>();
         }
 
         public Task<Panama.Interfaces.IResult> Publish(Panama.Interfaces.IContext context)

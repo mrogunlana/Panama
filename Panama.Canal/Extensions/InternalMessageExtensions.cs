@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Panama.Canal.Models;
 using Panama.Extensions;
@@ -212,6 +213,15 @@ namespace Panama.Canal.Extensions
             var bytes = Encoding.UTF8.GetBytes(encrypted);
 
             return new TransientMessage(metadata.Headers, bytes);
+        }
+
+        public static InternalMessage SetExpiration(this InternalMessage message, IServiceProvider provider, DateTime? value = null)
+        {
+            var options = provider.GetRequiredService<IOptions<CanalOptions>>();
+
+            message.Expires = (value?.ToUniversalTime())?.AddSeconds(options.Value.FailedMessageExpiredAfter);
+
+            return message;
         }
     }
 }

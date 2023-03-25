@@ -82,7 +82,7 @@ namespace Panama.Canal.Extensions
 
             var results = subscriptions.Entries[type];
             if (results == null)
-                throw new InvalidOperationException($"Subscriptions for group {group} cannot be located.");
+                throw new InvalidOperationException($"Subscriptions for target {type?.FullName} cannot be located.");
 
             return results[group];
         }
@@ -91,6 +91,27 @@ namespace Panama.Canal.Extensions
             where T : ITarget
         {
             return GetSubscriptions(subscriptions, group, typeof(T));
+        }
+
+        public static IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>> GetSubscriptions(this Models.Subscriptions subscriptions, Type type)
+        {
+            if (subscriptions.Entries == null)
+                throw new InvalidOperationException("Subscriptions are not initialized.");
+
+            var results = subscriptions.Entries[type];
+            if (results == null)
+                throw new InvalidOperationException($"Subscriptions for target {type?.FullName} cannot be located.");
+
+            return results;
+        }
+
+        public static Subscription? GetSubscription(this Models.Subscriptions subscriptions, Type type, string group, string name)
+        {
+            var result = GetSubscriptions(subscriptions, group, type);
+            if (result == null)
+                return null;
+
+            return result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
         }
     }
 }

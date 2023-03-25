@@ -1,65 +1,174 @@
-﻿using Microsoft.Extensions.ObjectPool;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Exceptions;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
 using Quartz;
-using RabbitMQ.Client;
 
 namespace Panama.Canal.RabbitMQ.Jobs
 {
     [DisallowConcurrentExecution]
-    public class Default : IJob, IBrokerClient
+    public class Default : IJob, IBrokerProcess
     {
-        private CancellationTokenSource? _cts;
+        private Task? _task;
+        private bool _isHealthy = true;
+        private CancellationTokenSource _cts = new();
 
-        private readonly object _sync = new();
-        private readonly string _queue;
-        private readonly IPooledObjectPolicy<IModel> _models;
-        private readonly RabbitMQOptions _options;
-        private readonly string _exchange;
-        private IModel? _channel;
-
-        public Func<InternalMessage, object?, Task>? Callback { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private readonly IStore _store;
+        private readonly CanalOptions _canal;
+        private readonly ILogger<Default> _log;
+        private readonly IBrokerFactory _factory;
+        private readonly Subscriptions _subscriptions;
+        private readonly IServiceProvider _provider;
 
         public Default(
-              string queue
+              IStore store
+            , ILogger<Default> log
+            , IBrokerFactory factory
+            , IServiceProvider provider
+            , Subscriptions subscriptions
             , IOptions<CanalOptions> canal
-            , IOptions<RabbitMQOptions> options
-            , IPooledObjectPolicy<IModel> models)
+            , IOptions<RabbitMQOptions> options)
         {
-            _queue = queue;
-            _models = models;
-            _options = options.Value;
-            _exchange = $"{options.Value.Exchange}.{canal.Value.Version}";
+            _log = log;
+            _store = store; 
+            _provider = provider;
+            _factory = factory;
+            _canal = canal.Value;
+            _subscriptions = subscriptions;
         }
 
-        public void Connect()
+        private void Pulse()
         {
-            var connection = _models.Create();
+            _cts.Cancel();
+            _cts.Dispose();
+        }
 
-            lock (_sync)
-            {
-                if (_channel == null || _channel.IsClosed)
+        private void Register(IBrokerClient client)
+        {
+            client.OnCallback = async (message, sender) => {
+
+                try
                 {
-                    _channel = _models.Create();
-                    _channel.ExchangeDeclare(_exchange, "topic", true);
+                    var local = message.ToInternal(_provider);
+                    if (local == null)
+                        throw new InvalidOperationException($"Message id: {message.Headers[Canal.Models.Headers.Id]} could not be located.");
 
-                    var arguments = new Dictionary<string, object> {
-                        {"x-message-ttl", _options.MessageTTL}
-                    };
+                    var metadata = local.GetData<Message>(_provider);
 
-                    if (!string.IsNullOrEmpty(_options.QueueMode))
-                        arguments.Add("x-queue-mode", _options.QueueMode);
+                    _log.LogInformation($"Received message. id:{local.Id}, name: {local.Name}");
 
-                    _channel.QueueDeclare(_queue, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+                    metadata.RemoveException();
+
+                    var subscription = _subscriptions.GetSubscription(typeof(RabbitMQTarget), metadata.GetGroup(), metadata.GetName());
+                    if (subscription == null)
+                        metadata.AddException(new SubscriptionException("Subscription could not be located."));
+
+                    if (metadata.HasException())
+                    {
+                        await _store.StoreReceivedMessage(metadata
+                            .ResetId()
+                            .AddCreatedTime()
+                            .ToInternal(_provider)
+                            .SetStatus(MessageStatus.Failed)
+                            .SetExpiration(_provider, DateTime.UtcNow));
+
+                        client.Commit(sender);
+                    }
+                    else
+                    {
+                        await _store.StoreReceivedMessage(metadata
+                            .ResetId()
+                            .AddCreatedTime()
+                            .ToInternal(_provider)
+                            .SetStatus(MessageStatus.Scheduled)
+                            .SetExpiration(_provider));
+
+                        client.Commit(sender);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.LogError(ex, $"Exception occurred processing received message id: {message.Headers[Canal.Models.Headers.Id]}");
+
+                    client.Reject(sender);
+                }
+            };
+        }
+
+        private async Task Execute()
+        {
+            var subscriptions = _subscriptions.GetSubscriptions(typeof(RabbitMQTarget));
+            var tasks = new List<Task>();
+
+            foreach (var subscription in subscriptions)
+            {
+                ICollection<string> topics;
+                try
+                {
+                    using (var client = _factory.Create(subscription.Key))
+                        topics = subscription.Value.Select(x => x.Topic).ToList();
+                }
+                catch (BrokerException e)
+                {
+                    _isHealthy = false;
+                    _log.LogError(e, e.Message);
+                    return;
+                }
+
+                for (var i = 0; i < _canal.ConsumerThreads; i++)
+                {
+                    var ids = topics.Select(t => t);
+                    tasks.Add(Task.Factory.StartNew(() => {
+                        try
+                        {
+                            using (var client = _factory.Create(subscription.Key))
+                            {
+                                Register(client);
+
+                                client.Subscribe(ids);
+
+                                client.Listening(TimeSpan.FromSeconds(1), _cts.Token);
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            //ignore
+                        }
+                        catch (BrokerException e)
+                        {
+                            _isHealthy = false;
+                            _log.LogError(e, e.Message);
+                        }
+                        catch (Exception e)
+                        {
+                            _log.LogError(e, e.Message);
+                        }
+                    }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default));
                 }
             }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public void Commit(object? sender)
+        public bool IsHealthy()
         {
-            throw new NotImplementedException();
+            return _isHealthy;
+        }
+
+        public void Restart(bool force = false)
+        {
+            if (!IsHealthy() || force)
+            {
+                Pulse();
+
+                _cts = new CancellationTokenSource();
+                _isHealthy = true;
+
+                Execute().GetAwaiter().GetResult();
+            }
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -67,26 +176,13 @@ namespace Panama.Canal.RabbitMQ.Jobs
             context.CancellationToken.ThrowIfCancellationRequested();
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, CancellationToken.None);
-            _cts.Token.Register(() => { 
-                //TODO: disconnect broker model 
+            _cts.Token.Register(() => {
+                Pulse();
             });
 
-            throw new NotImplementedException();
-        }
+            Task.WaitAll(Execute());
 
-        public void Listening(TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reject(object? sender)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Subscribe(IEnumerable<string> topics)
-        {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

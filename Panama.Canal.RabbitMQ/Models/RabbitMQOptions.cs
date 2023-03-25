@@ -16,6 +16,9 @@ namespace Panama.Canal.RabbitMQ.Models
         public bool PublishAcks { get; set; } = true;
         public int MessageTTL { get; set; } = 864000000; //in ms
         public string QueueMode { get; set; } = default!;
+        public ushort QosPrefetchCount { get; private set; } = 0;
+        public bool QosGlobal { get; private set; } = false;
+
         public RabbitMQOptions()
         {
             HostAddress = $"{HostName}:{Port}";

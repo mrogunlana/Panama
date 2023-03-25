@@ -2,13 +2,13 @@
 
 namespace Panama.Canal.Interfaces
 {
-    public interface IBrokerClient
+    public interface IBrokerClient : IDisposable
     {
         void Subscribe(IEnumerable<string> topics);
         void Listening(TimeSpan timeout, CancellationToken cancellationToken);
         void Commit(object? sender);
         void Reject(object? sender);
 
-        public Func<InternalMessage, object?, Task>? Callback { get; set; }
+        public Func<TransientMessage, object?, Task>? OnCallback { get; set; }
     }
 }

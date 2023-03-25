@@ -2,10 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.RabbitMQ.Interfaces;
 using Panama.Canal.RabbitMQ.Models;
-using Panama.Extensions;
 using RabbitMQ.Client;
 using System.Reflection;
 
@@ -16,7 +13,9 @@ namespace Panama.Canal.RabbitMQ
         private static void AddPanamaCanalRabbitMQBase(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            services.AddSingleton<IPooledObjectPolicy<IModel>, Policy>();
+            services.AddSingleton<IPooledObjectPolicy<IModel>, RabbitMQPolicy>();
+            services.AddSingleton<IBroker, RabbitMQBroker>();
+            services.AddSingleton<IBrokerFactory, RabbitMQFactory>();
 
             //services.AddSingleton<IInitialize, Intializers.Default>();
             //services.AddSingleton<LogTailingJob>();
