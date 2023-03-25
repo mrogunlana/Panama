@@ -91,7 +91,7 @@ namespace Panama.Canal.RabbitMQ
                 _channel.BasicAck((ulong)sender!, false);
         }
 
-        public void Listening(TimeSpan timeout, CancellationToken cancellationToken)
+        public void Listen(TimeSpan timeout, CancellationToken cancellationToken)
         {
             Connect();
 

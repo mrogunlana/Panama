@@ -20,6 +20,8 @@ namespace Panama.Canal.RabbitMQ
         private readonly RabbitMQOptions _options;
         private readonly IServiceProvider _provider;
 
+        public Type Target { get; }
+
         public IPooledObjectPolicy<IModel> ConnectionPool { get; }
 
         IPooledObjectPolicy<Panama.Interfaces.IModel> IBroker.ConnectionPool => throw new NotImplementedException();
@@ -36,6 +38,7 @@ namespace Panama.Canal.RabbitMQ
             _options = options.Value;
             _exchange = $"{_options.Exchange}.{_canal.Version}";
 
+            Target = typeof(RabbitMQTarget);
             ConnectionPool = provider.GetRequiredService<RabbitMQPolicy>();
         }
 

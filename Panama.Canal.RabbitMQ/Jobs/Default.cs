@@ -109,7 +109,7 @@ namespace Panama.Canal.RabbitMQ.Jobs
                 try
                 {
                     using (var client = _factory.Create(subscription.Key))
-                        topics = subscription.Value.Select(x => x.Topic).ToList();
+                        topics = client.GetOrAddTopics(subscription.Value.Select(x => x.Topic));
                 }
                 catch (BrokerException e)
                 {
@@ -120,7 +120,6 @@ namespace Panama.Canal.RabbitMQ.Jobs
 
                 for (var i = 0; i < _canal.ConsumerThreads; i++)
                 {
-                    var ids = topics.Select(t => t);
                     tasks.Add(Task.Factory.StartNew(() => {
                         try
                         {
@@ -128,9 +127,9 @@ namespace Panama.Canal.RabbitMQ.Jobs
                             {
                                 Register(client);
 
-                                client.Subscribe(ids);
+                                client.Subscribe(topics);
 
-                                client.Listening(TimeSpan.FromSeconds(1), _cts.Token);
+                                client.Listen(TimeSpan.FromSeconds(1), _cts.Token);
                             }
                         }
                         catch (OperationCanceledException)

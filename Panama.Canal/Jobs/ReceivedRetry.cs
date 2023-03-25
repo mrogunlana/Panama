@@ -11,18 +11,18 @@ namespace Panama.Canal.Jobs
     {
         private readonly Job _job;
         private readonly IStore _store;
+        private readonly IDispatcher _dispatcher;
         private readonly IOptions<CanalOptions> _options;
-        private readonly IInvokeSubscriptions _subscriptions;
 
         public ReceivedRetry(
               IStore store
             , IEnumerable<Job> jobs
-            , IOptions<CanalOptions> options
-            , IInvokeSubscriptions subscriptions)
+            , IDispatcher dispatcher
+            , IOptions<CanalOptions> options)
         {
             _store = store;
             _options = options;
-            _subscriptions = subscriptions;
+            _dispatcher = dispatcher;
 
             _job = jobs.Where(x => x.Type == typeof(ReceivedRetry)).First();
         }
@@ -38,10 +38,8 @@ namespace Panama.Canal.Jobs
 
             var retry = await _store.GetReceivedMessagesToRetry().ConfigureAwait(false); ;
 
-            //TODO: publish to message subscribers once jobs are impl
-            //foreach (var broker in _brokers)
-            //    foreach (var publish in retry)
-            //        await broker.Publish(new MessageContext(publish, token: context.CancellationToken));
+            foreach (var received in retry)
+                await _dispatcher.Execute(received, context.CancellationToken).ConfigureAwait(false);
 
             if (_options.Value.UseLock)
                 await _store.ReleaseReceivedLock(token: context.CancellationToken);

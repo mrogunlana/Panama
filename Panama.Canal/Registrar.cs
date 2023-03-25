@@ -16,22 +16,22 @@ namespace Panama.Canal
         private static void AddPanamaCanalBase(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<Bootstrapper>();
+            
             services.AddTransient<IBus, Bus>();
             services.AddTransient<IInvoke, PollingInvoker>();
             services.AddTransient<IInvoke, StreamInvoker>();
             services.AddTransient<IInvoke, SubscriptionInvoker>();
             services.AddTransient<IInvoke, BrokerInvoker>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
-
             services.AddSingleton<ITarget, DefaultTarget>();
+            services.AddSingleton<IDispatcher, Dispatcher>();
 
-            services.AddSingleton<Dispatcher>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
             services.AddSingleton<PublishedRetry>();
             services.AddSingleton<DelayedReceived>();
             services.AddSingleton<DelayedPublished>();
-
+            
             services.AddSingleton(new Job(
                 type: typeof(Dispatcher),
                 expression: "0/1 * * * * ?"));

@@ -63,6 +63,13 @@ namespace Panama.Extensions
 
             return result;
         }
+        public static IResult Cancel(this IResult result)
+        {
+            result.Success = false;
+            result.Cancelled = true;
+
+            return result;
+        }
         public static IResult Fail(this IResult result, params string[] messages)
         {
             result.Success = false;

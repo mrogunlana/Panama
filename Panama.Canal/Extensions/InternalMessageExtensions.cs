@@ -191,7 +191,12 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+        public static InternalMessage SetRetries(this InternalMessage message, int value)
+        {
+            message.Retries = value;
 
+            return message;
+        }
         public static TransientMessage ToTransient(this InternalMessage message, IServiceProvider provider)
         {
             if (message == null) 

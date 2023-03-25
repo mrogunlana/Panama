@@ -248,9 +248,11 @@ namespace Panama.Canal.Extensions
 
             return new TransientMessage(message.Headers, bytes);
         }
-        public static void RemoveException(this Message message)
+        public static Message RemoveException(this Message message)
         {
             message.Headers.Remove(Headers.Exception);
+
+            return message;
         }
 
         public static bool HasException(this Message message)
