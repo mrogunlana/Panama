@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
-
 </Project>
