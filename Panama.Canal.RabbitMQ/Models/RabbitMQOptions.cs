@@ -14,7 +14,8 @@ namespace Panama.Canal.RabbitMQ.Models
         public string VHost { get; set; } = "/";
         public string Exchange { get; set; } = "panama.default.router";
         public bool PublishAcks { get; set; } = true;
-        
+        public int MessageTTL { get; set; } = 864000000; //in ms
+        public string QueueMode { get; set; } = default!;
         public RabbitMQOptions()
         {
             HostAddress = $"{HostName}:{Port}";

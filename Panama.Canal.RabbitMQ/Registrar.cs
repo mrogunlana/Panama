@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.RabbitMQ.Interfaces;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
 using RabbitMQ.Client;

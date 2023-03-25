@@ -21,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Invokers\" />
-    <Folder Include="Jobs\" />
+    <Folder Include="Interfaces\" />
   </ItemGroup>
 
 </Project>
