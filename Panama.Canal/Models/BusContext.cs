@@ -16,7 +16,6 @@ namespace Panama.Canal.Models
         public string Instance { get; set; } = String.Empty;
         public DateTime Delay { get; set; }
         public Type? Target { get; set; }
-        public AsyncLocal<ITransaction> Transaction { get; set; }
         public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }
         public BusContext(
@@ -25,7 +24,6 @@ namespace Panama.Canal.Models
             : base(provider)
         {
             Current = instance;
-            Transaction = new AsyncLocal<ITransaction>();
             Headers = new Dictionary<string, string?>();
             Invoker = provider.GetRequiredService<StreamInvoker>();
         }
