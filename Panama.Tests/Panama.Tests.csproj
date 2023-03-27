@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.json" />
+    <None Remove="appsettings.test.json" />
     <None Remove="NLog.config" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json">
+    <Content Include="appsettings.test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="NLog.config">
@@ -40,10 +40,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Panama.Security\Panama.Security.csproj" />
     <ProjectReference Include="..\Panama\Panama.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Commands\" />
   </ItemGroup>
 
   <Target Name="CopyAppConfig" AfterTargets="Build" DependsOnTargets="Build">

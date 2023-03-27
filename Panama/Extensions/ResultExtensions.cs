@@ -6,31 +6,31 @@ namespace Panama.Extensions
     {
         public static List<T> DataGet<T>(this IResult result) where T : IModel
         {
-            return result.DataGet<T>();
+            return result.Data.DataGet<T>();
         }
 
         public static T DataGetSingle<T>(this IResult result) where T : IModel
         {
-            return result.DataGetSingle<T>();
+            return result.Data.DataGetSingle<T>();
         }
-        public static List<T> KvpGet<T>(this IResult result, string key)
+        public static List<V> KvpGet<K, V>(this IResult result, K key)
         {
-            return result.KvpGet<T>(key);
+            return result.Data.KvpGet<K, V>(key);
         }
 
-        public static T KvpGetSingle<T>(this IResult result, string key)
+        public static V KvpGetSingle<K, V>(this IResult result, K key)
         {
-            return result.KvpGetSingle<T>(key);
+            return result.Data.KvpGetSingle<K, V>(key);
         }
 
         public static void RemoveAll<T>(this IResult result) where T : IModel
         {
-            result.RemoveAll<T>();
+            result.Data.RemoveAll<T>();
         }
 
         public static bool Exist<T>(this IResult result) where T : IModel
         {
-            return result.Exist<T>();
+            return result.Data.Exist<T>();
         }
 
         public static void ContinueWith(this IResult result, Action<IResult> action)
