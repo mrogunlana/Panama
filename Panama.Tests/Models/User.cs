@@ -1,4 +1,4 @@
-﻿using Panama.Entities;
+﻿using Panama.Interfaces;
 using System;
 
 namespace Panama.Tests.Models

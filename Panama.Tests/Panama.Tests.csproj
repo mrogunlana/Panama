@@ -38,13 +38,12 @@
    </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Mocks\" />
-    <Folder Include="Data\" />
+    <ProjectReference Include="..\Panama.Security\Panama.Security.csproj" />
+    <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama.Security\Panama.Security.csproj" />
-    <ProjectReference Include="..\Panama\Panama.csproj" />
+    <Folder Include="Commands\" />
   </ItemGroup>
 
   <Target Name="CopyAppConfig" AfterTargets="Build" DependsOnTargets="Build">
