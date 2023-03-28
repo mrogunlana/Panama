@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Intializers;
 using Panama.Canal.MySQL.Jobs;
+using Panama.Extensions;
 
 namespace Panama.Canal.MySQL
 {
@@ -14,6 +16,7 @@ namespace Panama.Canal.MySQL
             var settings = new MySqlSettings();
             config.GetSection("MySqlSettings").Bind(settings);
 
+            services.Remove<IStore>();
             services.AddSingleton(settings);
             services.AddSingleton<IStore, Store>();
             services.AddSingleton<IInitialize, Intializers.Default>();

@@ -25,7 +25,13 @@ namespace Panama.Canal
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();
+            services.AddSingleton<IStore, Store>();
 
+            var settings = new MemorySettings();
+            config.GetSection("MemorySettings").Bind(settings);
+
+            services.AddSingleton(settings);
+            services.AddSingleton<MemorySettings>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
             services.AddSingleton<PublishedRetry>();
@@ -72,12 +78,9 @@ namespace Panama.Canal
 
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
         {
-            var assembliesToScan = assemblies.Distinct();
-
             AddPanamaCanalBase(services, config);
 
-            foreach (var assembly in assembliesToScan)
-                services.AddAssemblyType(typeof(ISubscribe), assembly, false);
+            services.AddAssemblyTypes<ISubscribe>(assemblies.Distinct(), false);
         }
     }
 }
