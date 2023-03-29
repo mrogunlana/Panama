@@ -50,7 +50,7 @@ namespace Panama.Canal
 
             var result = await Context.Invoker.Invoke(context).ConfigureAwait(false);
 
-            Context.Origin?.Data?.AddPublished<InternalMessage>(result);
+            Context.Origin?.Data?.Enqueue<InternalMessage>(result);
         }
     }
 }

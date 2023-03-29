@@ -47,7 +47,7 @@ namespace Panama.Canal.Invokers
 
             var result = new Result()
                 .Success()
-                .Published(published);
+                .Queue(published);
 
             return result;
         }

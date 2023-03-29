@@ -68,10 +68,10 @@ namespace Panama.Canal.Extensions
             data.AddRange(result.Data.DataGet<IFilter<T>>());
         }
 
-        public static void AddPublished<T>(this IList<IModel> data, IResult result)
+        public static void Enqueue<T>(this IList<IModel> data, IResult result)
             where T : IModel
         {
-            data.AddFiltered<Published<T>>(result);
+            data.AddFiltered<Queued<T>>(result);
         }
     }
 }

@@ -51,5 +51,13 @@ namespace Panama.Canal.Extensions
 
             return result;
         }
+
+        public static IResult Queue<T>(this IResult result, T model)
+            where T : IModel
+        {
+            result.Data.Queue(model);
+
+            return result;
+        }
     }
 }
