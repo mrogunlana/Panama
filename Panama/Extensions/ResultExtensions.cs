@@ -1,4 +1,5 @@
 ﻿using Panama.Interfaces;
+using System.Transactions;
 
 namespace Panama.Extensions
 {
@@ -94,6 +95,16 @@ namespace Panama.Extensions
                 result.Data.Add(model);
 
             return result;
+        }
+
+        public static void Complete(this IResult result, TransactionScope scope)
+        {
+            if (result == null)
+                return;
+            if (!result.Success)
+                return;
+
+            scope.Complete();
         }
     }
 }

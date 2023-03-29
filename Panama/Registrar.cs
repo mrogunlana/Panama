@@ -17,6 +17,7 @@ namespace Panama.Service
             services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
             services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
               serviceProvider
               .GetServices<IInvoke<IHandler>>()
@@ -35,6 +36,7 @@ namespace Panama.Service
             services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
             services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
               serviceProvider
               .GetServices<IInvoke<IHandler>>()
@@ -53,6 +55,7 @@ namespace Panama.Service
             services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
+            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
             services.AddSingleton<HandlerInvokerResolver>(serviceProvider => name =>
               serviceProvider
               .GetServices<IInvoke<IHandler>>()

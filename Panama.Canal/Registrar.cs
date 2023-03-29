@@ -22,7 +22,7 @@ namespace Panama.Canal
             services.AddTransient<IInvoke, StreamInvoker>();
             services.AddTransient<IInvoke, SubscriptionInvoker>();
             services.AddTransient<IInvoke, BrokerInvoker>();
-            services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();
+            services.AddTransient<IInvoke<IHandler>, DispatchInvoker>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();

@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Extensions;
 using Panama.Interfaces;
-using System.Transactions;
 
 namespace Panama.Canal.Extensions
 {
@@ -40,16 +38,6 @@ namespace Panama.Canal.Extensions
                         .GetAwaiter()
                         .GetResult();
             }
-        }
-
-        public static void Complete(this IResult result, TransactionScope scope)
-        {
-            if (result == null)
-                return;
-            if (!result.Success)
-                return;
-
-            scope.Complete();
         }
     }
 }

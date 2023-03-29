@@ -9,13 +9,13 @@ using System.Transactions;
 
 namespace Panama.Canal.Invokers
 {
-    public class ScopedInvoker : IInvoke<IHandler> 
+    public class DispatchInvoker : IInvoke<IHandler> 
     {
         private readonly IServiceProvider _provider;
-        private readonly ILogger<ScopedInvoker> _logger;
+        private readonly ILogger<DispatchInvoker> _logger;
 
-        public ScopedInvoker(
-              ILogger<ScopedInvoker> logger
+        public DispatchInvoker(
+              ILogger<DispatchInvoker> logger
             , IServiceProvider provider)
         {
             _logger = logger;
