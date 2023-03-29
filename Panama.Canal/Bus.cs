@@ -2,7 +2,6 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Interfaces;
 using Panama.Models;
 
 namespace Panama.Canal
