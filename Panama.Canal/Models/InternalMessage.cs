@@ -10,6 +10,15 @@ namespace Panama.Canal.Models
             if (Created == DateTime.MinValue)
                 Created = DateTime.Now;
         }
+        public override int GetHashCode()
+        {
+            if (this is null) return 0;
+
+            var hash_Id = this._Id.GetHashCode();
+            var hashId = this.Id.GetHashCode();
+
+            return hash_Id ^ hashId;
+        }
         public int _Id { get; set; }
         public string Id { get; set; } = String.Empty;
         public string CorrelationId { get; set; } = String.Empty;

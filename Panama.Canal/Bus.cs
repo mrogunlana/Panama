@@ -2,6 +2,7 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Filters;
 using Panama.Models;
 
 namespace Panama.Canal
@@ -25,7 +26,7 @@ namespace Panama.Canal
             var source = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, Context.Token);
 
             var message = new Message()
-                .AddMessageId(Context.Id)
+                .AddMessageId(Guid.NewGuid().ToString())
                 .AddMessageName(Context.Name)
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group)
@@ -49,7 +50,7 @@ namespace Panama.Canal
 
             var result = await Context.Invoker.Invoke(context).ConfigureAwait(false);
 
-            Context.Origin?.Data?.AddFiltered<Publish<InternalMessage>>(result);
+            Context.Origin?.Data?.AddPublished<InternalMessage>(result);
         }
     }
 }

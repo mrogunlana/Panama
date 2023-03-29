@@ -1,12 +1,12 @@
 ﻿using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Filters
 {
-    public class Publish<T> : Filter<T>
+    public class Published<T> : Filter<T>
         where T : IModel
     {
-        public Publish(T value)
+        public Published(T value)
             : base(value) { }
     }
 }

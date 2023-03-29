@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panama.Canal.Invokers;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;

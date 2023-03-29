@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Extensions;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Extensions
@@ -15,11 +14,12 @@ namespace Panama.Canal.Extensions
             if (!result.Success)
                 return;
 
-            var messages = result.Data.PublishGet<InternalMessage>();
+            var messages = result.Data.QueueGet<InternalMessage>();
             var dispatcher = provider.GetRequiredService<IDispatcher>();
 
-            foreach (var message in messages)
+            while (messages.Count > 0)
             {
+                var message = messages.Dequeue();
                 var metadata = message.GetData<Message>(provider);
                 var delay = metadata.GetDelay();
 
@@ -38,9 +38,18 @@ namespace Panama.Canal.Extensions
                         .ConfigureAwait(false)
                         .GetAwaiter()
                         .GetResult();
-            }
 
-            result.Data.RemoveAll<Publish<InternalMessage>>();
+                result.Data.Dequeue(message);
+                result.Data.Published(message);
+            }
+        }
+
+        public static IResult Published<T>(this IResult result, T model)
+            where T : IModel
+        {
+            result.Data.Published(model);
+
+            return result;
         }
     }
 }
