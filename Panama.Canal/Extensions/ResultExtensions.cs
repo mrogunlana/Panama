@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Extensions;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Extensions
@@ -38,6 +39,8 @@ namespace Panama.Canal.Extensions
                         .GetAwaiter()
                         .GetResult();
             }
+
+            result.Data.RemoveAll<Publish<InternalMessage>>();
         }
     }
 }
