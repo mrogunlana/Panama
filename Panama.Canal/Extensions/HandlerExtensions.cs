@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Interfaces;
 using Panama.Invokers;

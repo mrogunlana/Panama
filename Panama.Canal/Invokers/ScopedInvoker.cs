@@ -1,20 +1,25 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Panama.Canal.Extensions;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
 using System.Diagnostics;
 using System.Transactions;
 
-namespace Panama.Invokers
+namespace Panama.Canal.Invokers
 {
     public class ScopedInvoker : IInvoke<IHandler> 
     {
-        private readonly ILogger<DefaultInvoker> _logger;
+        private readonly IServiceProvider _provider;
+        private readonly ILogger<ScopedInvoker> _logger;
 
-        public ScopedInvoker(ILogger<DefaultInvoker> logger)
+        public ScopedInvoker(
+              ILogger<ScopedInvoker> logger
+            , IServiceProvider provider)
         {
             _logger = logger;
+            _provider = provider;
         }
 
         public async Task<IResult> Invoke(IContext context)
@@ -50,7 +55,9 @@ namespace Panama.Invokers
                         .Invoke(context)
                         .ConfigureAwait(false);
 
-                    commands.ContinueWith(_ => scope.Complete());
+                    commands.Complete(scope);
+                    commands.Flush(_provider);
+
                     if (commands.Success)
                         return commands;
                 }
@@ -62,8 +69,9 @@ namespace Panama.Invokers
                         .Invoke(context)
                         .ConfigureAwait(false);
 
-                    compensation.ContinueWith(o => scope.Complete());
                     compensation.EnsureSuccess();
+                    compensation.Complete(scope);
+                    compensation.Flush(_provider);
 
                     return compensation;
                 }

@@ -7,6 +7,12 @@ namespace Panama.Canal.Extensions
 {
     public static class BusExtensions
     {
+        public static IBus Origin(this IBus bus, IContext origin)
+        {
+            bus.Context.Origin = origin;
+
+            return bus.Context.Current;
+        }
         public static IBus Header(this IBus bus, string key, string? value)
         {
             bus.Context.Headers.Add(key, value);

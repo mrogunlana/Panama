@@ -1,6 +1,6 @@
 ﻿namespace Panama.Interfaces
 {
-    public interface ISnapshot<T> : IModel
+    public interface IFilter<T> : IModel
         where T : IModel 
     { 
         T Value { get; }

@@ -76,7 +76,7 @@ namespace Panama.Extensions
         {
             var result = new List<T>();
             foreach (var model in data)
-                if (model is ISnapshot<T>)
+                if (model is Snapshot<T>)
                     result.Add((T)model);
             return result;
         }

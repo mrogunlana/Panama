@@ -18,6 +18,7 @@ namespace Panama.Canal.Extensions
             bus.Token(context.Token);
             bus.Header(Headers.Id, context.Id);
             bus.Header(Headers.CorrelationId, context.CorrelationId);
+            bus.Origin(context);
 
             bus.Context.CorrelationId = context.CorrelationId;
             bus.Context.Token = context.Token;

@@ -37,14 +37,13 @@ namespace Panama.Canal.Invokers
 
             message.SetStatus(MessageStatus.Scheduled);
 
-            var outbox = await _store.StoreOutboxMessage(
+            await _store.StoreOutboxMessage(
                 message: message, 
                 transaction: Transaction.Current)
                 .ConfigureAwait(false);
 
             var result = new Result()
-                .Success()
-                .Add(outbox);
+                .Success();
 
             return result;
         }

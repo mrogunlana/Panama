@@ -2,6 +2,7 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Interfaces;
 using Panama.Models;
 
 namespace Panama.Canal
@@ -47,7 +48,9 @@ namespace Panama.Canal
                 provider: Context.Provider,
                 correlationId: Context.CorrelationId);
 
-            await Context.Invoker.Invoke(context).ConfigureAwait(false);
+            var result = await Context.Invoker.Invoke(context).ConfigureAwait(false);
+
+            Context.Origin?.Data?.AddFiltered<Publish<InternalMessage>>(result);
         }
     }
 }

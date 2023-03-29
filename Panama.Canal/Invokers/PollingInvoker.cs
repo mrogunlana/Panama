@@ -38,28 +38,12 @@ namespace Panama.Canal.Invokers
             if (!_bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
-            var data = message.GetData<Message>(_provider);
-            var delay = data.GetDelay();
-            
             message.SetStatus(MessageStatus.Scheduled);
 
             var published = await _store.StorePublishedMessage(
                 message: message,
                 transaction: Transaction.Current)
                 .ConfigureAwait(false);
-
-            if (delay == DateTime.MinValue)
-                await _dispatcher.Publish(
-                    message: message, 
-                    token: context.Token)
-                    .ConfigureAwait(false);
-            else
-                await _dispatcher.Schedule(
-                    message: message, 
-                    delay: delay, 
-                    transaction: Transaction.Current, 
-                    token: context.Token)
-                    .ConfigureAwait(false);
 
             var result = new Result()
                 .Success()

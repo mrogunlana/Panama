@@ -33,16 +33,6 @@ namespace Panama.Extensions
             return result.Data.Exist<T>();
         }
 
-        public static void ContinueWith(this IResult result, Action<IResult> action)
-        {
-            if (result == null)
-                return;
-            if (!result.Success)
-                return;
-
-            action.Invoke(result);
-        }
-
         public static void EnsureSuccess(this IResult result)
         {
             if (result == null)

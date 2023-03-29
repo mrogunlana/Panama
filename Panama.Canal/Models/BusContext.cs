@@ -14,15 +14,18 @@ namespace Panama.Canal.Models
         public string Name { get; set; } = String.Empty;
         public string Group { get; set; } = String.Empty;
         public string Instance { get; set; } = String.Empty;
+        public IContext? Origin { get; set; }
         public DateTime Delay { get; set; }
         public Type? Target { get; set; }
         public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }
         public BusContext(
             IBus instance,
-            IServiceProvider provider)
+            IServiceProvider provider,
+            IContext? origin = null)
             : base(provider)
         {
+            Origin = origin;
             Current = instance;
             Headers = new Dictionary<string, string?>();
             Invoker = provider.GetRequiredService<StreamInvoker>();
