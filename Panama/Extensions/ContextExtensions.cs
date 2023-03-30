@@ -24,5 +24,24 @@ namespace Panama.Extensions
                     .Any(i => i.IsGenericType
                         && (i.GetGenericTypeDefinition() == type)));
         }
+        public static List<T> DataGet<T>(this IContext context) where T : IModel
+        {
+            return context.Data.DataGet<T>();
+        }
+
+        public static T DataGetSingle<T>(this IContext context) where T : IModel
+        {
+            return context.Data.DataGetSingle<T>();
+        }
+        public static List<V> KvpGet<K, V>(this IContext context, K key)
+        {
+            return context.Data.KvpGet<K, V>(key);
+        }
+
+        public static V KvpGetSingle<K, V>(this IContext context, K key)
+        {
+            return context.Data.KvpGetSingle<K, V>(key);
+        }
+
     }
 }
