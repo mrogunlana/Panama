@@ -29,14 +29,20 @@ USE $(MSSQL_DB);
 GO
 CREATE TABLE [User] (
 	_ID INT NOT NULL IDENTITY(1, 1) PRIMARY KEY, 
-	ID uniqueidentifier not null,
+	ID varchar(50) not null,
     FirstName varchar(25) null,
     LastName varchar(25) null,
     Email varchar(100) null,
     Password varchar(100) null,
     Created datetime not null
 );
-
+CREATE TABLE [Setting] (
+	_ID INT NOT NULL IDENTITY(1, 1) PRIMARY KEY, 
+	ID varchar(50) not null,
+    [Key] varchar(25) null,
+    [Value] varchar(25) null,
+    Created datetime not null
+);
 
 
 Go

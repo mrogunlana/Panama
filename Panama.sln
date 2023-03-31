@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.TestApi", "Panama.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.RabbitMQ", "Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj", "{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Tests.MySQL", "Panama.Tests.MySQL\Panama.Tests.MySQL.csproj", "{253CC02B-EE67-4070-A176-3A632EDB257E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Tests.SQLServer", "Panama.Tests.SQLServer\Panama.Tests.SQLServer.csproj", "{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{253CC02B-EE67-4070-A176-3A632EDB257E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{253CC02B-EE67-4070-A176-3A632EDB257E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{253CC02B-EE67-4070-A176-3A632EDB257E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{253CC02B-EE67-4070-A176-3A632EDB257E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,14 +1,15 @@
 version: '3.7'
 services:
-  sqlserver:
+  db:
     build: 
       context: .
       dockerfile: Dockerfile
     ports:  
-      - "15789:1433"
+      - 1433:1433
     env_file: .env
     volumes: 
       - sqldata:/var/opt/sqlserver/data
+      - ./setup.sql:/usr/config/setup.sql
 
 # from https://github.com/microsoft/mssql-docker/issues/668#issuecomment-812530180
   mssqlarm64:

@@ -1,26 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="appsettings.test.json" />
-    <None Remove="NLog.config" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
@@ -38,17 +37,4 @@
     <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 
-  <Target Name="CopyAppConfig" AfterTargets="Build" DependsOnTargets="Build">
-    <CreateItem Include="$(OutputPath)$(AssemblyName).dll.config">
-      <Output TaskParameter="Include" ItemName="FilesToCopy" />
-    </CreateItem>
-  </Target>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <ItemGroup>
-      <DataFiles Include="$(ProjectDir)Data\*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(TargetDir)data\" />
-	</Target>
-	
 </Project>

@@ -49,7 +49,8 @@ namespace Panama.Invokers
 
                 using (var scope = new TransactionScope(
                       TransactionScopeOption.Required
-                    , new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
+                    , new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }
+                    , TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var commands = await context.Provider
                         .GetRequiredService<IInvoke<ICommand>>()
@@ -64,7 +65,8 @@ namespace Panama.Invokers
 
                 using (var scope = new TransactionScope(
                       TransactionScopeOption.Required
-                    , new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
+                    , new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }
+                    , TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var compensation = await context.Provider
                         .GetRequiredService<IInvoke<IRollback>>()

@@ -49,10 +49,10 @@ namespace Panama.Service
         public static void AddPanama(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             var assembliesToScan = assemblies.Distinct();
-            services.AddSingleton<IInvoke<IValidate>, ActionInvoker<IValidate>>();
-            services.AddSingleton<IInvoke<IQuery>, ActionInvoker<IQuery>>();
-            services.AddSingleton<IInvoke<ICommand>, ActionInvoker<ICommand>>();
-            services.AddSingleton<IInvoke<IRollback>, ActionInvoker<IRollback>>();
+            services.AddTransient<IInvoke<IValidate>, ActionInvoker<IValidate>>();
+            services.AddTransient<IInvoke<IQuery>, ActionInvoker<IQuery>>();
+            services.AddTransient<IInvoke<ICommand>, ActionInvoker<ICommand>>();
+            services.AddTransient<IInvoke<IRollback>, ActionInvoker<IRollback>>();
             services.AddTransient<IHandler, Handler>();
             services.AddTransient<IInvoke<IHandler>, DefaultInvoker>();
             services.AddTransient<IInvoke<IHandler>, ScopedInvoker>();

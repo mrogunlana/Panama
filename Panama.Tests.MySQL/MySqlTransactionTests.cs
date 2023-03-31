@@ -3,17 +3,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panama.Canal.Extensions;
-using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
+using Panama.Models;
 using Panama.Security;
 using Panama.Service;
-using Panama.Tests.Commands;
-using Panama.Tests.Commands.EF;
-using Panama.Tests.Contexts;
-using Panama.Tests.Models;
+using Panama.Tests.MySQL.Commands;
+using Panama.Tests.MySQL.Commands.EF;
+using Panama.Tests.MySQL.Contexts;
+using Panama.Tests.MySQL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,11 +59,11 @@ namespace Panama.Tests
             services.AddPanama(domain);
             services.AddPanamaSecurity();
 
-            services.AddDbContext<MySqlDbContext>(options => {
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<AppDbContext>(options => {
+                var connectionString = configuration.GetConnectionString("MYSQL");
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-                .LogTo(Console.WriteLine, LogLevel.Information)
-                .EnableDetailedErrors();
+                    .LogTo(Console.WriteLine, LogLevel.Information)
+                    .EnableDetailedErrors();
             });
 
             _provider = services.BuildServiceProvider();
@@ -77,29 +76,26 @@ namespace Panama.Tests
                 .Command<SaveGeneratedUser>()
                 .Command<SaveGeneratedUser>()
                 .Command<SaveGeneratedUser>()
+                .Command<SaveGeneratedUserInline>()
+                .Command<SaveGeneratedSetting>()
                 .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(save.Success);
 
             var query = await _provider.GetRequiredService<IHandler>()
+                .Add(save.DataGet<User>().Select(x => new Kvp<string, string>("ID", x.ID.ToString())))
                 .Query<GetUsers>()
                 .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(query.Success);
-            Assert.AreEqual(query.DataGet<User>().Count, 3);
+            Assert.AreEqual(query.DataGet<User>().Count, 4);
         }
 
         [TestMethod]
         public async Task VerifyTransactionRollback()
         {
-            var delete = await _provider.GetRequiredService<IHandler>()
-                .Query<GetUsers>()
-                .Command<DeleteUsers>()
-                .Set<ScopedInvoker>()
-                .Invoke();
-
             var save = await _provider.GetRequiredService<IHandler>()
                 .Command<SaveGeneratedUser>()
                 .Command<SaveGeneratedUser>()
@@ -108,9 +104,10 @@ namespace Panama.Tests
                 .Set<ScopedInvoker>()
                 .Invoke();
 
-            Assert.IsFalse(save.Success);
+            Assert.IsTrue(save.Success);
 
             var query = await _provider.GetRequiredService<IHandler>()
+                .Add(save.DataGet<User>().Select(x => new Kvp<string, string>("ID", x.ID.ToString())))
                 .Query<GetUsers>()
                 .Set<ScopedInvoker>()
                 .Invoke();
