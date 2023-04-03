@@ -15,5 +15,7 @@
         public const string Created = "panama-created-time";
         public const string Sent = "panama-sent-time";
         public const string Delay = "panama-delay-time";
+        public const string StoreStrategy = "panama-store-strategy";
+        public const string Saga = "panama-saga";
     }
 }

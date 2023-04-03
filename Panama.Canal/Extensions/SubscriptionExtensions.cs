@@ -105,13 +105,13 @@ namespace Panama.Canal.Extensions
             return results;
         }
 
-        public static Subscription? GetSubscription(this Models.Subscriptions subscriptions, Type type, string group, string name)
+        public static IReadOnlyCollection<Subscription>? GetSubscriptions(this Models.Subscriptions subscriptions, Type type, string group, string name)
         {
             var result = GetSubscriptions(subscriptions, group, type);
             if (result == null)
                 return null;
 
-            return result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            return new ReadOnlyCollection<Subscription>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
         }
     }
 }

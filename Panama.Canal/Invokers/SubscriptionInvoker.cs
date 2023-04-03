@@ -50,13 +50,16 @@ namespace Panama.Canal.Invokers
             var nack = metadata.GetNack();
             var correlationId = metadata.GetCorrelationId();
             var target = Type.GetType(metadata.GetBroker());
+            var name = metadata.GetName();
             
             if (target == null)
                 throw new InvalidOperationException($"Subscription target: {metadata.GetBroker()} could not be located.");
 
             try
             {
-                var subscriptions = _subscriptions.GetSubscriptions(group, target);
+                var subscriptions = _subscriptions.GetSubscriptions(target, group, name);
+                if (subscriptions == null)
+                    return new Result().Success();
 
                 foreach (var subscription in subscriptions)
                 {

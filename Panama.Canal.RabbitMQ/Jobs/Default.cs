@@ -62,10 +62,6 @@ namespace Panama.Canal.RabbitMQ.Jobs
 
                     metadata.RemoveException();
 
-                    var subscription = _subscriptions.GetSubscription(typeof(RabbitMQTarget), metadata.GetGroup(), metadata.GetName());
-                    if (subscription == null)
-                        metadata.AddException(new SubscriptionException("Subscription could not be located."));
-
                     if (metadata.HasException())
                     {
                         await _store.StoreReceivedMessage(metadata
