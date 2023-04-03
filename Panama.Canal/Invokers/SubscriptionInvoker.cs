@@ -48,6 +48,7 @@ namespace Panama.Canal.Invokers
             var instance = metadata.GetInstance();
             var ack = metadata.GetAck();
             var nack = metadata.GetNack();
+            var correlationId = metadata.GetCorrelationId();
             var target = Type.GetType(metadata.GetBroker());
             
             if (target == null)
@@ -79,12 +80,17 @@ namespace Panama.Canal.Invokers
                 _log.LogError(ex, reason);
 
                 if (!string.IsNullOrEmpty(nack))
-                    await context.Bus(target)
+                    await _provider.GetRequiredService<IBus>()
                         .Instance(instance)
+                        .Token(context.Token)
+                        .Id(Guid.NewGuid().ToString())
+                        .CorrelationId(correlationId)
                         .Topic(nack)
                         .Group(group)
                         .Data(data)
-                        .Publish()
+                        .Stream()
+                        .Target(target)
+                        .Post()
                         .ConfigureAwait(false);
 
                 return new Result()
@@ -92,13 +98,18 @@ namespace Panama.Canal.Invokers
             }
 
             if (!string.IsNullOrEmpty(ack))
-                await context.Bus(target)
-                    .Instance(instance)
-                    .Topic(ack)
-                    .Group(group)
-                    .Data(data)
-                    .Publish()
-                    .ConfigureAwait(false);
+                await _provider.GetRequiredService<IBus>()
+                        .Instance(instance)
+                        .Token(context.Token)
+                        .Id(Guid.NewGuid().ToString())
+                        .CorrelationId(correlationId)
+                        .Topic(ack)
+                        .Group(group)
+                        .Data(data)
+                        .Stream()
+                        .Target(target)
+                        .Post()
+                        .ConfigureAwait(false);
 
             return new Result()
                 .Success();

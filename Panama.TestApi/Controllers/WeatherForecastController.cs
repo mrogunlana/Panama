@@ -27,7 +27,6 @@ namespace Panama.TestApi.Controllers
         {
             var result = await _provider
                 .GetRequiredService<IHandler>()
-                .UseCanal()
                 .AddKvp(1, "Freezing")
                 .AddKvp(2, "Bracing")
                 .AddKvp(3, "Chilly")

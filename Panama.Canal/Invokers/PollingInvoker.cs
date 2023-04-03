@@ -42,7 +42,7 @@ namespace Panama.Canal.Invokers
 
             var published = await _store.StorePublishedMessage(
                 message: message,
-                transaction: Transaction.Current)
+                transaction: context.Transaction)
                 .ConfigureAwait(false);
 
             var result = new Result()

@@ -10,12 +10,6 @@ namespace Panama.Canal.Extensions
 {
     public static class HandlerExtensions
     {
-        public static IHandler UseCanal(this IHandler handler)
-        {
-            handler.Set<ScopedInvoker>();
-
-            return handler;
-        }
         public static IHandler UseCanal<T>(this IHandler handler)
             where T : IInvoke<IHandler>
         {

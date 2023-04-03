@@ -66,10 +66,23 @@ namespace Panama.Models
             Data.Add(data);
         }
 
+        public Context(
+              IModel data
+            , CancellationToken? token = null
+            , string? id = null
+            , string? correlationId = null
+            , IServiceProvider? provider = null
+            , object? transaction = null)
+            : this(data, token, id, correlationId, provider)
+        {
+            Transaction = transaction;
+        }
+
         public IList<IModel> Data { get; set; }
         public CancellationToken Token { get; set; }
         public string Id { get; set; }
         public string CorrelationId { get; set; }
         public IServiceProvider Provider { get; } = default!;
+        public object? Transaction { get; set; } = null;
     }
 }

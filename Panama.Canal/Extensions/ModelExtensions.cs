@@ -56,22 +56,5 @@ namespace Panama.Canal.Extensions
         {
             data.Add(new Models.Filters.Published<T>(model));
         }
-
-        public static void AddFiltered<T>(this IList<IModel> data, IResult result)
-            where T : IModel
-        {
-            if (result == null)
-                return;
-            if (!result.Success)
-                return;
-
-            data.AddRange(result.Data.DataGet<IFilter<T>>());
-        }
-
-        public static void Enqueue<T>(this IList<IModel> data, IResult result)
-            where T : IModel
-        {
-            data.AddFiltered<Queued<T>>(result);
-        }
     }
 }

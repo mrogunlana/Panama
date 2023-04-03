@@ -19,7 +19,7 @@ namespace Panama.Canal.Extensions
             return message;
         }
 
-        public static Message AddCorrelationId(this Message message, string value)
+        public static Message AddCorrelationId(this Message message, string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
@@ -46,7 +46,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageGroup(this Message message, string value)
+        public static Message AddMessageGroup(this Message message, string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
@@ -66,6 +66,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+
         public static Message AddMessageInstance(this Message message, string? value = null)
         {
             if (string.IsNullOrEmpty(value))
@@ -135,9 +136,12 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddDelayTime(this Message message, DateTime value)
+        public static Message AddDelayTime(this Message message, DateTime? value)
         {
-            message.Headers.Add(Headers.Delay, value.ToUniversalTime().ToString());
+            if (value == null)
+                return message;
+
+            message.Headers.Add(Headers.Delay, value?.ToUniversalTime().ToString());
 
             return message;
         }
@@ -181,6 +185,15 @@ namespace Panama.Canal.Extensions
 
             var result = message.Headers[Headers.Nack];
             
+            return result ?? string.Empty;
+        }
+        public static string GetCorrelationId(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.CorrelationId];
+
             return result ?? string.Empty;
         }
         public static string GetName(this Message message)

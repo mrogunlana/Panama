@@ -6,9 +6,8 @@ using Panama.Models;
 
 namespace Panama.Canal.Models
 {
-    public class BusContext : Context
+    public class EventContext : Context
     {
-        public IBus Current { get; }
         public string Ack { get; set; } = String.Empty;
         public string Nack { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
@@ -19,14 +18,12 @@ namespace Panama.Canal.Models
         public Type? Target { get; set; }
         public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }
-        public BusContext(
-            IBus instance,
+        public EventContext(
             IServiceProvider provider,
             IContext? origin = null)
             : base(provider)
         {
             Origin = origin;
-            Current = instance;
             Headers = new Dictionary<string, string?>();
             Invoker = provider.GetRequiredService<StreamInvoker>();
         }

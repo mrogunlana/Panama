@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
@@ -16,13 +17,14 @@ namespace Panama.Canal
         private static void AddPanamaCanalBase(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<Bootstrapper>();
-            
+
             services.AddTransient<IBus, Bus>();
             services.AddTransient<IInvoke, PollingInvoker>();
             services.AddTransient<IInvoke, StreamInvoker>();
             services.AddTransient<IInvoke, SubscriptionInvoker>();
             services.AddTransient<IInvoke, BrokerInvoker>();
-            services.AddTransient<IInvoke<IHandler>, DispatchInvoker>();
+            services.AddTransient<IChannel, DefaultChannel>();
+            services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();

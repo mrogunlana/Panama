@@ -39,7 +39,7 @@ namespace Panama.Canal.Invokers
 
             await _store.StoreOutboxMessage(
                 message: message, 
-                transaction: Transaction.Current)
+                transaction: context.Transaction)
                 .ConfigureAwait(false);
 
             var result = new Result()

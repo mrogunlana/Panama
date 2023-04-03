@@ -11,5 +11,6 @@ namespace Panama.Interfaces
         IList<IModel> Data { get; }
         CancellationToken Token { get; set; }
         IServiceProvider Provider { get; }
+        object? Transaction { get; set; }
     }
 }

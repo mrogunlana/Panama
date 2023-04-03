@@ -6,8 +6,8 @@ namespace Panama.Canal.Interfaces
 {
     public interface IBus
     {
-        BusContext Context { get; }
+        EventContext Context { get; }
 
-        Task Publish(CancellationToken? token = null);
+        Task<IResult> Post(CancellationToken? token = null);
     }
 }

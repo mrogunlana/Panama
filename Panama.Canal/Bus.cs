@@ -2,7 +2,7 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Canal.Models.Filters;
+using Panama.Interfaces;
 using Panama.Models;
 
 namespace Panama.Canal
@@ -11,17 +11,17 @@ namespace Panama.Canal
     {
         private readonly ILogger<Bus> _log;
         
-        public BusContext Context { get; }
+        public EventContext Context { get; }
 
         public Bus(
               IServiceProvider provider
             , ILogger<Bus> log)
         {
             _log = log;
-            Context = new BusContext(this, provider);
+            Context = new EventContext(provider);
         }
 
-        public async Task Publish(CancellationToken? token = null)
+        public async Task<IResult> Post(CancellationToken? token = null)
         {
             var source = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, Context.Token);
 
@@ -46,11 +46,10 @@ namespace Panama.Canal
                 data: message,
                 token: source.Token,
                 provider: Context.Provider,
-                correlationId: Context.CorrelationId);
+                correlationId: Context.CorrelationId,
+                transaction: Context.Transaction);
 
-            var result = await Context.Invoker.Invoke(context).ConfigureAwait(false);
-
-            Context.Origin?.Data?.Enqueue<InternalMessage>(result);
+            return await Context.Invoker.Invoke(context).ConfigureAwait(false);
         }
     }
 }
