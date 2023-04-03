@@ -93,7 +93,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                     nack: "foo.event.failed").ConfigureAwait(false);
 
                 await channel.Commit();
-
+                
                 connection.Close();
 
                 context.Data.Add(user);

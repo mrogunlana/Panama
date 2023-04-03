@@ -6,6 +6,7 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Extensions;
 using Panama.Extensions;
+using Panama.Interfaces;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;
@@ -431,59 +432,57 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed) 
-                    await connection.OpenAsync().ConfigureAwait(false);
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                using var command = new MySqlCommand($@"
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
 
-                    UPDATE `{tableName}` 
-                    SET `Content`       = @Content,
-                        `Retries`       = @Retries,
-                        `Expires`       = @Expires,
-                        `Status`        = @Status 
-                    WHERE `_Id`         = @_Id;"
+                UPDATE `{tableName}` 
+                SET `Content`       = @Content,
+                    `Retries`       = @Retries,
+                    `Expires`       = @Expires,
+                    `Status`        = @Status 
+                WHERE `_Id`         = @_Id;";
 
-                , connection);
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@_Id",
+                DbType = DbType.Int32,
+                Value = message._Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = _encryptor.ToString(message.Content),
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Retries",
+                DbType = DbType.Int32,
+                Value = message.Retries,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Status",
+                DbType = DbType.String,
+                Value = message.Status,
+            });
 
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@_Id",
-                    DbType = DbType.Int32,
-                    Value = message._Id,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Content",
-                    DbType = DbType.String,
-                    Value = _encryptor.ToString(message.Content),
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = message.Retries,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Expires",
-                    DbType = DbType.DateTime,
-                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Status",
-                    DbType = DbType.String,
-                    Value = message.Status,
-                });
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
-                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-
+            if (transaction is IDbTransaction)
                 connection.Close();
-            }
         }
 
         public async Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
             await ChangeMessageState(_settings.PublishedTable, message, status, transaction).ConfigureAwait(false);
         }
-        
+
         public async Task ChangeReceivedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
             await ChangeMessageState(_settings.ReceivedTable, message, status, transaction).ConfigureAwait(false);
@@ -493,7 +492,7 @@ namespace Panama.Canal.MySQL
         {
             using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
-                if (connection.State == ConnectionState.Closed) 
+                if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);
 
                 using var command = new MySqlCommand($@"
@@ -533,427 +532,420 @@ namespace Panama.Canal.MySQL
 
         public async Task<InternalMessage> StorePublishedMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed) 
-                    await connection.OpenAsync().ConfigureAwait(false);
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                using var command = new MySqlCommand($@"
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
 
-                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.PublishedTable}`
-                    (`Id`,
-                    `CorrelationId`,
-                    `Version`,
-                    `Name`,
-                    `Broker`,
-                    `Group`,
-                    `Content`,
-                    `Retries`,
-                    `Created`,
-                    `Expires`,
-                    `Status`)
-                    VALUES
-                    (@Id,
-                     @CorrelationId,
-                     @Version,
-                     @Name,
-                     @Broker,
-                     @Group,
-                     @Content,
-                     @Retries,
-                     NOW(),
-                     @Expires,
-                     @Status);
+                INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.PublishedTable}`
+                (`Id`,
+                `CorrelationId`,
+                `Version`,
+                `Name`,
+                `Broker`,
+                `Group`,
+                `Content`,
+                `Retries`,
+                `Created`,
+                `Expires`,
+                `Status`)
+                VALUES
+                (@Id,
+                 @CorrelationId,
+                 @Version,
+                 @Name,
+                 @Broker,
+                 @Group,
+                 @Content,
+                 @Retries,
+                 NOW(),
+                 @Expires,
+                 @Status);
+                 
+                 SELECT LAST_INSERT_ID();";
 
-                     SELECT LAST_INSERT_ID();"
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = message.Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@CorrelationId",
+                DbType = DbType.String,
+                Value = message.CorrelationId,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Version",
+                DbType = DbType.String,
+                Value = message.Version,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Name",
+                DbType = DbType.String,
+                Value = message.Name,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Broker",
+                DbType = DbType.String,
+                Value = message.Broker,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Group",
+                DbType = DbType.String,
+                Value = message.Group,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = message.IsContentBase64()
+                    ? message.Content
+                    : _encryptor.ToString(message.Content)
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Retries",
+                DbType = DbType.Int32,
+                Value = message.Retries,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Created",
+                DbType = DbType.DateTime,
+                Value = message.Created,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Status",
+                DbType = DbType.String,
+                Value = message.Status,
+            });
 
-                , connection);
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Id",
-                    DbType = DbType.String,
-                    Value = message.Id,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@CorrelationId",
-                    DbType = DbType.String,
-                    Value = message.CorrelationId,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Version",
-                    DbType = DbType.String,
-                    Value = message.Version,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = message.Name,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Broker",
-                    DbType = DbType.String,
-                    Value = message.Broker,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Group",
-                    DbType = DbType.String,
-                    Value = message.Group,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Content",
-                    DbType = DbType.String,
-                    Value = message.IsContentBase64() 
-                        ? message.Content 
-                        : _encryptor.ToString(message.Content)
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = message.Retries,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Created",
-                    DbType = DbType.DateTime,
-                    Value = message.Created,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Expires",
-                    DbType = DbType.DateTime,
-                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Status",
-                    DbType = DbType.String,
-                    Value = message.Status,
-                });
-
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
+            if (transaction is IDbTransaction)
                 connection.Close();
 
-                message._Id = result.ToInt();
-                
-                return message;
-            }
+            message._Id = result.ToInt();
+
+            return message;
         }
 
         public async Task<InternalMessage> StoreReceivedMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed) 
-                    await connection.OpenAsync().ConfigureAwait(false);
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                using var command = new MySqlCommand($@"
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
 
-                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.ReceivedTable}`
-                    (`Id`,
-                    `CorrelationId`,
-                    `Version`,
-                    `Name`,
-                    `Broker`,
-                    `Group`,
-                    `Content`,
-                    `Retries`,
-                    `Created`,
-                    `Expires`,
-                    `Status`)
-                    VALUES
-                    (@Id,
-                     @CorrelationId,
-                     @Version,
-                     @Name,
-                     @Broker,
-                     @Group,
-                     @Content,
-                     @Retries,
-                     NOW(),
-                     @Expires,
-                     @Status);
+                INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.ReceivedTable}`
+                (`Id`,
+                `CorrelationId`,
+                `Version`,
+                `Name`,
+                `Broker`,
+                `Group`,
+                `Content`,
+                `Retries`,
+                `Created`,
+                `Expires`,
+                `Status`)
+                VALUES
+                (@Id,
+                @CorrelationId,
+                @Version,
+                @Name,
+                @Broker,
+                @Group,
+                @Content,
+                @Retries,
+                NOW(),
+                @Expires,
+                @Status);
 
-                     SELECT LAST_INSERT_ID();"
+                SELECT LAST_INSERT_ID();";
 
-                , connection);
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = message.Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@CorrelationId",
+                DbType = DbType.String,
+                Value = message.CorrelationId,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Version",
+                DbType = DbType.String,
+                Value = message.Version,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Name",
+                DbType = DbType.String,
+                Value = message.Name,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Broker",
+                DbType = DbType.String,
+                Value = message.Broker,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Group",
+                DbType = DbType.String,
+                Value = message.Group,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = message.IsContentBase64()
+                    ? message.Content
+                    : _encryptor.ToString(message.Content)
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Retries",
+                DbType = DbType.Int32,
+                Value = message.Retries,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Created",
+                DbType = DbType.DateTime,
+                Value = message.Created,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Status",
+                DbType = DbType.String,
+                Value = message.Status,
+            });
 
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Id",
-                    DbType = DbType.String,
-                    Value = message.Id,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@CorrelationId",
-                    DbType = DbType.String,
-                    Value = message.CorrelationId,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Version",
-                    DbType = DbType.String,
-                    Value = message.Version,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = message.Name,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Broker",
-                    DbType = DbType.String,
-                    Value = message.Broker,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Group",
-                    DbType = DbType.String,
-                    Value = message.Group,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Content",
-                    DbType = DbType.String,
-                    Value = message.IsContentBase64() 
-                        ? message.Content 
-                        : _encryptor.ToString(message.Content)
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = message.Retries,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Created",
-                    DbType = DbType.DateTime,
-                    Value = message.Created,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Expires",
-                    DbType = DbType.DateTime,
-                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Status",
-                    DbType = DbType.String,
-                    Value = message.Status,
-                });
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
+            if (transaction is IDbTransaction)
                 connection.Close();
 
-                message._Id = result.ToInt();
-                
-                return message;
-            }
+            message._Id = result.ToInt();
+
+            return message;
         }
 
         public async Task<InternalMessage> StoreInboxMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed) 
-                    await connection.OpenAsync().ConfigureAwait(false);
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                using var command = new MySqlCommand($@"
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
 
-                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.InboxTable}`
-                    (`Id`,
-                    `CorrelationId`,
-                    `Version`,
-                    `Name`,
-                    `Broker`,
-                    `Group`,
-                    `Content`,
-                    `Retries`,
-                    `Created`,
-                    `Expires`,
-                    `Status`)
-                    VALUES
-                    (@Id,
-                     @CorrelationId,
-                     @Version,
-                     @Name,
-                     @Broker,
-                     @Group,
-                     @Content,
-                     @Retries,
-                     NOW(),
-                     @Expires,
-                     @Status);
+                INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.InboxTable}`
+                (`Id`,
+                `CorrelationId`,
+                `Version`,
+                `Name`,
+                `Broker`,
+                `Group`,
+                `Content`,
+                `Retries`,
+                `Created`,
+                `Expires`,
+                `Status`)
+                VALUES
+                (@Id,
+                @CorrelationId,
+                @Version,
+                @Name,
+                @Broker,
+                @Group,
+                @Content,
+                @Retries,
+                NOW(),
+                @Expires,
+                @Status);
 
-                     SELECT LAST_INSERT_ID();"
+                SELECT LAST_INSERT_ID();";
 
-                , connection);
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = message.Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@CorrelationId",
+                DbType = DbType.String,
+                Value = message.CorrelationId,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Version",
+                DbType = DbType.String,
+                Value = message.Version,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Name",
+                DbType = DbType.String,
+                Value = message.Name,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Broker",
+                DbType = DbType.String,
+                Value = message.Broker,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Group",
+                DbType = DbType.String,
+                Value = message.Group,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = message.IsContentBase64()
+                    ? message.Content
+                    : _encryptor.ToString(message.Content)
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Retries",
+                DbType = DbType.Int32,
+                Value = message.Retries,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Created",
+                DbType = DbType.DateTime,
+                Value = message.Created,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Status",
+                DbType = DbType.String,
+                Value = message.Status,
+            });
 
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Id",
-                    DbType = DbType.String,
-                    Value = message.Id,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@CorrelationId",
-                    DbType = DbType.String,
-                    Value = message.CorrelationId,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Version",
-                    DbType = DbType.String,
-                    Value = message.Version,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = message.Name,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Broker",
-                    DbType = DbType.String,
-                    Value = message.Broker,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Group",
-                    DbType = DbType.String,
-                    Value = message.Group,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Content",
-                    DbType = DbType.String,
-                    Value = message.IsContentBase64() 
-                        ? message.Content 
-                        : _encryptor.ToString(message.Content)
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = message.Retries,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Created",
-                    DbType = DbType.DateTime,
-                    Value = message.Created,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Expires",
-                    DbType = DbType.DateTime,
-                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Status",
-                    DbType = DbType.String,
-                    Value = message.Status,
-                });
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
+            if (transaction is IDbTransaction)
                 connection.Close();
 
-                message._Id = result.ToInt();
-                
-                return message;
-            }
+            message._Id = result.ToInt();
+
+            return message;
         }
 
         public async Task<InternalMessage> StoreOutboxMessage(InternalMessage message, object? transaction = null)
         {
-            using (var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed) 
-                    await connection.OpenAsync().ConfigureAwait(false);
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                using var command = new MySqlCommand($@"
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
 
-                    INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.OutboxTable}`
-                    (`Id`,
-                    `CorrelationId`,
-                    `Version`,
-                    `Name`,
-                    `Broker`,
-                    `Group`,
-                    `Content`,
-                    `Retries`,
-                    `Created`,
-                    `Expires`,
-                    `Status`)
-                    VALUES
-                    (@Id,
-                     @CorrelationId,
-                     @Version,
-                     @Name,
-                     @Broker,
-                     @Group,
-                     @Content,
-                     @Retries,
-                     NOW(),
-                     @Expires,
-                     @Status);
+                INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.OutboxTable}`
+                (`Id`,
+                `CorrelationId`,
+                `Version`,
+                `Name`,
+                `Broker`,
+                `Group`,
+                `Content`,
+                `Retries`,
+                `Created`,
+                `Expires`,
+                `Status`)
+                VALUES
+                (@Id,
+                @CorrelationId,
+                @Version,
+                @Name,
+                @Broker,
+                @Group,
+                @Content,
+                @Retries,
+                NOW(),
+                @Expires,
+                @Status);
 
-                     SELECT LAST_INSERT_ID();"
+                SELECT LAST_INSERT_ID();";
 
-                , connection);
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = message.Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@CorrelationId",
+                DbType = DbType.String,
+                Value = message.CorrelationId,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Version",
+                DbType = DbType.String,
+                Value = message.Version,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Name",
+                DbType = DbType.String,
+                Value = message.Name,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Broker",
+                DbType = DbType.String,
+                Value = message.Broker,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Group",
+                DbType = DbType.String,
+                Value = message.Group,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = message.IsContentBase64()
+                    ? message.Content
+                    : _encryptor.ToString(message.Content)
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Retries",
+                DbType = DbType.Int32,
+                Value = message.Retries,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Created",
+                DbType = DbType.DateTime,
+                Value = message.Created,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Status",
+                DbType = DbType.String,
+                Value = message.Status,
+            });
 
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Id",
-                    DbType = DbType.String,
-                    Value = message.Id,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@CorrelationId",
-                    DbType = DbType.String,
-                    Value = message.CorrelationId,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Version",
-                    DbType = DbType.String,
-                    Value = message.Version,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = message.Name,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Broker",
-                    DbType = DbType.String,
-                    Value = message.Broker,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Group",
-                    DbType = DbType.String,
-                    Value = message.Group,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Content",
-                    DbType = DbType.String,
-                    Value = message.IsContentBase64() 
-                        ? message.Content 
-                        : _encryptor.ToString(message.Content)
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = message.Retries,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Created",
-                    DbType = DbType.DateTime,
-                    Value = message.Created,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Expires",
-                    DbType = DbType.DateTime,
-                    Value = message.Expires.HasValue ? message.Expires.Value : DBNull.Value,
-                });
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Status",
-                    DbType = DbType.String,
-                    Value = message.Status,
-                });
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
+            if (transaction is IDbTransaction)
                 connection.Close();
 
-                message._Id = result.ToInt();
-                
-                return message;
-            }
+            message._Id = result.ToInt();
+
+            return message;
         }
+
 
         public async Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
@@ -973,35 +965,40 @@ namespace Panama.Canal.MySQL
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Timeout",
                     DbType = DbType.DateTime,
                     Value = timeout,
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Succeeded",
                     DbType = DbType.String,
                     Value = MessageStatus.Succeeded.ToString(),
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Failed",
                     DbType = DbType.String,
                     Value = MessageStatus.Failed.ToString(),
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Batch",
                     DbType = DbType.Int32,
                     Value = batch,
                 });
 
                 var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-
                 connection.Close();
 
                 _log.LogDebug($"Deletion of expired data from table: {table} complete.");
 
                 return result;
             }
+
+            
         }
 
         public async Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
@@ -1054,17 +1051,20 @@ namespace Panama.Canal.MySQL
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Retries",
                     DbType = DbType.Int32,
                     Value = _mysqlOptions.Value.FailedRetries
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Version",
                     DbType = DbType.String,
                     Value = _canalOptions.Value.Version
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Added",
                     DbType = DbType.String,
                     Value = DateTime.Now.AddMinutes(-4)
@@ -1082,7 +1082,7 @@ namespace Panama.Canal.MySQL
 
                     messages.Add(model);
                 }
-                
+
                 connection.Close();
 
                 return messages;
@@ -1137,17 +1137,20 @@ namespace Panama.Canal.MySQL
 
                 , connection);
 
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@Version",
                     DbType = DbType.String,
                     Value = _canalOptions.Value.Version
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@TwoMinutesLater",
                     DbType = DbType.String,
                     Value = DateTime.Now.AddMinutes(2)
                 });
-                command.Parameters.Add(new MySqlParameter {
+                command.Parameters.Add(new MySqlParameter
+                {
                     ParameterName = "@OneMinutesAgo",
                     DbType = DbType.String,
                     Value = DateTime.Now.AddMinutes(-1)
