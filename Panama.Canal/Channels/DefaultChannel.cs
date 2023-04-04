@@ -17,7 +17,6 @@ namespace Panama.Canal.Channels
         private readonly IServiceProvider _provider;
         
         public object? Current { get; set; }
-        public EventContext Context { get; }
         public IInvoke Invoker { get; set; }
         public ConcurrentQueue<InternalMessage> Queue { get; }
         public DefaultChannel(
@@ -30,7 +29,6 @@ namespace Panama.Canal.Channels
             _provider = provider;
             
             Queue = new ConcurrentQueue<InternalMessage>();
-            Context = new EventContext(provider);
             Invoker = _provider.GetRequiredService<OutboxInvoker>();
         }
 

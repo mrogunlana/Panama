@@ -28,7 +28,6 @@ namespace Panama.Tests.Commands
             {
                 await context.Bus()
                     .Channel(channel)
-                    .Token(context.Token)
                     .Topic("foo.event")
                     .Group("foo")
                     .Data(models)
@@ -36,7 +35,10 @@ namespace Panama.Tests.Commands
                     .Nack("foo.event.failed")
                     .Post();
 
-                await _sagas.StartSaga<CreateWeatherForcastSaga>(channel, models);
+                await context.Saga<CreateWeatherForcastSaga>()
+                    .Channel(channel)
+                    .Data(models)
+                    .Start();
 
                 await channel.Commit();
             }

@@ -6,7 +6,7 @@ using Panama.Models;
 
 namespace Panama.Canal.Models
 {
-    public class EventContext : Context
+    public class BusContext : Context
     {
         public string Ack { get; set; } = String.Empty;
         public string Nack { get; set; } = String.Empty;
@@ -21,7 +21,7 @@ namespace Panama.Canal.Models
         public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }
         public IChannel? Channel { get; set; }
-        public EventContext(
+        public BusContext(
             IServiceProvider provider,
             IContext? origin = null)
             : base(provider)

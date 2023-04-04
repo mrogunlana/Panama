@@ -13,7 +13,6 @@ namespace Panama.Canal.Interfaces
     {
         object? Current { get; set; }
         ConcurrentQueue<InternalMessage> Queue { get; }
-        EventContext Context { get; }
         IInvoke Invoker { get; set; }
 
         void Rollback(CancellationToken token = default);

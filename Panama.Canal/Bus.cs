@@ -11,14 +11,14 @@ namespace Panama.Canal
     {
         private readonly ILogger<Bus> _log;
         
-        public EventContext Context { get; }
+        public BusContext Context { get; }
 
         public Bus(
               IServiceProvider provider
             , ILogger<Bus> log)
         {
             _log = log;
-            Context = new EventContext(provider);
+            Context = new BusContext(provider);
         }
 
         public async Task<IResult> Post(CancellationToken? token = null)

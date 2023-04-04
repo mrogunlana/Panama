@@ -5,8 +5,7 @@ namespace Panama.Canal.Interfaces
 {
     public interface ISagaFactory
     {
-        Task<ISaga> StartSaga<S>(IChannel channel, IEnumerable<IModel> models) where S : ISaga;
-        Task<ISaga> StartSaga<S>(IChannel channel, params IModel[] models) where S : ISaga;
-        Task<ISaga> GetSaga(InternalMessage message);
+        Task<ISaga> Start<S>(SagaContext context) where S : ISaga;
+        Task<ISaga> Get(InternalMessage message);
     }
 }

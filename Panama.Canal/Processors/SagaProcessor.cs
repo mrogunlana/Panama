@@ -30,11 +30,13 @@ namespace Panama.Canal.Processors
                 throw new InvalidOperationException("Message headers cannot be found.");
             
             var data = message.GetData<Message>(_provider);
-            var saga = await _factory.GetSaga(message);
+            var saga = await _factory.Get(message);
             if (saga == null)
                 return new Result().Success().Add($"No saga located for message: {message.Id}, saga: {data.GetSagaType()}");
 
-            return await saga.Continue(context);
+            return await saga.Continue(new SagaContext(_provider, context)
+                .Data(message)
+                .Token(context.Token));
         }
     }
 }
