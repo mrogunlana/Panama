@@ -242,6 +242,43 @@ namespace Panama.Canal.Extensions
             return result;
         }
 
+        public static string GetSagaType(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.SagaType];
+            if (result == null)
+                throw new InvalidOperationException($"Header: {Headers.SagaType} cannot be found.");
+
+            return result;
+        }
+
+        public static string GetSagaId(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.SagaId];
+            if (result == null)
+                throw new InvalidOperationException($"Header: {Headers.SagaId} cannot be found.");
+
+            return result;
+        }
+
+        public static bool IsSagaParticipant(this Message message)
+        {
+            var id = message.GetSagaId();
+            var type = message.GetSagaType();
+
+            if (string.IsNullOrEmpty(id))
+                return false;
+            if (string.IsNullOrEmpty(type))
+                return false;
+
+            return true;
+        }
+
         public static TransientMessage ToTransient(this Message message, IServiceProvider provider)
         {
             if (message == null)

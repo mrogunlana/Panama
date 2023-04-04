@@ -5,6 +5,7 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
+using Panama.Canal.Processors;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Quartz;
@@ -18,12 +19,16 @@ namespace Panama.Canal
         {
             services.AddHostedService<Bootstrapper>();
 
+            services.AddTransient<IProcessor, DefaultProcessor>();
+            services.AddTransient<IProcessor, SagaProcessor>();
+            services.AddSingleton<IProcessorFactory, ProcessorFactory>();
+
             services.AddTransient<IBus, Bus>();
-            services.AddTransient<IInvoke, PollingInvoker>();
-            services.AddTransient<IInvoke, StreamInvoker>();
+            services.AddTransient<IInvoke, PollingPublisherInvoker>();
+            services.AddTransient<IInvoke, OutboxInvoker>();
             services.AddTransient<IInvoke, SubscriptionInvoker>();
             services.AddTransient<IInvoke, BrokerInvoker>();
-            services.AddTransient<IChannel, DefaultChannel>();
+            services.AddTransient< IChannel, DefaultChannel>();
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
@@ -38,7 +43,6 @@ namespace Panama.Canal
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
             services.AddSingleton<PublishedRetry>();
-            services.AddSingleton<DelayedReceived>();
             services.AddSingleton<DelayedPublished>();
             
             services.AddSingleton(new Job(
@@ -46,9 +50,6 @@ namespace Panama.Canal
                 expression: "0/1 * * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(DelayedPublished),
-                expression: "0/0 1 * * * ?"));
-            services.AddSingleton(new Job(
-                type: typeof(DelayedReceived),
                 expression: "0/0 1 * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(PublishedRetry),

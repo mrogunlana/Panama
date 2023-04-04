@@ -43,5 +43,30 @@ namespace Panama.Extensions
             return context.Data.KvpGetSingle<K, V>(key);
         }
 
+        public static IContext Add(this IContext context, IEnumerable<IModel> data)
+        {
+            if (data == null)
+                return context;
+
+            context.Data.AddRange(data);
+
+            return context;
+        }
+        public static IContext Add(this IContext context, params IModel[] data)
+        {
+            if (data == null)
+                return context;
+
+            context.Data.AddRange(data);
+
+            return context;
+        }
+
+        public static IContext Token(this IContext context, CancellationToken token)
+        {
+            context.Token = token;
+
+            return context;
+        }
     }
 }

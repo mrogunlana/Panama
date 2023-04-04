@@ -1,27 +1,30 @@
 ﻿using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Invokers;
-using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi;
+using Panama.TestApi.Sagas;
 
 namespace Panama.Tests.Commands
 {
-    public class PublishWeatherForecast : ICommand
+    public class StartWeatherForecastSaga : ICommand
     {
-        private readonly IDefaultChannelFactory _factory;
+        private readonly ISagaFactory _sagas;
+        private readonly IDefaultChannelFactory _channels;
 
-        public PublishWeatherForecast(IDefaultChannelFactory factory)
+        public StartWeatherForecastSaga(
+              IDefaultChannelFactory channels
+            , ISagaFactory sagas)
         {
-            _factory = factory;
+            _sagas = sagas;
+            _channels = channels;
         }
         public async Task Execute(IContext context)
         {
             var models = context.Data.DataGet<WeatherForecast>();
 
-            using (var channel = _factory.CreateChannel<DefaultChannel>())
+            using (var channel = _channels.CreateChannel<DefaultChannel>())
             {
                 await context.Bus()
                     .Channel(channel)
@@ -33,17 +36,7 @@ namespace Panama.Tests.Commands
                     .Nack("foo.event.failed")
                     .Post();
 
-                await context.Bus()
-                    .Channel(channel)
-                    .Token(context.Token)
-                    .Topic("bar.event")
-                    .Group("bar")
-                    .Target<DefaultTarget>()
-                    .Invoker<PollingPublisherInvoker>()
-                    .Data(models)
-                    .Ack("bar.event.success")
-                    .Nack("bar.event.failed")
-                    .Post();
+                await _sagas.StartSaga<CreateWeatherForcastSaga>(channel, models);
 
                 await channel.Commit();
             }

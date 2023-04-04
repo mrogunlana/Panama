@@ -1,6 +1,5 @@
 ﻿using Panama.Canal.Models;
 using Panama.Interfaces;
-using System.Collections.Generic;
 
 namespace Panama.Canal.Interfaces
 {
@@ -9,5 +8,6 @@ namespace Panama.Canal.Interfaces
         EventContext Context { get; }
 
         Task<IResult> Post(CancellationToken? token = null);
+        Task<IResult> Post(InternalMessage message, CancellationToken? token = null);
     }
 }

@@ -2,6 +2,8 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Extensions;
+using Panama.Models;
 using Quartz;
 
 namespace Panama.Canal.Jobs
@@ -11,18 +13,18 @@ namespace Panama.Canal.Jobs
     {
         private readonly Job _job;
         private readonly IStore _store;
-        private readonly IDispatcher _dispatcher;
         private readonly IOptions<CanalOptions> _options;
+        private readonly IProcessorFactory _factory;
 
         public PublishedRetry(
               IStore store
             , IEnumerable<Job> jobs
-            , IDispatcher dispatcher
+            , IProcessorFactory factory
             , IOptions<CanalOptions> options)
         {
             _store = store;
             _options = options;
-            _dispatcher = dispatcher;
+            _factory = factory;
 
             _job = jobs.Where(x => x.Type == typeof(PublishedRetry)).First();
         }
@@ -39,7 +41,11 @@ namespace Panama.Canal.Jobs
             var retry = await _store.GetPublishedMessagesToRetry().ConfigureAwait(false);
 
             foreach (var publish in retry)
-                await _dispatcher.Publish(publish, context.CancellationToken).ConfigureAwait(false);
+                await _factory
+                    .GetProcessor(publish)
+                    .Execute(new Context()
+                        .Add(retry)
+                        .Token(context.CancellationToken));
 
             if (_options.Value.UseLock)
                 await _store.ReleasePublishedLock(token: context.CancellationToken);

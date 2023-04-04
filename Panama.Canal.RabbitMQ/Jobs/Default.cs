@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Exceptions;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
 using Quartz;
@@ -64,23 +66,34 @@ namespace Panama.Canal.RabbitMQ.Jobs
 
                     if (metadata.HasException())
                     {
-                        await _store.StoreReceivedMessage(metadata
-                            .ResetId()
-                            .AddCreatedTime()
-                            .ToInternal(_provider)
-                            .SetStatus(MessageStatus.Failed)
-                            .SetExpiration(_provider, DateTime.UtcNow));
+                        await _provider.GetRequiredService<IBus>()
+                            .Id(Guid.NewGuid().ToString())
+                            .CorrelationId(metadata.GetCorrelationId())
+                            .Invoker<InboxInvoker>()
+                            .Post(metadata
+                                .ResetId()
+                                .AddCreatedTime()
+                                .ToInternal(_provider)
+                                .SetStatus(MessageStatus.Failed)
+                                .SetExpiration(_provider, DateTime.UtcNow))
+                            .ConfigureAwait(false);
+
 
                         client.Commit(sender);
                     }
                     else
                     {
-                        await _store.StoreReceivedMessage(metadata
-                            .ResetId()
-                            .AddCreatedTime()
-                            .ToInternal(_provider)
-                            .SetStatus(MessageStatus.Scheduled)
-                            .SetExpiration(_provider));
+                        await _provider.GetRequiredService<IBus>()
+                            .Id(Guid.NewGuid().ToString())
+                            .CorrelationId(metadata.GetCorrelationId())
+                            .Invoker<InboxInvoker>()
+                            .Post(metadata
+                                .ResetId()
+                                .AddCreatedTime()
+                                .ToInternal(_provider)
+                                .SetStatus(MessageStatus.Scheduled)
+                                .SetExpiration(_provider))
+                            .ConfigureAwait(false);
 
                         client.Commit(sender);
                     }

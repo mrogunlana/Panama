@@ -106,5 +106,12 @@ namespace Panama.Extensions
 
             scope.Complete();
         }
+
+        public static IResult Add(this IResult result, string message)
+        {
+            result.Messages.Add(message);
+
+            return result;
+        }
     }
 }

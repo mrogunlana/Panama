@@ -4,23 +4,22 @@ using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
-using System.Transactions;
 
 namespace Panama.Canal.Invokers
 {
-    public class StreamInvoker : IInvoke
+    public class PollingReceiverInvoker : IInvoke
     {
         private readonly IStore _store;
-        private readonly IDispatcher _dispatcher;
         private readonly IBootstrap _bootstrapper;
+        private readonly IServiceProvider _provider;
 
-        public StreamInvoker(
+        public PollingReceiverInvoker(
               IStore store
             , IBootstrap bootstrapper
-            , IDispatcher dispatcher)
+            , IServiceProvider provider)
         {
             _store = store;
-            _dispatcher = dispatcher;
+            _provider = provider;
             _bootstrapper = bootstrapper;
         }
         public async Task<IResult> Invoke(IContext? context = null)
@@ -37,13 +36,14 @@ namespace Panama.Canal.Invokers
 
             message.SetStatus(MessageStatus.Scheduled);
 
-            await _store.StoreOutboxMessage(
-                message: message, 
+            var published = await _store.StoreReceivedMessage(
+                message: message,
                 transaction: context.Transaction)
                 .ConfigureAwait(false);
 
             var result = new Result()
-                .Success();
+                .Success()
+                .Queue(published);
 
             return result;
         }

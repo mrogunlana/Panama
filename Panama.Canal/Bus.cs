@@ -23,8 +23,6 @@ namespace Panama.Canal
 
         public async Task<IResult> Post(CancellationToken? token = null)
         {
-            var source = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, Context.Token);
-
             var message = new Message()
                 .AddMessageId(Guid.NewGuid().ToString())
                 .AddMessageName(Context.Name)
@@ -40,7 +38,14 @@ namespace Panama.Canal
                 .AddAck(Context.Ack)
                 .AddNack(Context.Nack)
                 .ToInternal(Context.Provider);
-            
+
+            return await Post(message, token);
+        }
+
+        public async Task<IResult> Post(InternalMessage message, CancellationToken? token = null)
+        {
+            var source = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, Context.Token);
+
             var context = new Context(
                 id: Context.Id,
                 data: message,
@@ -49,7 +54,11 @@ namespace Panama.Canal
                 correlationId: Context.CorrelationId,
                 transaction: Context.Transaction);
 
-            return await Context.Invoker.Invoke(context).ConfigureAwait(false);
+            var result = await Context.Invoker.Invoke(context).ConfigureAwait(false);
+
+            Context?.Channel?.Queue?.EnqueueResult(result);
+
+            return result;
         }
     }
 }

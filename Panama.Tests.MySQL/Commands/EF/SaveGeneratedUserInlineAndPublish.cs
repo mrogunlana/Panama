@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MySqlConnector;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -85,12 +86,15 @@ namespace Panama.Tests.MySQL.Commands.EF
 
                 user._ID = id;
 
-                await channel.Post(
-                    name: "foo.event",
-                    group: "foo",
-                    data: user,
-                    ack: "foo.event.success",
-                    nack: "foo.event.failed").ConfigureAwait(false);
+                await context.Bus()
+                    .Channel(channel)
+                    .Token(context.Token)
+                    .Topic("foo.event")
+                    .Group("foo")
+                    .Data(user)
+                    .Ack("foo.event.success")
+                    .Nack("foo.event.failed")
+                    .Post();
 
                 await channel.Commit();
                 

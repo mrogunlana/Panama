@@ -45,19 +45,14 @@ namespace Panama.Canal.Invokers
             var metadata = message.GetData<Message>(_provider);
             var data = message.GetData<IList<IModel>>(_provider);
             var group = metadata.GetGroup();
-            var instance = metadata.GetInstance();
-            var ack = metadata.GetAck();
-            var nack = metadata.GetNack();
-            var correlationId = metadata.GetCorrelationId();
+
             var target = Type.GetType(metadata.GetBroker());
-            var name = metadata.GetName();
-            
             if (target == null)
                 throw new InvalidOperationException($"Subscription target: {metadata.GetBroker()} could not be located.");
 
             try
             {
-                var subscriptions = _subscriptions.GetSubscriptions(target, group, name);
+                var subscriptions = _subscriptions.GetSubscriptions(target, group, metadata.GetName());
                 if (subscriptions == null)
                     return new Result().Success();
 
@@ -82,17 +77,19 @@ namespace Panama.Canal.Invokers
                 
                 _log.LogError(ex, reason);
 
-                if (!string.IsNullOrEmpty(nack))
+                if (!string.IsNullOrEmpty(metadata.GetNack()))
                     await _provider.GetRequiredService<IBus>()
-                        .Instance(instance)
+                        .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Id(Guid.NewGuid().ToString())
-                        .CorrelationId(correlationId)
-                        .Topic(nack)
+                        .CorrelationId(metadata.GetCorrelationId())
+                        .Topic(metadata.GetNack())
                         .Group(group)
                         .Data(data)
                         .Stream()
                         .Target(target)
+                        .SagaId(metadata.GetSagaId())
+                        .SagaType(metadata.GetSagaType())
                         .Post()
                         .ConfigureAwait(false);
 
@@ -100,17 +97,19 @@ namespace Panama.Canal.Invokers
                     .Fail(reason);
             }
 
-            if (!string.IsNullOrEmpty(ack))
+            if (!string.IsNullOrEmpty(metadata.GetAck()))
                 await _provider.GetRequiredService<IBus>()
-                        .Instance(instance)
+                        .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Id(Guid.NewGuid().ToString())
-                        .CorrelationId(correlationId)
-                        .Topic(ack)
+                        .CorrelationId(metadata.GetCorrelationId())
+                        .Topic(metadata.GetAck())
                         .Group(group)
                         .Data(data)
                         .Stream()
                         .Target(target)
+                        .SagaId(metadata.GetSagaId())
+                        .SagaType(metadata.GetSagaType())
                         .Post()
                         .ConfigureAwait(false);
 

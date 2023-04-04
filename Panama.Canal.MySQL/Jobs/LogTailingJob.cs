@@ -2,10 +2,12 @@
 using MySqlCdc;
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Canal.Extensions;
 using Panama.Canal.MySQL.Extensions;
+using Panama.Extensions;
+using Panama.Models;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using Quartz;
@@ -18,8 +20,7 @@ namespace Panama.Canal.MySQL.Jobs
         private readonly BinlogClient _client;
         private readonly MySqlSettings _settings;
         private readonly IDispatcher _dispatcher;
-        private readonly IInitialize _initializer;
-        private readonly IStringEncryptor _encryptor;
+        private readonly IProcessorFactory _factory;
         private readonly IOptions<MySqlOptions> _options;
         private readonly IServiceProvider _provider;
 
@@ -27,20 +28,21 @@ namespace Panama.Canal.MySQL.Jobs
               MySqlSettings settings
             , IDispatcher dispatcher
             , IInitialize initializer
+            , IProcessorFactory factory
             , IOptions<MySqlOptions> options
             , IServiceProvider serviceProvider
+
             , StringEncryptorResolver stringEncryptorResolver)
         {
             //TODO: check the existance of MySqlCdCOptions in the 
             //registrar and if it's null, throw an exception as 
             //its table and database specific values below are required
 
+            _factory = factory;
             _options = options;
             _settings = settings;
             _dispatcher = dispatcher;
-            _initializer = initializer;
             _provider = serviceProvider;
-            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
             
             /*  NOTES: 
              * 
@@ -121,20 +123,12 @@ namespace Panama.Canal.MySQL.Jobs
                 var message = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
                 if (message == null)
                     throw new InvalidOperationException("Message headers cannot be found.");
-                
-                var delay = message.GetDelay();
 
-                if (delay == DateTime.MinValue)
-                    await _dispatcher.Publish(
-                        message: publish,
-                        token: context.CancellationToken)
-                        .ConfigureAwait(false);
-                else
-                    await _dispatcher.Schedule(
-                        message: publish,
-                        delay: delay,
-                        token: context.CancellationToken)
-                        .ConfigureAwait(false);
+                await _factory
+                    .GetProcessor(publish)
+                    .Execute(new Context()
+                        .Add(message)
+                        .Token(context.CancellationToken));
             }
         }
     }

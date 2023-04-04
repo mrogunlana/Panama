@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Interfaces;
@@ -37,24 +37,28 @@ namespace Panama.Tests.MySQL.Commands.EF
                 _context.Add(user);
                 _context.SaveChanges();
 
-                await channel.Post(
-                    name: "foo.event",
-                    group: "foo",
-                    data: user,
-                    ack: "foo.event.success",
-                    nack: "foo.event.failed")
-                    .ConfigureAwait(false);
+                await context.Bus()
+                    .Channel(channel)
+                    .Target<DefaultTarget>()
+                    .Token(context.Token)
+                    .Topic("foo.event")
+                    .Group("foo")
+                    .Data(user)
+                    .Ack("foo.event.success")
+                    .Nack("foo.event.failed")
+                    .Post();
 
-                await channel.Post<DefaultTarget>(
-                    name: "bar.event",
-                    group: "bar",
-                    data: user,
-                    ack: "bar.event.success",
-                    nack: "bar.event.failed")
-                    .ConfigureAwait(false);
+                await context.Bus()
+                    .Channel(channel)
+                    .Token(context.Token)
+                    .Topic("bar.event")
+                    .Group("bar")
+                    .Data(user)
+                    .Ack("bar.event.success")
+                    .Nack("bar.event.failed")
+                    .Post();
 
-                await channel.Commit()
-                    .ConfigureAwait(false);
+                await channel.Commit();
                 
                 context.Data.Add(user);
             }

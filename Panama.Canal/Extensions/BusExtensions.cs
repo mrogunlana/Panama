@@ -104,6 +104,16 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
+        public static IBus Channel(this IBus bus, IChannel? channel = null)
+        {
+            if (channel == null)
+                return bus;
+
+            bus.Context.Channel = channel;
+            bus.Context.Transaction = channel.Current;
+
+            return bus;
+        }
         public static IBus Group(this IBus bus, string? group = null)
         {
             if (group == null)
@@ -170,16 +180,36 @@ namespace Panama.Canal.Extensions
         }
         public static IBus Polling(this IBus bus)
         {
-            bus.Invoker<PollingInvoker>();
+            bus.Invoker<PollingPublisherInvoker>();
 
             return bus;
         }
 
         public static IBus Stream(this IBus bus)
         {
-            bus.Invoker<StreamInvoker>();
+            bus.Invoker<OutboxInvoker>();
 
             return bus;
         }
+
+        public static IBus SagaId(this IBus bus, string? id = null)
+        {
+            if (id == null)
+                return bus;
+
+            bus.Context.SagaId = id;
+
+            return bus;
+        }
+        public static IBus SagaType(this IBus bus, string? type = null)
+        {
+            if (type == null)
+                return bus;
+
+            bus.Context.SagaType = type;
+
+            return bus;
+        }
+
     }
 }
