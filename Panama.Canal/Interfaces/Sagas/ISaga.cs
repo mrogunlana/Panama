@@ -7,11 +7,12 @@ namespace Panama.Canal.Interfaces.Sagas
 {
     public interface ISaga
     {
+        string ReplyTopic { get; }
         List<ISagaState> States { get; set; }
         List<ISagaTrigger> Triggers { get; set; }
         StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
-        Task Configure(IContext context);
-        Task<IResult> Start();
+        void Configure(IContext context);
+        Task Start();
         Task<IResult> Continue(SagaContext context);
     }
 }

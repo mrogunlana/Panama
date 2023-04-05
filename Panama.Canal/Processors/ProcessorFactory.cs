@@ -18,7 +18,7 @@ namespace Panama.Canal.Processors
         public IProcessor GetProcessor(InternalMessage message)
         {
             var data = message.GetData<Message>(_provider);
-            if (data.IsSagaParticipant())
+            if (data.IsSagaReply())
                 return _provider.GetRequiredService<SagaProcessor>();
 
             return _provider.GetRequiredService<DefaultProcessor>();

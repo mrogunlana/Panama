@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Interfaces;
@@ -73,7 +74,7 @@ namespace Panama.Canal.Extensions
 
             return context;
         }
-        public static async Task<IResult> Start(this SagaContext context)
+        public static async Task Start(this SagaContext context)
         {
             if (context.Type == null)
                 throw new InvalidOperationException($"Saga cannot be located from type: {context?.Type?.Name}");
@@ -86,7 +87,9 @@ namespace Panama.Canal.Extensions
             if (saga == null)
                 throw new InvalidOperationException($"Saga cannot be converted from type: {result.GetType().Name}");
 
-            return await saga.Continue(context);
+            saga.Configure(context);
+
+            await saga.Start();
         }
     }
 }

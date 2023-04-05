@@ -18,11 +18,14 @@ namespace Panama.Canal.Sagas
         private readonly ILogger _log;
         private readonly IStore _store;
         private readonly IServiceProvider _provider;
+        private readonly ISagaTriggerFactory _triggers;
         private readonly IOptions<CanalOptions> _canalOptions;
 
         public StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
+
         public List<ISagaState> States { get; set; }
         public List<ISagaTrigger> Triggers { get; set; }
+        public string ReplyTopic { get; }
 
         public Saga(IServiceProvider provider)
         {
@@ -30,9 +33,11 @@ namespace Panama.Canal.Sagas
             _store = provider.GetRequiredService<IStore>();
             _log = provider.GetRequiredService<ILogger<Saga>>();
             _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>(); ;
+            _triggers = provider.GetRequiredService<ISagaTriggerFactory>();
 
             States = new List<ISagaState>();
             Triggers = new List<ISagaTrigger>();
+            ReplyTopic = $"{_canalOptions.Value.TopicPrefix}.{this.GetType().Name}.reply";
 
             States.Add(new NotStarted());
 
@@ -41,7 +46,7 @@ namespace Panama.Canal.Sagas
 
         public virtual Task<IResult> Continue(SagaContext context)
         {
-            StateMachine.OnTransitionCompletedAsync(async (transition) => {
+            StateMachine.OnTransitionCompleted((transition) => {
                 var i = context.DataGetSingle<InternalMessage>();
                 var m = i.GetData<Message>(_provider);
                 var e = new SagaEvent();
@@ -52,7 +57,7 @@ namespace Panama.Canal.Sagas
                 e.Destination = transition?.Destination?.ToString() ?? string.Empty;
                 e.Expires = (DateTime.UtcNow.ToUniversalTime()).AddSeconds(_canalOptions.Value.SucceedMessageExpiredAfter);
 
-                await _store.StoreSagaEvent(e);
+                _store.StoreSagaEvent(e).GetAwaiter().GetResult();
             });
 
             StateMachine.OnUnhandledTrigger((state, trigger) => {
@@ -70,13 +75,13 @@ namespace Panama.Canal.Sagas
                 provider: _provider, 
                 correlationId: message.GetCorrelationId()).Add(message));
 
-            StateMachine.Fire(message.GetSagaTrigger(_provider));
+            StateMachine.Fire(_triggers.Get(message.GetSagaTrigger()));
 
             return Task.FromResult(new Result().Success());
         }
 
-        public abstract Task Configure(IContext context);
+        public abstract void Configure(IContext context);
 
-        public abstract Task<IResult> Start();
+        public abstract Task Start();
     }
 }

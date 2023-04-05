@@ -2,5 +2,5 @@
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast.States
 {
-    public class SendFailedWeatherForcastNotification : ISagaTrigger { }
+    public class CreateWeatherForcastPublishResultsComplete : ISagaState { }
 }

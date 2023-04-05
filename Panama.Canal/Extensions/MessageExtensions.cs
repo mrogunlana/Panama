@@ -259,7 +259,7 @@ namespace Panama.Canal.Extensions
             return result;
         }
 
-        public static ISagaTrigger GetSagaTrigger(this Message message, IServiceProvider provider)
+        public static string GetSagaTrigger(this Message message)
         {
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
@@ -268,11 +268,7 @@ namespace Panama.Canal.Extensions
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.SagaTrigger} cannot be found.");
 
-            var type = Type.GetType(result);
-            if (type == null)
-                throw new InvalidOperationException($"Header: {Headers.SagaTrigger} type cannot be found.");
-
-            return (ISagaTrigger)provider.GetRequiredService(type);
+            return result;
         }
 
         public static bool IsSagaParticipant(this Message message)
@@ -283,6 +279,21 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(id))
                 return false;
             if (string.IsNullOrEmpty(type))
+                return false;
+
+            return true;
+        }
+
+        public static bool IsSagaReply(this Message message)
+        {
+            var type = message.GetSagaType();
+            var name = message.GetName();
+
+            if (string.IsNullOrEmpty(type))
+                return false;
+            if (string.IsNullOrEmpty(name))
+                return false;
+            if (!name.Contains(type, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             return true;

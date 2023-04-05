@@ -1,10 +1,11 @@
 ﻿using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Interfaces.Sagas;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi;
-using Panama.TestApi.Sagas.CreateWeatherForcastSaga;
+using Panama.TestApi.Sagas;
 
 namespace Panama.Tests.Commands
 {
