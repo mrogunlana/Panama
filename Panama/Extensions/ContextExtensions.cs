@@ -61,7 +61,6 @@ namespace Panama.Extensions
 
             return context;
         }
-
         public static IContext Token(this IContext context, CancellationToken token)
         {
             context.Token = token;

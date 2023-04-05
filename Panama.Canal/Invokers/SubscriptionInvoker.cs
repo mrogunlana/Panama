@@ -77,13 +77,13 @@ namespace Panama.Canal.Invokers
                 
                 _log.LogError(ex, reason);
 
-                if (!string.IsNullOrEmpty(metadata.GetNack()))
+                if (!string.IsNullOrEmpty(metadata.GetReply()))
                     await _provider.GetRequiredService<IBus>()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
-                        .Topic(metadata.GetNack())
+                        .Topic(metadata.GetReply())
                         .Group(group)
                         .Data(data)
                         .Stream()
@@ -97,13 +97,13 @@ namespace Panama.Canal.Invokers
                     .Fail(reason);
             }
 
-            if (!string.IsNullOrEmpty(metadata.GetAck()))
+            if (!string.IsNullOrEmpty(metadata.GetReply()))
                 await _provider.GetRequiredService<IBus>()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
-                        .Topic(metadata.GetAck())
+                        .Topic(metadata.GetReply())
                         .Group(group)
                         .Data(data)
                         .Stream()

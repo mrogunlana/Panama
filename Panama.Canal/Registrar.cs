@@ -2,10 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Processors;
+using Panama.Canal.Sagas;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Quartz;
@@ -34,6 +36,9 @@ namespace Panama.Canal
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();
             services.AddSingleton<IStore, Store>();
+            services.AddSingleton<ISagaFactory, SagaFactory>();
+            services.AddSingleton<ISagaTriggerFactory, SagaTriggerFactory>();
+            services.AddSingleton<ISagaStateFactory, SagaStateFactory>();
 
             var settings = new MemorySettings();
             config.GetSection("MemorySettings").Bind(settings);
@@ -85,6 +90,8 @@ namespace Panama.Canal
             AddPanamaCanalBase(services, config);
 
             services.AddAssemblyTypes<ISubscribe>(assemblies.Distinct(), false);
+            services.AddAssemblyTypes<ISagaState>(assemblies.Distinct(), true);
+            services.AddAssemblyTypes<ISagaTrigger>(assemblies.Distinct(), true);
         }
     }
 }

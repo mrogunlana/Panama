@@ -4,7 +4,7 @@ using Panama.Canal.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi;
-using Panama.TestApi.Sagas;
+using Panama.TestApi.Sagas.CreateWeatherForcastSaga;
 
 namespace Panama.Tests.Commands
 {

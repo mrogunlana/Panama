@@ -52,8 +52,7 @@ namespace Panama.Canal.Invokers
             var metadata = message.GetData<Message>(_provider);
             var data = message.GetData<IList<IModel>>(_provider);
             var group = metadata.GetGroup();
-            var ack = metadata.GetAck();
-            var nack = metadata.GetNack();
+            var ack = metadata.GetReply();
             var target = Type.GetType(metadata.GetBroker());
             
             if (target == null)

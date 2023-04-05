@@ -35,8 +35,7 @@ namespace Panama.Canal
                 .AddDelayTime(Context.Delay)
                 .AddHeaders(Context.Headers)
                 .AddData(Context.Data)
-                .AddAck(Context.Ack)
-                .AddNack(Context.Nack)
+                .AddReply(Context.Ack)
                 .ToInternal(Context.Provider);
 
             return await Post(message, token);

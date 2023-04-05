@@ -1,7 +1,7 @@
 ﻿using Panama.Canal.Models;
 using Panama.Interfaces;
 
-namespace Panama.Canal.Interfaces
+namespace Panama.Canal.Interfaces.Sagas
 {
     public interface ISagaFactory
     {

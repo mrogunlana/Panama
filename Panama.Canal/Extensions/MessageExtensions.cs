@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Models;
 using Panama.Security.Resolvers;
 using System.Text;
@@ -94,21 +95,22 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddAck(this Message message, string? value)
+        public static Message AddReply(this Message message, string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
 
-            message.Headers.Add(Headers.Ack, value);
+            message.Headers.Add(Headers.Reply, value);
 
             return message;
         }
-        public static Message AddNack(this Message message, string? value)
+        public static Message AddTrigger<T>(this Message message, T value)
+            where T : ISagaTrigger
         {
-            if (string.IsNullOrEmpty(value))
+            if (value == null)
                 return message;
-
-            message.Headers.Add(Headers.Nack, value);
+            
+            message.Headers.Add(Headers.SagaTrigger, value.GetType().AssemblyQualifiedName);
 
             return message;
         }
@@ -169,21 +171,12 @@ namespace Panama.Canal.Extensions
 
             return result;
         }
-        public static string GetAck(this Message message)
+        public static string GetReply(this Message message)
         {
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.Ack];
-            
-            return result ?? string.Empty;
-        }
-        public static string GetNack(this Message message)
-        {
-            if (message.Headers == null)
-                throw new InvalidOperationException("Message headers cannot be found.");
-
-            var result = message.Headers[Headers.Nack];
+            var result = message.Headers[Headers.Reply];
             
             return result ?? string.Empty;
         }
@@ -264,6 +257,22 @@ namespace Panama.Canal.Extensions
                 throw new InvalidOperationException($"Header: {Headers.SagaId} cannot be found.");
 
             return result;
+        }
+
+        public static ISagaTrigger GetSagaTrigger(this Message message, IServiceProvider provider)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            var result = message.Headers[Headers.SagaTrigger];
+            if (result == null)
+                throw new InvalidOperationException($"Header: {Headers.SagaTrigger} cannot be found.");
+
+            var type = Type.GetType(result);
+            if (type == null)
+                throw new InvalidOperationException($"Header: {Headers.SagaTrigger} type cannot be found.");
+
+            return (ISagaTrigger)provider.GetRequiredService(type);
         }
 
         public static bool IsSagaParticipant(this Message message)
