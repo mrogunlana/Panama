@@ -49,7 +49,7 @@ namespace Panama.Canal.MySQL
                     
                     CREATE TABLE IF NOT EXISTS `{_settings.PublishedTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
-                      `Id` varchar(150) DEFAULT NULL,
+                      `Id` varchar(150) NOT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
                       `Name` varchar(400) NOT NULL,
@@ -113,6 +113,22 @@ namespace Panama.Canal.MySQL
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
                       INDEX `IX_Expires`(`Expires`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+                    CREATE TABLE IF NOT EXISTS `{_settings.SagaTable}` (
+                      `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `Id` varchar(150) DEFAULT NULL,
+                      `BinaryId` BINARY(16) NOT NULL,
+                      `CorrelationId` varchar(150) DEFAULT NULL,
+                      `Trigger` varchar(200) DEFAULT NULL,
+                      `Source` varchar(200) DEFAULT NULL,
+                      `Destination` varchar(200) DEFAULT NULL,
+                      `Content` longtext,
+                      `Created` datetime NOT NULL,
+                      `Expires` datetime DEFAULT NULL,
+                      PRIMARY KEY (`_Id`),
+                      INDEX `IX_Expires`(`Expires`),
+                      INDEX `IX_BinaryId`(`BinaryId`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_settings.LockTable}` (
@@ -560,7 +576,7 @@ namespace Panama.Canal.MySQL
                  @Group,
                  @Content,
                  @Retries,
-                 NOW(),
+                 UTC_TIMESTAMP(),
                  @Expires,
                  @Status);
                  
@@ -664,7 +680,7 @@ namespace Panama.Canal.MySQL
                 @Group,
                 @Content,
                 @Retries,
-                NOW(),
+                UTC_TIMESTAMP(),
                 @Expires,
                 @Status);
 
@@ -768,7 +784,7 @@ namespace Panama.Canal.MySQL
                 @Group,
                 @Content,
                 @Retries,
-                NOW(),
+                UTC_TIMESTAMP(),
                 @Expires,
                 @Status);
 
@@ -872,7 +888,7 @@ namespace Panama.Canal.MySQL
                 @Group,
                 @Content,
                 @Retries,
-                NOW(),
+                UTC_TIMESTAMP(),
                 @Expires,
                 @Status);
 
@@ -946,7 +962,6 @@ namespace Panama.Canal.MySQL
             return message;
         }
 
-
         public async Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             _log.LogDebug($"Deleting expired data from table: {table}.");
@@ -990,7 +1005,7 @@ namespace Panama.Canal.MySQL
                     Value = batch,
                 });
 
-                var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                var result = await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 connection.Close();
 
                 _log.LogDebug($"Deletion of expired data from table: {table} complete.");
@@ -1195,6 +1210,181 @@ namespace Panama.Canal.MySQL
                 , task
                 , token)
                 .ConfigureAwait(false);
+        }
+
+        public async Task<SagaEvent> StoreSagaEvent(SagaEvent saga)
+        {
+            var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync().ConfigureAwait(false);
+
+            using var command = connection.CreateCommand();
+            command.CommandText = $@"
+
+                INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.SagaTable}`
+                (`Id`,
+                `BinaryId`,
+                `CorrelationId`,
+                `Content`,
+                `Trigger`,
+                `Source`,
+                `Destination`,
+                `Created`,
+                `Expires`)
+                VALUES
+                (@Id,
+                UNHEX(MD5(TRIM(LOWER(@Id)))),
+                @CorrelationId,
+                @Content,
+                @Trigger,
+                @Source,
+                @Destination,
+                UTC_TIMESTAMP(),
+                @Expires);
+
+                SELECT LAST_INSERT_ID();";
+
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = saga.Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@CorrelationId",
+                DbType = DbType.String,
+                Value = saga.CorrelationId,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Content",
+                DbType = DbType.String,
+                Value = saga.Content.IsContentBase64()
+                    ? saga.Content
+                    : _encryptor.ToString(saga.Content ?? string.Empty)
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Trigger",
+                DbType = DbType.String,
+                Value = saga.Trigger,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Source",
+                DbType = DbType.String,
+                Value = saga.Source,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Destination",
+                DbType = DbType.String,
+                Value = saga.Destination,
+            });
+            
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Created",
+                DbType = DbType.DateTime,
+                Value = saga.Created,
+            });
+            command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@Expires",
+                DbType = DbType.DateTime,
+                Value = saga.Expires.HasValue ? saga.Expires.Value : DBNull.Value,
+            });
+
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+
+            connection.Close();
+
+            saga._Id = result.ToInt();
+
+            return saga;
+        }
+
+        public async Task<IEnumerable<SagaEvent>> GetSagaEvents(string id)
+        {
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand($@"
+                    
+                    SELECT 
+                         `_Id`
+                        ,`Id` 
+                        ,`CorrelationId`
+                        ,`Content`
+                        ,`Trigger` 
+                        ,`Source` 
+                        ,`Destination` 
+                        ,`Created` 
+                        ,`Expires`
+                    FROM `{_mysqlOptions.Value.Database}`.`{_settings.SagaTable}`
+                    WHERE `BinaryId` = UNHEX(MD5(TRIM(LOWER(@Id))))
+                    LIMIT 200;"
+
+                , connection);
+
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Id",
+                    DbType = DbType.String,
+                    Value = id
+                });
+
+                var results = new List<SagaEvent>();
+                var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
+                var map = _settings.GetMap(_settings.SagaTable);
+
+                while (await reader.ReadAsync().ConfigureAwait(false))
+                {
+                    var model = new SagaEvent();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        model.SetValue<SagaEvent>(map[i], reader.GetValue(i));
+
+                    results.Add(model);
+                }
+
+                connection.Close();
+
+                return results;
+            }
+        }
+
+        public async Task<int> DeleteExpiredSagaEvents(DateTime timeout, int batch = 1000, CancellationToken token = default)
+        {
+            
+            _log.LogDebug($"Deleting expired data from table: {_settings.SagaTable}.");
+
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
+            {
+                if (connection.State == ConnectionState.Closed)
+                    await connection.OpenAsync().ConfigureAwait(false);
+
+                using var command = new MySqlCommand($@"
+                    DELETE FROM `{_mysqlOptions.Value.Database}`.`{_settings.SagaTable}`
+                    WHERE Expires < @Timeout 
+                    limit @Batch;"
+
+                , connection);
+
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Timeout",
+                    DbType = DbType.DateTime,
+                    Value = timeout,
+                });
+                
+                command.Parameters.Add(new MySqlParameter {
+                    ParameterName = "@Batch",
+                    DbType = DbType.Int32,
+                    Value = batch,
+                });
+
+                var result = await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+                connection.Close();
+
+                _log.LogDebug($"Deletion of expired data from table: {_settings.SagaTable} complete.");
+
+                return result;
+            }
+
+
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Panama.Canal.MySQL
         public MySqlType Type { set; get; } = MySqlType.None;
         public string PublishedTable { set; get; } = String.Empty;
         public string ReceivedTable { set; get; } = String.Empty;
+        public string SagaTable { set; get; } = String.Empty;
         public string OutboxTable { set; get; } = String.Empty;
         public string InboxTable { set; get; } = String.Empty;
         public string LockTable { set; get; } = String.Empty;
@@ -15,9 +16,11 @@ namespace Panama.Canal.MySQL
         public int ReceivedTableId { get; set; } = 0;
         public int InboxTableId { get; set; } = 0;
         public int OutboxTableId { get; set; } = 0;
+        public int SagaTableId { get; set; } = 0;
         public Dictionary<int, string> PublishedTableMap { set; get; } = new Dictionary<int, string>();
         public Dictionary<int, string> ReceivedTableMap { set; get; } = new Dictionary<int, string>();
         public Dictionary<int, string> OutboxTableMap { set; get; } = new Dictionary<int, string>();
         public Dictionary<int, string> InboxTableMap { set; get; } = new Dictionary<int, string>();
+        public Dictionary<int, string> SagaTableMap { set; get; } = new Dictionary<int, string>();
     }
 }

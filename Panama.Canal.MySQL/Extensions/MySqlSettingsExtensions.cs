@@ -10,10 +10,16 @@ namespace Panama.Canal.MySQL.Extensions
             if (string.IsNullOrEmpty(table))
                 throw new ArgumentNullException("Table name must have value to get schema map.");
 
-            if (table.Equals(nameof(settings.PublishedTableMap), StringComparison.InvariantCultureIgnoreCase))
+            if (table.Equals(settings.PublishedTable, StringComparison.InvariantCultureIgnoreCase))
                 return settings.PublishedTableMap;
-            if (table.Equals(nameof(settings.ReceivedTableMap), StringComparison.InvariantCultureIgnoreCase))
+            if (table.Equals(settings.ReceivedTable, StringComparison.InvariantCultureIgnoreCase))
                 return settings.ReceivedTableMap;
+            if (table.Equals(settings.InboxTable, StringComparison.InvariantCultureIgnoreCase))
+                return settings.InboxTableMap;
+            if (table.Equals(settings.OutboxTable, StringComparison.InvariantCultureIgnoreCase))
+                return settings.OutboxTableMap;
+            if (table.Equals(settings.SagaTable, StringComparison.InvariantCultureIgnoreCase))
+                return settings.SagaTableMap;
 
             throw new Exception($"Table map {table} not found!");
         }

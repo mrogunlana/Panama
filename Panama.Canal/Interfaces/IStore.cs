@@ -34,5 +34,8 @@ namespace Panama.Canal.Interfaces
         Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
         Task GetDelayedPublishedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
         Task GetDelayedReceivedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default);
+        Task<SagaEvent> StoreSagaEvent(SagaEvent saga);
+        Task<IEnumerable<SagaEvent>> GetSagaEvents(string id);
+        Task<int> DeleteExpiredSagaEvents(DateTime timeout, int batch = 1000, CancellationToken token = default);
     }
 }

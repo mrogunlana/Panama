@@ -20,6 +20,7 @@
     <PackageReference Include="Quartz" Version="3.6.2" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.6.2" />
+    <PackageReference Include="Stateless" Version="5.13.0" />
   </ItemGroup>
 
 </Project>

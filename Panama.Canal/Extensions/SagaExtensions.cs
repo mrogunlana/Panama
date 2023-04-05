@@ -86,7 +86,7 @@ namespace Panama.Canal.Extensions
             if (saga == null)
                 throw new InvalidOperationException($"Saga cannot be converted from type: {result.GetType().Name}");
 
-            return await saga.Start(context);
+            return await saga.Continue(context);
         }
     }
 }

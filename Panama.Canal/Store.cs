@@ -20,6 +20,7 @@ namespace Panama.Canal
         private readonly ConcurrentDictionary<string, InternalMessage> _received;
         private readonly ConcurrentDictionary<string, InternalMessage> _inbox;
         private readonly ConcurrentDictionary<string, InternalMessage> _outbox;
+        private readonly ConcurrentDictionary<string, SagaEvent> _saga;
 
 
         public Store(
@@ -37,6 +38,7 @@ namespace Panama.Canal
             _received = new ConcurrentDictionary<string, InternalMessage>();
             _inbox = new ConcurrentDictionary<string, InternalMessage>();
             _outbox = new ConcurrentDictionary<string, InternalMessage>();
+            _saga = new ConcurrentDictionary<string, SagaEvent>();
         }
 
         public Task<bool> AcquireLock(string key, TimeSpan ttl, string? instance = null, CancellationToken token = default)
@@ -182,6 +184,21 @@ namespace Panama.Canal
             return Task.FromResult(removed);
         }
 
+        public Task<int> DeleteExpiredSagaEvents(DateTime timeout, int batch = 1000, CancellationToken token = default)
+        {
+            var removed = 0;
+            var ids = _saga.Values
+                    .Where(x => x.Expires < timeout)
+                    .Select(x => x.Id)
+                    .Take(batch);
+
+            foreach (var id in ids)
+                if (_outbox.TryRemove(id, out _))
+                    removed++;
+
+            return Task.FromResult(removed);
+        }
+
         public Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
             var result = _published.Values.Where(x =>
@@ -262,6 +279,14 @@ namespace Panama.Canal
             return Task.FromResult(result);
         }
 
+        public Task<IEnumerable<SagaEvent>> GetSagaEvents(string id)
+        {
+            var result = _saga.Values.Where(x => x.Id == id)
+                .Select(x => x);
+
+            return Task.FromResult(result);
+        }
+
         public Task<Dictionary<int, string>> GetSchema(string table)
         {
             return Task.FromResult(new Dictionary<int, string>());
@@ -335,6 +360,13 @@ namespace Panama.Canal
             _received[message.Id] = message;
 
             return Task.FromResult(message);
+        }
+
+        public Task<SagaEvent> StoreSagaEvent(SagaEvent saga)
+        {
+            _saga[saga.Id] = saga;
+
+            return Task.FromResult(saga);
         }
     }
 }

@@ -34,6 +34,7 @@ namespace Panama.Canal.MySQL.Intializers
             _settings.LockTable = $"{_options.Value.TablePrefix}.Lock";
             _settings.OutboxTable = $"{_options.Value.TablePrefix}.Outbox";
             _settings.InboxTable = $"{_options.Value.TablePrefix}.Inbox";
+            _settings.SagaTable = $"{_options.Value.TablePrefix}.Saga";
 
             //2. Initialize Database Store
             await _store.Init();
@@ -43,10 +44,12 @@ namespace Panama.Canal.MySQL.Intializers
             _settings.ReceivedTableId = await _store.GetTableId(_settings.ReceivedTable).ConfigureAwait(false);
             _settings.OutboxTableId = await _store.GetTableId(_settings.OutboxTable).ConfigureAwait(false);
             _settings.InboxTableId = await _store.GetTableId(_settings.InboxTable).ConfigureAwait(false);
+            _settings.SagaTableId = await _store.GetTableId(_settings.SagaTable).ConfigureAwait(false);
             _settings.PublishedTableMap = await _store.GetSchema(_settings.PublishedTable).ConfigureAwait(false);
             _settings.ReceivedTableMap = await _store.GetSchema(_settings.ReceivedTable).ConfigureAwait(false);
             _settings.OutboxTableMap = await _store.GetSchema(_settings.OutboxTable).ConfigureAwait(false);
             _settings.InboxTableMap = await _store.GetSchema(_settings.InboxTable).ConfigureAwait(false);
+            _settings.SagaTableMap = await _store.GetSchema(_settings.SagaTable).ConfigureAwait(false);
         }
     }
 }
