@@ -24,7 +24,7 @@ namespace Panama.Canal.Sagas
         public StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
 
         public List<ISagaState> States { get; set; }
-        public List<ISagaTrigger> Triggers { get; set; }
+        public List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
         public string ReplyTopic { get; }
 
         public Saga(IServiceProvider provider)
@@ -36,7 +36,7 @@ namespace Panama.Canal.Sagas
             _triggers = provider.GetRequiredService<ISagaTriggerFactory>();
 
             States = new List<ISagaState>();
-            Triggers = new List<ISagaTrigger>();
+            Triggers = new List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>();
             ReplyTopic = $"{_canalOptions.Value.TopicPrefix}.{this.GetType().Name}.reply";
 
             States.Add(new NotStarted());
@@ -70,18 +70,20 @@ namespace Panama.Canal.Sagas
             var message = context.DataGetSingle<InternalMessage>()
                     .GetData<Message>(_provider);
 
-            Configure(new Context(
-                token: context.Token, 
-                provider: _provider, 
-                correlationId: message.GetCorrelationId()).Add(message));
+            var session = new Context(
+                token: context.Token,
+                provider: _provider,
+                correlationId: message.GetCorrelationId()).Add(message);
 
-            StateMachine.Fire(_triggers.Get(message.GetSagaTrigger()));
+            Configure(session);
+
+            StateMachine.Fire(_triggers.Create(message.GetSagaTrigger(), StateMachine), session);
 
             return Task.FromResult(new Result().Success());
         }
 
         public abstract void Configure(IContext context);
 
-        public abstract Task Start();
+        public abstract Task Start(IContext context);
     }
 }

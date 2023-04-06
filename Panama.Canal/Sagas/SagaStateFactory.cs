@@ -10,7 +10,7 @@ namespace Panama.Canal.Sagas
         {
             _provider = provider;   
         }
-        public ISagaState Get<T>() where T : ISagaState
+        public ISagaState Create<T>() where T : ISagaState
         {
             return _provider.GetRequiredService<T>();
         }

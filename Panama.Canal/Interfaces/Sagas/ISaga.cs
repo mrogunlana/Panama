@@ -9,10 +9,10 @@ namespace Panama.Canal.Interfaces.Sagas
     {
         string ReplyTopic { get; }
         List<ISagaState> States { get; set; }
-        List<ISagaTrigger> Triggers { get; set; }
+        List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
         StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
         void Configure(IContext context);
-        Task Start();
+        Task Start(IContext context);
         Task<IResult> Continue(SagaContext context);
     }
 }

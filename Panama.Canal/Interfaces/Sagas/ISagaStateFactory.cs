@@ -2,6 +2,6 @@
 {
     public interface ISagaStateFactory
     {
-        ISagaState Get<T>() where T : ISagaState;
+        ISagaState Create<T>() where T : ISagaState;
     }
 }

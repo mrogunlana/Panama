@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Models;
-using Panama.Models;
-using Quartz.Impl.AdoJobStore.Common;
+using Panama.Interfaces;
+using Stateless;
 
 namespace Panama.Canal.Sagas
 {
@@ -13,18 +13,20 @@ namespace Panama.Canal.Sagas
         {
             _provider = provider;   
         }
-        public ISagaTrigger Get<T>() where T : ISagaTrigger
+        public StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Create<T>(StateMachine<ISagaState, ISagaTrigger> machine) where T : ISagaTrigger
         {
-            return _provider.GetRequiredService<T>();
+            var result = _provider.GetRequiredService<T>();
+
+            return machine.SetTriggerParameters<IContext>(result);
         }
 
-        public ISagaTrigger Get(string type)
+        public StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Create(string type, StateMachine<ISagaState, ISagaTrigger> machine)
         {
             var result = Type.GetType(type);
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.SagaTrigger} type cannot be found.");
 
-            return (ISagaTrigger)_provider.GetRequiredService(result);
+            return machine.SetTriggerParameters<IContext>((ISagaTrigger)_provider.GetRequiredService(result));
         }
     }
 }

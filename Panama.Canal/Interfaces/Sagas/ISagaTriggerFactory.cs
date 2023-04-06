@@ -1,8 +1,11 @@
-﻿namespace Panama.Canal.Interfaces.Sagas
+﻿using Panama.Interfaces;
+using Stateless;
+
+namespace Panama.Canal.Interfaces.Sagas
 {
     public interface ISagaTriggerFactory
     {
-        ISagaTrigger Get<T>() where T : ISagaTrigger;
-        ISagaTrigger Get(string type);
+        StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Create<T>(StateMachine<ISagaState, ISagaTrigger> machine) where T : ISagaTrigger;
+        StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Create(string type, StateMachine<ISagaState, ISagaTrigger> machine);
     }
 }
