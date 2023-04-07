@@ -1,7 +1,7 @@
-﻿using Panama.Canal.Interfaces.Sagas;
-using Panama.Canal.Models;
+﻿using Panama.Canal.Models;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 
-namespace Panama.Canal.Sagas
+namespace Panama.Canal.Sagas.Stateless
 {
     public class SagaFactory : ISagaFactory
     {

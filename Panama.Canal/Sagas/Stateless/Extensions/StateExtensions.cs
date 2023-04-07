@@ -1,6 +1,6 @@
-﻿using Panama.Canal.Interfaces.Sagas;
+﻿using Panama.Canal.Sagas.Stateless.Interfaces;
 
-namespace Panama.Canal.Sagas.Extensions
+namespace Panama.Canal.Sagas.Stateless.Extensions
 {
     public static class StateExtensions
     {
@@ -9,7 +9,7 @@ namespace Panama.Canal.Sagas.Extensions
         {
             if (states == null)
                 throw new ArgumentNullException(nameof(states));
-            
+
             var result = states.Where(x => x is T).FirstOrDefault();
             if (result == null)
                 throw new InvalidOperationException($"State of type: {typeof(T).Name} could not be located.");

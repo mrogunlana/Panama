@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
 using Stateless;
 
-namespace Panama.Canal.Sagas
+namespace Panama.Canal.Sagas.Stateless
 {
     public class SagaTriggerFactory : ISagaTriggerFactory
     {
-        private readonly IServiceProvider _provider; 
+        private readonly IServiceProvider _provider;
         public SagaTriggerFactory(IServiceProvider provider)
         {
-            _provider = provider;   
+            _provider = provider;
         }
         public StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Create<T>(StateMachine<ISagaState, ISagaTrigger> machine) where T : ISagaTrigger
         {

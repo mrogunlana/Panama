@@ -2,12 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Processors;
-using Panama.Canal.Sagas;
+using Panama.Canal.Sagas.Stateless;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Quartz;

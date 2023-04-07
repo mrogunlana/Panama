@@ -3,16 +3,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Models;
-using Panama.Canal.Models.Sagas;
+using Panama.Canal.Sagas.Stateless.Interfaces;
+using Panama.Canal.Sagas.Stateless.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
 using Panama.Security.Resolvers;
 using Stateless;
 
-namespace Panama.Canal.Sagas
+namespace Panama.Canal.Sagas.Stateless
 {
     public abstract class Saga : ISaga
     {
@@ -34,13 +34,13 @@ namespace Panama.Canal.Sagas
             _provider = provider;
             _store = provider.GetRequiredService<IStore>();
             _log = provider.GetRequiredService<ILogger<Saga>>();
-            _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>(); 
+            _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>();
             _triggers = provider.GetRequiredService<ISagaTriggerFactory>();
             _resolver = provider.GetRequiredService<StringEncryptorResolver>();
 
             States = new List<ISagaState>();
             Triggers = new List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>();
-            ReplyTopic = $"{_canalOptions.Value.TopicPrefix}.{this.GetType().Name}.reply";
+            ReplyTopic = $"{_canalOptions.Value.TopicPrefix}.{GetType().Name}.reply";
 
             States.Add(new NotStarted());
 
@@ -49,7 +49,8 @@ namespace Panama.Canal.Sagas
 
         public virtual Task<IResult> Continue(SagaContext context)
         {
-            StateMachine.OnTransitionCompleted((transition) => {
+            StateMachine.OnTransitionCompleted((transition) =>
+            {
                 var i = context.DataGetSingle<InternalMessage>();
                 var m = i.GetData<Message>(_provider);
                 var e = new SagaEvent();
@@ -58,12 +59,13 @@ namespace Panama.Canal.Sagas
                 e.CorrelationId = m.GetCorrelationId();
                 e.Source = transition?.Source?.ToString() ?? string.Empty;
                 e.Destination = transition?.Destination?.ToString() ?? string.Empty;
-                e.Expires = (DateTime.UtcNow.ToUniversalTime()).AddSeconds(_canalOptions.Value.SucceedMessageExpiredAfter);
+                e.Expires = DateTime.UtcNow.ToUniversalTime().AddSeconds(_canalOptions.Value.SucceedMessageExpiredAfter);
 
                 _store.StoreSagaEvent(e).GetAwaiter().GetResult();
             });
 
-            StateMachine.OnUnhandledTrigger((state, trigger) => {
+            StateMachine.OnUnhandledTrigger((state, trigger) =>
+            {
                 var id = context.DataGetSingle<InternalMessage>()
                     .GetData<Message>(_provider)
                     .GetSagaId();

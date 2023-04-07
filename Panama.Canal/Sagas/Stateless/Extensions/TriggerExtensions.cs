@@ -1,10 +1,10 @@
 ﻿using Panama.Canal.Interfaces;
-using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
 using Stateless;
 
-namespace Panama.Canal.Sagas.Extensions
+namespace Panama.Canal.Sagas.Stateless.Extensions
 {
     public static class TriggerExtensions
     {

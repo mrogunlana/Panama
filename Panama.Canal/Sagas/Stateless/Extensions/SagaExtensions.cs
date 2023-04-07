@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
 using Quartz.Util;
 
-namespace Panama.Canal.Extensions
+namespace Panama.Canal.Sagas.Stateless.Extensions
 {
     public static class SagaExtensions
     {
@@ -51,7 +51,7 @@ namespace Panama.Canal.Extensions
         public static SagaContext Data(this SagaContext context, params IModel[]? models)
         {
             if (models == null)
-                return context; 
+                return context;
 
             foreach (var model in models)
                 context.Data.Add(model);
