@@ -92,6 +92,7 @@ namespace Panama.Canal
             services.AddAssemblyTypes<ISubscribe>(assemblies.Distinct(), false);
             services.AddAssemblyTypes<ISagaState>(assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaTrigger>(assemblies.Distinct(), true);
+            services.AddAssemblyTypes<ISagaEvent>(assemblies.Distinct(), false);
         }
     }
 }

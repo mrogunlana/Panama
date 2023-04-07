@@ -1,16 +1,11 @@
-﻿using Panama.Canal.Channels;
-using Panama.Canal.Extensions;
-using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.Sagas.Stateless;
+﻿using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
-using Panama.Extensions;
 using Panama.Interfaces;
+using Panama.TestApi.Sagas.CreateWeatherForcast.Events;
 using Panama.TestApi.Sagas.CreateWeatherForcast.States;
 using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
-using Panama.Canal.Sagas.Extensions;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast
 {
@@ -49,84 +44,38 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             Triggers.Add(_triggers.Create<PublishCreateWeatherForcastResults>(StateMachine));
 
             StateMachine.Configure(States.Get<NotStarted>())
-                .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (context) =>
-                {
-                    //TODO: post create weather forcast message on eventbus here..
-                    var model = context.DataGetSingle<WeatherForecast>();
-                    var channels = context.Provider.GetRequiredService<IDefaultChannelFactory>();
-
-                    using (var channel = channels.CreateChannel<DefaultChannel>())
-                    {
-                        context.Bus()
-                            .Data(model)
-                            .Channel(channel)
-                            .Reply(context.GetReplyTopic())
-                            .Token(context.Token)
-                            .Topic("weatherforcast.create")
-                            .Trigger<ReviewCreateWeatherForcastAnswer>()
-                            .Post().GetAwaiter().GetResult();
-
-                        channel.Commit().GetAwaiter().GetResult();
-                    }
-
-                    return context.GetState<CreateWeatherForcastRequested>();
+                .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (context) => {
+                    return context.ExecuteEvent<CreateWeatherForcastEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRequestAnswered>())
-                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (context) =>
-                {
-                    var message = context.DataGetSingle<Message>();
-
-                    return message.HasException()
-                        ? context.GetState<CreateWeatherForcastFailed>()
-                        : context.GetState<CreateWeatherForcastCreated>();
+                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (context) => {
+                    return context.ExecuteEvent<ReviewCreateWeatherForcastAnswerEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastCreated>())
-                .PermitDynamic(Triggers.Get<SendCreatedWeatherForcastNotification>(), (context) =>
-                {
-
-                    //TODO: send success notification here..
-
-                    return context.GetState<CreateWeatherForcastComplete>();
+                .PermitDynamic(Triggers.Get<SendCreatedWeatherForcastNotification>(), (context) => {
+                    return context.ExecuteEvent<SendCreatedWeatherForcastNotificationEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastComplete>())
-                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) =>
-                {
-
-                    //TODO: publish weather forcast to read models here..
-
-                    return context.GetState<CreateWeatherForcastPublishResultsComplete>();
+                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) => {
+                    return context.ExecuteEvent<SendCreatedWeatherForcastNotificationEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailed>())
-                .PermitDynamic(Triggers.Get<RollbackCreateWeatherForcast>(), (context) =>
-                {
-
-                    //TODO: rollback weather forcast here..
-
-                    return context.GetState<CreateWeatherForcastRollbackRequested>();
+                .PermitDynamic(Triggers.Get<RollbackCreateWeatherForcast>(), (context) => {
+                    return context.ExecuteEvent<SendCreatedWeatherForcastNotificationEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRollbackAnswered>())
-                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastRollbackAnswer>(), (context) =>
-                {
-
-                    //TODO: send review rollback response here..
-                    //but this is a repeatable trasaction so the response doesn't matter in this case
-                    //so we just send the failed notification instead
-
-                    return context.GetState<CreateWeatherForcastFailedNotificationSent>();
+                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastRollbackAnswer>(), (context) => {
+                    return context.ExecuteEvent<ReviewCreateWeatherForcastRollbackAnswerEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailedNotificationSent>())
-                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) =>
-                {
-
-                    //TODO: publish weather forcast to read models here..
-
-                    return context.GetState<CreateWeatherForcastPublishResultsComplete>();
+                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) => {
+                    return context.ExecuteEvent<PublishCreateWeatherForcastResultsEvent>();
                 });
         }
 

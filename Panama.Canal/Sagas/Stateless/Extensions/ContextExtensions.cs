@@ -1,4 +1,5 @@
-﻿using Panama.Canal.Sagas.Stateless.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Stateless;
@@ -26,6 +27,14 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
                 throw new InvalidOperationException("No triggers can be located.");
 
             return triggers.Get<T>();
+        }
+
+        public static ISagaState ExecuteEvent<E>(this IContext context)
+            where E : ISagaEvent
+        {
+            var @event = context.Provider.GetRequiredService<E>();
+
+            return @event.Execute(context).GetAwaiter().GetResult();
         }
     }
 }
