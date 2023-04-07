@@ -159,6 +159,13 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+        public static T? GetData<T>(this Message message)
+        {
+            if (message.Value is T)
+                return (T)message.Value;
+
+            return default;
+        }
 
         public static string GetGroup(this Message message)
         {

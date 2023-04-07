@@ -8,8 +8,7 @@ namespace Panama.Canal.Models
 {
     public class BusContext : Context
     {
-        public string Ack { get; set; } = String.Empty;
-        public string Nack { get; set; } = String.Empty;
+        public string Reply { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
         public string Group { get; set; } = String.Empty;
         public string Instance { get; set; } = String.Empty;

@@ -43,7 +43,7 @@ namespace Panama.Extensions
             return context.Data.KvpGetSingle<K, V>(key);
         }
 
-        public static IContext Add(this IContext context, IEnumerable<IModel> data)
+        public static IContext Add(this IContext context, IEnumerable<IModel>? data)
         {
             if (data == null)
                 return context;

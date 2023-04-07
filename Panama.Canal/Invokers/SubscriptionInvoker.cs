@@ -81,6 +81,7 @@ namespace Panama.Canal.Invokers
                     await _provider.GetRequiredService<IBus>()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
+                        .Header(Headers.Exception, ex.Message)
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
                         .Topic(metadata.GetReply())

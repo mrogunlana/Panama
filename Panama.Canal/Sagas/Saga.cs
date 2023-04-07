@@ -9,6 +9,7 @@ using Panama.Canal.Models.Sagas;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
+using Panama.Security.Resolvers;
 using Stateless;
 
 namespace Panama.Canal.Sagas
@@ -20,6 +21,7 @@ namespace Panama.Canal.Sagas
         private readonly IServiceProvider _provider;
         private readonly ISagaTriggerFactory _triggers;
         private readonly IOptions<CanalOptions> _canalOptions;
+        private readonly StringEncryptorResolver _resolver;
 
         public StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
 
@@ -32,8 +34,9 @@ namespace Panama.Canal.Sagas
             _provider = provider;
             _store = provider.GetRequiredService<IStore>();
             _log = provider.GetRequiredService<ILogger<Saga>>();
-            _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>(); ;
+            _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>(); 
             _triggers = provider.GetRequiredService<ISagaTriggerFactory>();
+            _resolver = provider.GetRequiredService<StringEncryptorResolver>();
 
             States = new List<ISagaState>();
             Triggers = new List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>();
@@ -70,10 +73,12 @@ namespace Panama.Canal.Sagas
             var message = context.DataGetSingle<InternalMessage>()
                     .GetData<Message>(_provider);
 
+            var data = message.GetData<IList<IModel>>();
+
             var session = new Context(
                 token: context.Token,
                 provider: _provider,
-                correlationId: message.GetCorrelationId()).Add(message);
+                correlationId: message.GetCorrelationId()).Add(message).Add(data);
 
             Configure(session);
 

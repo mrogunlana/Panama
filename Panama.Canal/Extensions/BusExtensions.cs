@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Interfaces.Sagas;
 using Panama.Canal.Invokers;
+using Panama.Canal.Models;
 using Panama.Interfaces;
 using Quartz.Util;
 
@@ -37,21 +39,12 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
-        public static IBus Ack(this IBus bus, string? ack = null)
+        public static IBus Reply(this IBus bus, string? ack = null)
         {
             if (ack == null)
                 return bus;
 
-            bus.Context.Ack = ack;
-
-            return bus;
-        }
-        public static IBus Nack(this IBus bus, string? nack = null)
-        {
-            if (nack == null)
-                return bus;
-
-            bus.Context.Nack = nack;
+            bus.Context.Reply = ack;
 
             return bus;
         }
@@ -211,5 +204,12 @@ namespace Panama.Canal.Extensions
             return bus;
         }
 
+        public static IBus Trigger<T>(this IBus bus)
+            where T : ISagaTrigger
+        {
+            bus.Context.Headers.Add(Headers.SagaTrigger, typeof(T).GetType().AssemblyQualifiedName);
+
+            return bus;
+        }
     }
 }

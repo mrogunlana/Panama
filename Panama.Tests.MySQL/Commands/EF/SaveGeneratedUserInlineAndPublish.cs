@@ -92,8 +92,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                     .Topic("foo.event")
                     .Group("foo")
                     .Data(user)
-                    .Ack("foo.event.success")
-                    .Nack("foo.event.failed")
+                    .Reply("foo.event.success")
                     .Post();
 
                 await channel.Commit();

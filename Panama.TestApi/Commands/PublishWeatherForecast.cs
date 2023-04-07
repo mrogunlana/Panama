@@ -29,8 +29,7 @@ namespace Panama.Tests.Commands
                     .Topic("foo.event")
                     .Group("foo")
                     .Data(models)
-                    .Ack("foo.event.success")
-                    .Nack("foo.event.failed")
+                    .Reply("foo.event.success")
                     .Post();
 
                 await context.Bus()
@@ -41,8 +40,7 @@ namespace Panama.Tests.Commands
                     .Target<DefaultTarget>()
                     .Invoker<PollingPublisherInvoker>()
                     .Data(models)
-                    .Ack("bar.event.success")
-                    .Nack("bar.event.failed")
+                    .Reply("bar.event.success")
                     .Post();
 
                 await channel.Commit();

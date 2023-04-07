@@ -32,8 +32,7 @@ namespace Panama.Tests.Commands
                     .Topic("foo.event")
                     .Group("foo")
                     .Data(models)
-                    .Ack("foo.event.success")
-                    .Nack("foo.event.failed")
+                    .Reply("foo.event.success")
                     .Post();
 
                 await context.Saga<CreateWeatherForcastSaga>()

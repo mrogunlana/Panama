@@ -44,8 +44,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                     .Topic("foo.event")
                     .Group("foo")
                     .Data(user)
-                    .Ack("foo.event.success")
-                    .Nack("foo.event.failed")
+                    .Reply("foo.event.success")
                     .Post();
 
                 await context.Bus()
@@ -54,8 +53,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                     .Topic("bar.event")
                     .Group("bar")
                     .Data(user)
-                    .Ack("bar.event.success")
-                    .Nack("bar.event.failed")
+                    .Reply("bar.event.success")
                     .Post();
 
                 await channel.Commit();
