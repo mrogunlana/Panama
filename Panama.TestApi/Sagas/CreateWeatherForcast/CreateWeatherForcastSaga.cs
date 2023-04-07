@@ -10,6 +10,7 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi.Sagas.CreateWeatherForcast.States;
 using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
+using Panama.Canal.Sagas.Extensions;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast
 {
@@ -17,16 +18,13 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
     {
         private readonly ISagaStateFactory _states;
         private readonly ISagaTriggerFactory _triggers;
-        private readonly IDefaultChannelFactory _channels;
 
         public CreateWeatherForcastSaga(IServiceProvider provider,
             ISagaStateFactory states,
-            ISagaTriggerFactory triggers,
-            IDefaultChannelFactory channels)
+            ISagaTriggerFactory triggers)
             : base(provider)
         {
             _states = states;
-            _channels = channels;
             _triggers = triggers;
         }
 
@@ -53,16 +51,16 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             StateMachine.Configure(States.Get<NotStarted>())
                 .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (context) =>
                 {
-
                     //TODO: post create weather forcast message on eventbus here..
                     var model = context.DataGetSingle<WeatherForecast>();
+                    var channels = context.Provider.GetRequiredService<IDefaultChannelFactory>();
 
-                    using (var channel = _channels.CreateChannel<DefaultChannel>())
+                    using (var channel = channels.CreateChannel<DefaultChannel>())
                     {
                         context.Bus()
                             .Data(model)
                             .Channel(channel)
-                            .Reply(ReplyTopic)
+                            .Reply(context.GetReplyTopic())
                             .Token(context.Token)
                             .Topic("weatherforcast.create")
                             .Trigger<ReviewCreateWeatherForcastAnswer>()
@@ -71,7 +69,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
                         channel.Commit().GetAwaiter().GetResult();
                     }
 
-                    return States.Get<CreateWeatherForcastRequested>();
+                    return context.GetState<CreateWeatherForcastRequested>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRequestAnswered>())
@@ -133,11 +131,6 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
                 });
         }
 
-        public override async Task Start(IContext context)
-        {
-            Configure(context);
-
-            await StateMachine.FireAsync(Triggers.Get<CreateNewWeatherForcast>(), context);
-        }
+        public override async Task Start(IContext context) => await StateMachine.FireAsync(Triggers.Get<CreateNewWeatherForcast>(), context);
     }
 }

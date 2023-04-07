@@ -3,6 +3,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Models;
 using Panama.Canal.Sagas.Interfaces;
 using Panama.Canal.Sagas.Models;
+using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 
 namespace Panama.Canal.Sagas.Stateless
@@ -30,11 +31,9 @@ namespace Panama.Canal.Sagas.Stateless
         public async Task Start<S>(SagaContext context)
             where S : ISaga
         {
-            var result = context.Provider.GetRequiredService<S>();
-            if (result == null || result is not IStatelessSaga)
-                throw new InvalidOperationException($"Saga cannot be located from type: {typeof(S).GetType().Name}");
+            context.Type = typeof(S);
 
-            await result.Start(context);
+            await context.Start();
         }
     }
 }

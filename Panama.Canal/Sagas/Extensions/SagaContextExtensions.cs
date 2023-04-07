@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces;
+﻿using Panama.Canal.Interfaces;
 using Panama.Canal.Sagas.Models;
-using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Sagas.Extensions
 {
-    public static class SagaExtensions
+    public static class SagaContextExtensions
     {
         public static SagaContext Type<T>(this SagaContext context)
         {
@@ -70,21 +68,6 @@ namespace Panama.Canal.Sagas.Extensions
                 context.Data.Add(model);
 
             return context;
-        }
-        public static async Task Start(this SagaContext context)
-        {
-            if (context.Type == null)
-                throw new InvalidOperationException($"Saga cannot be located from type: {context?.Type?.Name}");
-
-            var result = context.Provider.GetRequiredService(context.Type);
-            if (result is not IStatelessSaga)
-                throw new InvalidOperationException($"Saga cannot be located from type: {result.GetType().Name}");
-
-            var saga = result as IStatelessSaga;
-            if (saga == null)
-                throw new InvalidOperationException($"Saga cannot be converted from type: {result.GetType().Name}");
-
-            await saga.Start(context);
         }
     }
 }
