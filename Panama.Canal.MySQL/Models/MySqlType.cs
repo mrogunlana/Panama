@@ -1,6 +1,6 @@
-﻿namespace Panama.Canal.MySQL
+﻿namespace Panama.Canal.MySQL.Models
 {
-    public enum MySqlType 
+    public enum MySqlType
     {
         None = -1,
         MySql = 0,

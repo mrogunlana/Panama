@@ -1,14 +1,14 @@
 ﻿using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Sagas.Stateless.Extensions;
+using Panama.Canal.Sagas.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi;
-using Panama.TestApi.Sagas;
+using Panama.TestApi.Sagas.CreateWeatherForcast;
 
-namespace Panama.Tests.Commands
+namespace Panama.TestApi.Commands
 {
     public class StartWeatherForecastSaga : ICommand
     {

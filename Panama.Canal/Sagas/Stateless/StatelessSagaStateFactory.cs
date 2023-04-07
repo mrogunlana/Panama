@@ -3,10 +3,10 @@ using Panama.Canal.Sagas.Stateless.Interfaces;
 
 namespace Panama.Canal.Sagas.Stateless
 {
-    public class SagaStateFactory : ISagaStateFactory
+    public class StatelessSagaStateFactory : ISagaStateFactory
     {
         private readonly IServiceProvider _provider;
-        public SagaStateFactory(IServiceProvider provider)
+        public StatelessSagaStateFactory(IServiceProvider provider)
         {
             _provider = provider;
         }

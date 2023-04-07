@@ -5,7 +5,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 
-namespace Panama.Canal.Intializers
+namespace Panama.Canal.Initializers
 {
     internal class Subscriptions : IInitialize
     {
@@ -25,7 +25,7 @@ namespace Panama.Canal.Intializers
             _provider = provider;
             _subscriptions = subscriptions;
         }
-         
+
         public Task Invoke(CancellationToken token)
         {
             if (token.IsCancellationRequested)

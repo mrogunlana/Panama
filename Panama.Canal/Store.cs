@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Models;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Collections.Concurrent;

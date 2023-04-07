@@ -1,8 +1,8 @@
 ﻿using Panama.Interfaces;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Sagas.Models
 {
-    public class SagaEvent : IModel 
+    public class SagaEvent : IModel
     {
         public int _Id { get; set; }
         public string Id { get; set; }
@@ -16,7 +16,7 @@ namespace Panama.Canal.Models
 
         public SagaEvent()
         {
-            if (string.IsNullOrEmpty(Id)) 
+            if (string.IsNullOrEmpty(Id))
                 Id = Guid.NewGuid().ToString();
             if (Created == DateTime.MinValue)
                 Created = DateTime.UtcNow;

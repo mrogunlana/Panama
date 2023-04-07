@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Panama.Exceptions;
 using Panama.Interfaces;
 using Panama.Models;
-using Panama.Models.Exceptions;
 using System.Diagnostics;
 
 namespace Panama.Invokers

@@ -1,4 +1,5 @@
 ﻿using Panama.Canal.Models;
+using Panama.Canal.MySQL.Models;
 using System.Text.RegularExpressions;
 
 namespace Panama.Canal.MySQL.Extensions

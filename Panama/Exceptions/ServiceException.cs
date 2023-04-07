@@ -1,4 +1,4 @@
-﻿namespace Panama.Models.Exceptions
+﻿namespace Panama.Exceptions
 {
     [Serializable]
     public class ServiceException : Exception

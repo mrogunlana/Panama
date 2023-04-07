@@ -2,7 +2,7 @@
 using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Tests.Commands
+namespace Panama.TestApi.Commands
 {
     public class SerialCommand1 : ICommand
     {

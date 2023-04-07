@@ -8,7 +8,6 @@ using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Models;
 using Panama.Security;
-using Panama.Service;
 using Panama.Tests.MySQL.Commands;
 using Panama.Tests.MySQL.Commands.EF;
 using Panama.Tests.MySQL.Contexts;
@@ -19,7 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Panama.Tests
+namespace Panama.Tests.MySQL
 {
     [TestClass]
     public class MySqlTransactionTests
@@ -59,7 +58,8 @@ namespace Panama.Tests
             services.AddPanama(domain);
             services.AddPanamaSecurity();
 
-            services.AddDbContext<AppDbContext>(options => {
+            services.AddDbContext<AppDbContext>(options =>
+            {
                 var connectionString = configuration.GetConnectionString("MYSQL");
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
                     .LogTo(Console.WriteLine, LogLevel.Information)

@@ -1,14 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
 using Panama.Canal.Attributes;
 using Panama.Canal.Comparers;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Security.Resolvers;
 using System.Collections.ObjectModel;
-using System.Net;
-using System.Text;
 
 namespace Panama.Canal.Extensions
 {

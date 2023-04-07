@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.Sagas.Stateless.Extensions;
+using Panama.Canal.Sagas.Extensions;
+using Panama.Canal.Sagas.Models;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Extensions

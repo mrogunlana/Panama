@@ -1,14 +1,15 @@
 ﻿using Microsoft.Extensions.Options;
 using Panama.Canal.Interfaces;
+using Panama.Canal.MySQL.Models;
 
-namespace Panama.Canal.MySQL.Intializers
+namespace Panama.Canal.MySQL.Initializers
 {
     internal class Default : IInitialize
     {
         private readonly IStore _store;
         private readonly IOptions<MySqlOptions> _options;
         private readonly IServiceProvider _provider;
-        
+
         private MySqlSettings _settings = default!;
 
         public Default(

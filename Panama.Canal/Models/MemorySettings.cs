@@ -1,6 +1,6 @@
 ﻿using Panama.Interfaces;
 
-namespace Panama.Canal
+namespace Panama.Canal.Models
 {
     public class MemorySettings : IModel
     {

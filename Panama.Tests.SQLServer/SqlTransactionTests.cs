@@ -8,7 +8,6 @@ using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Models;
 using Panama.Security;
-using Panama.Service;
 using Panama.Tests.SQLServer.Commands;
 using Panama.Tests.SQLServer.Commands.EF;
 using Panama.Tests.SQLServer.Contexts;
@@ -19,7 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Panama.Tests
+namespace Panama.Tests.SQLServer
 {
     [TestClass]
     public class SqlTransactionTests
@@ -59,7 +58,8 @@ namespace Panama.Tests
             services.AddPanama(domain);
             services.AddPanamaSecurity();
 
-            services.AddDbContext<AppDbContext>(options => {
+            services.AddDbContext<AppDbContext>(options =>
+            {
                 var connectionString = configuration.GetConnectionString("MSSQL");
                 options.UseSqlServer(connectionString)
                     .LogTo(Console.WriteLine, LogLevel.Information)

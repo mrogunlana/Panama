@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
 using Panama.Extensions;
@@ -14,7 +15,7 @@ using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless
 {
-    public abstract class Saga : ISaga
+    public abstract class StatelessSaga : IStatelessSaga
     {
         private readonly ILogger _log;
         private readonly IStore _store;
@@ -29,11 +30,11 @@ namespace Panama.Canal.Sagas.Stateless
         public List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
         public string ReplyTopic { get; }
 
-        public Saga(IServiceProvider provider)
+        public StatelessSaga(IServiceProvider provider)
         {
             _provider = provider;
             _store = provider.GetRequiredService<IStore>();
-            _log = provider.GetRequiredService<ILogger<Saga>>();
+            _log = provider.GetRequiredService<ILogger<StatelessSaga>>();
             _canalOptions = provider.GetRequiredService<IOptions<CanalOptions>>();
             _triggers = provider.GetRequiredService<ISagaTriggerFactory>();
             _resolver = provider.GetRequiredService<StringEncryptorResolver>();

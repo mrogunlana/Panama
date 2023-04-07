@@ -5,7 +5,6 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Security;
-using Panama.Service;
 using Panama.Tests.Commands;
 using System;
 using System.Collections.Generic;

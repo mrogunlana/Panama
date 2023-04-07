@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces;
-using Panama.Canal.Invokers;
+﻿using Panama.Canal.Interfaces;
 using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Sagas.Models
 {
     public class SagaContext : Context
     {

@@ -5,6 +5,8 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Extensions;
+using Panama.Canal.MySQL.Models;
+using Panama.Canal.Sagas.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Security.Interfaces;

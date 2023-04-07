@@ -7,8 +7,9 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.MySQL.Channels;
-using Panama.Canal.MySQL.Intializers;
+using Panama.Canal.MySQL.Initializers;
 using Panama.Canal.MySQL.Jobs;
+using Panama.Canal.MySQL.Models;
 using Panama.Extensions;
 using System.Data;
 
@@ -28,7 +29,7 @@ namespace Panama.Canal.MySQL
             services.Remove<IStore>();
             services.AddSingleton(settings);
             services.AddSingleton<IStore, Store>();
-            services.AddSingleton<IInitialize, Intializers.Default>();
+            services.AddSingleton<IInitialize, Default>();
             services.AddSingleton<LogTailingJob>();
             services.AddSingleton(new Job(
                 type: typeof(LogTailingJob),

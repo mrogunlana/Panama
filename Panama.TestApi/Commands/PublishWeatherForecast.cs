@@ -7,7 +7,7 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi;
 
-namespace Panama.Tests.Commands
+namespace Panama.TestApi.Commands
 {
     public class PublishWeatherForecast : ICommand
     {

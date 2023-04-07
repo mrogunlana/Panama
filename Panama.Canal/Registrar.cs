@@ -36,9 +36,9 @@ namespace Panama.Canal
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();
             services.AddSingleton<IStore, Store>();
-            services.AddSingleton<ISagaFactory, SagaFactory>();
-            services.AddSingleton<ISagaTriggerFactory, SagaTriggerFactory>();
-            services.AddSingleton<ISagaStateFactory, SagaStateFactory>();
+            services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
+            services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
+            services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
 
             var settings = new MemorySettings();
             config.GetSection("MemorySettings").Bind(settings);

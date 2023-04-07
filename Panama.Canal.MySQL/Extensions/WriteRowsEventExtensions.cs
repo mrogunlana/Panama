@@ -1,5 +1,6 @@
 ﻿using MySqlCdc.Events;
 using Panama.Canal.Models;
+using Panama.Canal.MySQL.Models;
 
 namespace Panama.Canal.MySQL.Extensions
 {

@@ -3,7 +3,7 @@ using Panama.Canal.Extensions;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
-using Panama.Tests.Commands;
+using Panama.TestApi.Commands;
 
 
 namespace Panama.TestApi.Controllers

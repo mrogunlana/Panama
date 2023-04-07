@@ -6,10 +6,10 @@ using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless
 {
-    public class SagaTriggerFactory : ISagaTriggerFactory
+    public class StatelessSagaTriggerFactory : ISagaTriggerFactory
     {
         private readonly IServiceProvider _provider;
-        public SagaTriggerFactory(IServiceProvider provider)
+        public StatelessSagaTriggerFactory(IServiceProvider provider)
         {
             _provider = provider;
         }

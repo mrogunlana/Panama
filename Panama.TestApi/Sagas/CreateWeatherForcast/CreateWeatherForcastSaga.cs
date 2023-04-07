@@ -9,10 +9,11 @@ using Panama.Canal.Sagas.Stateless.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi.Sagas.CreateWeatherForcast.States;
+using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
 
-namespace Panama.TestApi.Sagas
+namespace Panama.TestApi.Sagas.CreateWeatherForcast
 {
-    public class CreateWeatherForcastSaga : Saga
+    public class CreateWeatherForcastSaga : StatelessSaga
     {
         private readonly ISagaStateFactory _states;
         private readonly ISagaTriggerFactory _triggers;
@@ -50,7 +51,8 @@ namespace Panama.TestApi.Sagas
             Triggers.Add(_triggers.Create<PublishCreateWeatherForcastResults>(StateMachine));
 
             StateMachine.Configure(States.Get<NotStarted>())
-                .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (context) =>
+                {
 
                     //TODO: post create weather forcast message on eventbus here..
                     var model = context.DataGetSingle<WeatherForecast>();
@@ -73,17 +75,19 @@ namespace Panama.TestApi.Sagas
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRequestAnswered>())
-                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (context) =>
+                {
 
                     var message = context.DataGetSingle<Message>();
-                    
+
                     return message.HasException()
                         ? States.Get<CreateWeatherForcastFailed>()
                         : States.Get<CreateWeatherForcastCreated>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastCreated>())
-                .PermitDynamic(Triggers.Get<SendCreatedWeatherForcastNotification>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<SendCreatedWeatherForcastNotification>(), (context) =>
+                {
 
                     //TODO: send success notification here..
 
@@ -91,7 +95,8 @@ namespace Panama.TestApi.Sagas
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastComplete>())
-                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) =>
+                {
 
                     //TODO: publish weather forcast to read models here..
 
@@ -99,7 +104,8 @@ namespace Panama.TestApi.Sagas
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailed>())
-                .PermitDynamic(Triggers.Get<RollbackCreateWeatherForcast>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<RollbackCreateWeatherForcast>(), (context) =>
+                {
 
                     //TODO: rollback weather forcast here..
 
@@ -107,7 +113,8 @@ namespace Panama.TestApi.Sagas
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRollbackAnswered>())
-                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastRollbackAnswer>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastRollbackAnswer>(), (context) =>
+                {
 
                     //TODO: send review rollback response here..
                     //but this is a repeatable trasaction so the response doesn't matter in this case
@@ -117,7 +124,8 @@ namespace Panama.TestApi.Sagas
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailedNotificationSent>())
-                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (IContext context) => {
+                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) =>
+                {
 
                     //TODO: publish weather forcast to read models here..
 

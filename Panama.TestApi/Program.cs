@@ -1,7 +1,7 @@
+using Panama;
 using Panama.Canal;
 using Panama.Canal.MySQL;
 using Panama.Security;
-using Panama.Service;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var builder = WebApplication.CreateBuilder(args);

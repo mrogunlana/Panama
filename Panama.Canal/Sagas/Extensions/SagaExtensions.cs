@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Invokers;
-using Panama.Canal.Models;
+using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
-using Quartz.Util;
 
-namespace Panama.Canal.Sagas.Stateless.Extensions
+namespace Panama.Canal.Sagas.Extensions
 {
     public static class SagaExtensions
     {
@@ -80,10 +77,10 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
                 throw new InvalidOperationException($"Saga cannot be located from type: {context?.Type?.Name}");
 
             var result = context.Provider.GetRequiredService(context.Type);
-            if (result is not ISaga)
+            if (result is not IStatelessSaga)
                 throw new InvalidOperationException($"Saga cannot be located from type: {result.GetType().Name}");
 
-            var saga = result as ISaga;
+            var saga = result as IStatelessSaga;
             if (saga == null)
                 throw new InvalidOperationException($"Saga cannot be converted from type: {result.GetType().Name}");
 

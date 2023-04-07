@@ -3,7 +3,7 @@ using Panama.Interfaces;
 using Panama.Models;
 using Panama.TestApi;
 
-namespace Panama.Tests.Commands
+namespace Panama.TestApi.Commands
 {
     public class AddRandomWeatherForecast : ICommand
     {
@@ -15,7 +15,8 @@ namespace Panama.Tests.Commands
 
             context.Data.AddRange(Enumerable
                 .Range(1, 5)
-                .Select(index => new WeatherForecast {
+                .Select(index => new WeatherForecast
+                {
                     Date = DateTime.Now.AddDays(index),
                     TemperatureC = Random.Shared.Next(-20, 55),
                     Summary = list[Random.Shared.Next(list.Count)].Value

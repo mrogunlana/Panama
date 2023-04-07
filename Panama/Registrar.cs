@@ -5,7 +5,7 @@ using Panama.Invokers;
 using Panama.Resolvers;
 using System.Reflection;
 
-namespace Panama.Service
+namespace Panama
 {
     public static class Registrar
     {
@@ -30,24 +30,24 @@ namespace Panama.Service
         }
         public static void AddPanama(this IServiceCollection services)
         {
-            AddPanamaBase(services);
+            services.AddPanamaBase();
 
             AddAssembly(services, Assembly.GetEntryAssembly()!);
         }
-        
+
         public static void AddPanama(this IServiceCollection services, Assembly assembly)
         {
-            AddPanamaBase(services);
+            services.AddPanamaBase();
 
-            AddAssembly(services, assembly);            
+            AddAssembly(services, assembly);
         }
 
         public static void AddPanama(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
-            AddPanamaBase(services);
+            services.AddPanamaBase();
 
             var assembliesToScan = assemblies.Distinct();
-            
+
             foreach (var assembly in assembliesToScan)
             {
                 AddAssembly(services, assembly);

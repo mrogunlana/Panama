@@ -2,7 +2,8 @@
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
-using Panama.Canal.Sagas.Stateless.Extensions;
+using Panama.Canal.Sagas.Extensions;
+using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -32,7 +33,7 @@ namespace Panama.Canal.Processors
                 throw new InvalidOperationException("Message headers cannot be found.");
             
             var data = message.GetData<Message>(_provider);
-            var saga = await _factory.Get(message);
+            var saga = _factory.Get(message);
             if (saga == null)
                 return new Result().Success().Add($"No saga located for message: {message.Id}, saga: {data.GetSagaType()}");
 
