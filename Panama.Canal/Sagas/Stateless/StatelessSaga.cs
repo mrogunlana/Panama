@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Sagas.Interfaces;
 using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
@@ -50,8 +51,7 @@ namespace Panama.Canal.Sagas.Stateless
 
         public virtual Task<IResult> Continue(SagaContext context)
         {
-            StateMachine.OnTransitionCompleted((transition) =>
-            {
+            StateMachine.OnTransitionCompleted((transition) => {
                 var i = context.DataGetSingle<InternalMessage>();
                 var m = i.GetData<Message>(_provider);
                 var e = new SagaEvent();
@@ -65,8 +65,7 @@ namespace Panama.Canal.Sagas.Stateless
                 _store.StoreSagaEvent(e).GetAwaiter().GetResult();
             });
 
-            StateMachine.OnUnhandledTrigger((state, trigger) =>
-            {
+            StateMachine.OnUnhandledTrigger((state, trigger) => {
                 var id = context.DataGetSingle<InternalMessage>()
                     .GetData<Message>(_provider)
                     .GetSagaId();
@@ -78,14 +77,23 @@ namespace Panama.Canal.Sagas.Stateless
 
             var data = message.GetData<IList<IModel>>();
 
-            var session = new Context(
+            Configure(new Context(
                 token: context.Token,
                 provider: _provider,
-                correlationId: message.GetCorrelationId()).Add(message).Add(data);
+                correlationId: message.GetCorrelationId()));
 
-            Configure(session);
+            var local = new Context(
+                token: context.Token,
+                id: Guid.NewGuid().ToString(),
+                correlationId: context.CorrelationId,
+                provider: _provider)
+                .Add(message)
+                .Add(data)
+                .Add(States)
+                .Add(new Kvp<string, string>("ReplyTopic", ReplyTopic))
+                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", Triggers));
 
-            StateMachine.Fire(_triggers.Create(message.GetSagaTrigger(), StateMachine), session);
+            StateMachine.Fire(_triggers.Create(message.GetSagaTrigger(), StateMachine), local);
 
             return Task.FromResult(new Result().Success());
         }

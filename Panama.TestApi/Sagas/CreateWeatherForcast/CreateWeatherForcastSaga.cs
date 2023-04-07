@@ -75,12 +75,11 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             StateMachine.Configure(States.Get<CreateWeatherForcastRequestAnswered>())
                 .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (context) =>
                 {
-
                     var message = context.DataGetSingle<Message>();
 
                     return message.HasException()
-                        ? States.Get<CreateWeatherForcastFailed>()
-                        : States.Get<CreateWeatherForcastCreated>();
+                        ? context.GetState<CreateWeatherForcastFailed>()
+                        : context.GetState<CreateWeatherForcastCreated>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastCreated>())
@@ -89,7 +88,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
 
                     //TODO: send success notification here..
 
-                    return States.Get<CreateWeatherForcastComplete>();
+                    return context.GetState<CreateWeatherForcastComplete>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastComplete>())
@@ -98,7 +97,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
 
                     //TODO: publish weather forcast to read models here..
 
-                    return States.Get<CreateWeatherForcastPublishResultsComplete>();
+                    return context.GetState<CreateWeatherForcastPublishResultsComplete>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailed>())
@@ -107,7 +106,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
 
                     //TODO: rollback weather forcast here..
 
-                    return States.Get<CreateWeatherForcastRollbackRequested>();
+                    return context.GetState<CreateWeatherForcastRollbackRequested>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRollbackAnswered>())
@@ -118,7 +117,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
                     //but this is a repeatable trasaction so the response doesn't matter in this case
                     //so we just send the failed notification instead
 
-                    return States.Get<CreateWeatherForcastFailedNotificationSent>();
+                    return context.GetState<CreateWeatherForcastFailedNotificationSent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailedNotificationSent>())
@@ -127,7 +126,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
 
                     //TODO: publish weather forcast to read models here..
 
-                    return States.Get<CreateWeatherForcastPublishResultsComplete>();
+                    return context.GetState<CreateWeatherForcastPublishResultsComplete>();
                 });
         }
 

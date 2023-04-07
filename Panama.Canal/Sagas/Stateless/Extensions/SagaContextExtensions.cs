@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces;
 using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
+using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless.Extensions
 {
@@ -29,8 +29,9 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
                 correlationId: context.CorrelationId,
                 provider: context.Provider)
                 .Add(context.Data)
+                .Add(saga.States)
                 .Add(new Kvp<string, string>("ReplyTopic", saga.ReplyTopic))
-                .Add(saga.States);
+                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", saga.Triggers));
 
             saga.Configure(local);
 
