@@ -30,11 +30,7 @@ namespace Panama.Canal
             services.AddSingleton<IProcessorFactory, ProcessorFactory>();
 
             services.AddTransient<IBus, Bus>();
-            services.AddTransient<IInvoke, PollingPublisherInvoker>();
-            services.AddTransient<IInvoke, OutboxInvoker>();
-            services.AddTransient<IInvoke, SubscriptionInvoker>();
-            services.AddTransient<IInvoke, BrokerInvoker>();
-            services.AddTransient<IChannel, DefaultChannel>();
+            
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
             services.AddSingleton<IBootstrap, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
@@ -83,6 +79,8 @@ namespace Panama.Canal
         {
             AddPanamaCanalBase(services, config);
 
+            services.AddAssemblyType(typeof(IInvoke), Assembly.GetEntryAssembly()!, false);
+            services.AddAssemblyType(typeof(IChannel), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyType(typeof(IInitialize), Assembly.GetEntryAssembly()!, true);
             services.AddAssemblyType(typeof(ISubscribe), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyType(typeof(ISagaState), Assembly.GetEntryAssembly()!, true);
@@ -95,6 +93,8 @@ namespace Panama.Canal
         {
             AddPanamaCanalBase(services, config);
 
+            services.AddAssemblyTypes<IInvoke>(assemblies.Distinct(), false);
+            services.AddAssemblyTypes<IChannel>(assemblies.Distinct(), false);
             services.AddAssemblyTypes<IInitialize>(assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaState>(assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaTrigger>(assemblies.Distinct(), true);

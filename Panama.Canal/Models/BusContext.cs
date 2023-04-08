@@ -10,7 +10,7 @@ namespace Panama.Canal.Models
     {
         public string Reply { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
-        public string Group { get; set; } = String.Empty;
+        public string? Group { get; set; }
         public string Instance { get; set; } = String.Empty;
         public string SagaType { get; set; } = String.Empty;
         public string SagaId { get; set; } = String.Empty;

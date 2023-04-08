@@ -17,7 +17,7 @@ namespace Panama.Canal.MySQL.Channels
               IProcessorFactory factory
             , IServiceProvider provider
             , ILogger<MySqlChannel> log)
-            : base(log, factory, provider)
+            : base(factory, provider)
         {
             _log = log;
             _provider = provider;

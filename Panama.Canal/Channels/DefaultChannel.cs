@@ -12,7 +12,7 @@ namespace Panama.Canal.Channels
 {
     public class DefaultChannel : IChannel
     {
-        private readonly ILogger _log;
+        private readonly ILogger<DefaultChannel> _log;
         private readonly IProcessorFactory _factory;
         private readonly IServiceProvider _provider;
         
@@ -20,14 +20,13 @@ namespace Panama.Canal.Channels
         public IInvoke Invoker { get; set; }
         public ConcurrentQueue<InternalMessage> Queue { get; }
         public DefaultChannel(
-              ILogger log
-            , IProcessorFactory factory
+              IProcessorFactory factory
             , IServiceProvider provider)
         {
-            _log = log;
             _factory = factory;
             _provider = provider;
-            
+            _log = _provider.GetRequiredService<ILogger<DefaultChannel>>();
+
             Queue = new ConcurrentQueue<InternalMessage>();
             Invoker = _provider.GetRequiredService<OutboxInvoker>();
         }
