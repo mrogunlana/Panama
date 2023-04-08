@@ -1,11 +1,10 @@
-﻿using Panama.Canal.Interfaces;
-using Panama.Interfaces;
+﻿using Panama.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
 namespace Panama.Canal.Models
 {
-    public class Subscriptions : IModel
+    public class ConsumerSubscriptions : IModel
     {
         private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>>? _subscriptions;
 

@@ -31,6 +31,33 @@ namespace Panama.Extensions
             return services;
         }
 
+        public static IServiceCollection AddAssemblyTypeByInterface<T>(this IServiceCollection services, Assembly assembly, bool singleton = true)
+        {
+            var type = typeof(T);
+            var types = from t in assembly.GetTypes()
+                        where type.IsAssignableFrom(t) && type.Name != t.Name
+                        select t;
+            foreach (var value in types)
+            {
+                if (singleton)
+                    services.AddSingleton(typeof(T), value);
+                else
+                    services.AddTransient(typeof(T), value);
+            }
+
+            return services;
+        }
+
+        public static IServiceCollection AddAssemblyTypesByInterface<T>(this IServiceCollection services, IEnumerable<Assembly> assemblies, bool singleton = true)
+        {
+            var scan = assemblies.Distinct();
+
+            foreach (var assembly in scan)
+                services.AddAssemblyTypeByInterface<T>(assembly, singleton);
+
+            return services;
+        }
+
         public static IServiceCollection Remove<T>(this IServiceCollection services)
         {
             if (services.IsReadOnly)

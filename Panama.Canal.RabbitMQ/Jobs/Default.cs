@@ -22,7 +22,7 @@ namespace Panama.Canal.RabbitMQ.Jobs
         private readonly CanalOptions _canal;
         private readonly ILogger<Default> _log;
         private readonly IBrokerFactory _factory;
-        private readonly Subscriptions _subscriptions;
+        private readonly ConsumerSubscriptions _subscriptions;
         private readonly IServiceProvider _provider;
 
         public Default(
@@ -30,7 +30,7 @@ namespace Panama.Canal.RabbitMQ.Jobs
             , ILogger<Default> log
             , IBrokerFactory factory
             , IServiceProvider provider
-            , Subscriptions subscriptions
+            , ConsumerSubscriptions subscriptions
             , IOptions<CanalOptions> canal
             , IOptions<RabbitMQOptions> options)
         {
