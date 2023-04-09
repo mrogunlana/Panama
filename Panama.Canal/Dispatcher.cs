@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
@@ -6,16 +7,16 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Interfaces;
-using Panama.Models;
 using Quartz;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
 
-namespace Panama.Canal.Jobs
+namespace Panama.Canal
 {
     [DisallowConcurrentExecution]
-    public class Dispatcher : IDispatcher, IJob
+    public class Dispatcher : IHostedService, ICanalService, IDispatcher
     {
+        private bool _off;
         private CancellationTokenSource? _cts;
 
         private readonly IStore _store;
@@ -28,6 +29,8 @@ namespace Panama.Canal.Jobs
         private DateTime _next = DateTime.MaxValue;
         private Channel<InternalMessage> _published = default!;
         private ConcurrentDictionary<string, Channel<InternalMessage>> _received = default!;
+
+        public bool Online => !_cts?.IsCancellationRequested ?? false;
 
         public IInvoke Brokers { get; set; }
         public IInvoke Subscriptions { get; set; }
@@ -48,7 +51,8 @@ namespace Panama.Canal.Jobs
             _received = new ConcurrentDictionary<string, Channel<InternalMessage>>(
                 options.Value.ConsumerThreads, options.Value.ConsumerThreads * 2);
             _published = Channel.CreateBounded<InternalMessage>(
-                new BoundedChannelOptions(capacity > 5000 ? 5000 : capacity) {
+                new BoundedChannelOptions(capacity > 5000 ? 5000 : capacity)
+                {
                     AllowSynchronousContinuations = true,
                     SingleReader = options.Value.ProducerThreads == 1,
                     SingleWriter = true,
@@ -178,7 +182,8 @@ namespace Panama.Canal.Jobs
 
                 var capacity = 300;
                 var channel = Channel.CreateBounded<InternalMessage>(
-                    new BoundedChannelOptions(capacity > 3000 ? 3000 : capacity) {
+                    new BoundedChannelOptions(capacity > 3000 ? 3000 : capacity)
+                    {
                         AllowSynchronousContinuations = true,
                         SingleReader = true,
                         SingleWriter = true,
@@ -193,11 +198,33 @@ namespace Panama.Canal.Jobs
             });
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        public Task Off(CancellationToken cancellationToken)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            if (_off)
+                return Task.CompletedTask;
 
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, CancellationToken.None);
+            _cts?.Cancel();
+
+            _cts?.Dispose();
+            _cts = null;
+            _off = true;
+
+            return Task.CompletedTask;
+        }
+
+        public async Task On(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (_cts != null)
+            {
+                _log.LogInformation("### Panama Canal Dispatcher is already started!");
+
+                return;
+            }
+
+            _log.LogDebug("### Panama Canal Dispatcher is starting.");
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _cts.Token.Register(() => _delay.Cancel());
 
             await Task.WhenAll(Enumerable.Range(0, _options.Value.ProducerThreads)
@@ -206,11 +233,22 @@ namespace Panama.Canal.Jobs
 
             GetOrAddReceiver(_options.Value.DefaultGroup);
 
-            await Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+            _ = Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
 
-            _log.LogDebug("Dispatcher exiting successfully.");
+            _off = false;
+            _log.LogInformation("### Panama Canal Dispatcher started!");
         }
-        
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await On(cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await Off(cancellationToken).ConfigureAwait(false);
+        }
+
         public async ValueTask Publish(InternalMessage message, CancellationToken? token = null)
         {
             try

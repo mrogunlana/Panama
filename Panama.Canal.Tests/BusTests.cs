@@ -69,7 +69,7 @@ namespace Panama.Canal.Tests
         {
             _cts.Cancel();
 
-            await _bootstrapper.Off();
+            await _bootstrapper.Off(_cts.Token);
 
             _cts.Dispose();
         }

@@ -11,23 +11,17 @@ namespace Panama.Canal.Invokers
 {
     public class SubscriptionInvoker : IInvoke
     {
-        private readonly IBus _bus;
         private readonly ILogger<SubscriptionInvoker> _log;
-        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
         private readonly ConsumerSubscriptions _subscriptions;
 
         public SubscriptionInvoker(
-              IBus bus
-            , IBootstrapper bootstrapper
-            , IServiceProvider provider
+              IServiceProvider provider
             , ConsumerSubscriptions subscriptions
             , ILogger<SubscriptionInvoker> log)
         {
-            _bus = bus;
             _log = log;
             _provider = provider;
-            _bootstrapper = bootstrapper;
             _subscriptions = subscriptions;
         }
         public async Task<IResult> Invoke(IContext? context = null)
@@ -39,7 +33,8 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            if (!_bootstrapper.Online)
+            var bootstrapper = _provider.GetRequiredService<IBootstrapper>();
+            if (!bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
             var metadata = message.GetData<Message>(_provider);

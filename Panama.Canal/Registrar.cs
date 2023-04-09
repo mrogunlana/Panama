@@ -23,18 +23,18 @@ namespace Panama.Canal
             services.Configure<CanalOptions>(options =>
                 config.GetSection(CanalOptions.Section).Bind(options));
 
-            services.AddHostedService<Bootstrapper>();
+            services.AddHostedService<Dispatcher>();
+            services.AddHostedService<Scheduler>();
+            services.AddSingleton<IBootstrapper, Bootstrapper>();
+            services.AddSingleton<IDispatcher, Dispatcher>();
 
             services.AddTransient<IProcessor, DefaultProcessor>();
             services.AddTransient<IProcessor, SagaProcessor>();
             services.AddSingleton<IProcessorFactory, ProcessorFactory>();
-
-            services.AddTransient<IBus, Bus>();
             
+            services.AddTransient<IBus, Bus>();
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
-            services.AddSingleton<IBootstrapper, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
-            services.AddSingleton<IDispatcher, Dispatcher>();
             services.AddSingleton<IStore, Store>();
             services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
@@ -50,11 +50,7 @@ namespace Panama.Canal
             services.AddSingleton<DeleteExpired>();
             services.AddSingleton<PublishedRetry>();
             services.AddSingleton<DelayedPublished>();
-            services.AddSingleton<Dispatcher>();
 
-            services.AddSingleton(new Job(
-                type: typeof(Dispatcher),
-                expression: "0/1 * * * * ?"));
             services.AddSingleton(new Job(
                 type: typeof(DelayedPublished),
                 expression: "0/0 1 * * * ?"));
@@ -87,6 +83,7 @@ namespace Panama.Canal
             services.AddAssemblyType(typeof(ISagaEvent), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<ISubscribe>(Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<IInitialize>(Assembly.GetEntryAssembly()!, true);
+            services.AddAssemblyTypeByInterface<ICanalService>(Assembly.GetEntryAssembly()!, true);
         }
 
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
@@ -101,6 +98,7 @@ namespace Panama.Canal
             services.AddAssemblyTypes<ISagaEvent>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<ISubscribe>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<IInitialize>(assemblies.Distinct(), true);
+            services.AddAssemblyTypesByInterface<ICanalService>(assemblies.Distinct(), true);
         }
     }
 }

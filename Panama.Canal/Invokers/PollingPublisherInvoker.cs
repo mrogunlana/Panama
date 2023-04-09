@@ -1,4 +1,5 @@
-﻿using Panama.Canal.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Extensions;
@@ -12,19 +13,16 @@ namespace Panama.Canal.Invokers
     {
         private readonly IStore _store;
         private readonly IDispatcher _dispatcher;
-        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
 
         public PollingPublisherInvoker(
               IStore store
-            , IBootstrapper bootstrapper
             , IDispatcher dispatcher
             , IServiceProvider provider)
         {
             _store = store;
             _provider = provider;
             _dispatcher = dispatcher;
-            _bootstrapper = bootstrapper;
         }
         public async Task<IResult> Invoke(IContext? context = null)
         {
@@ -35,7 +33,8 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            if (!_bootstrapper.Online)
+            var bootstrapper = _provider.GetRequiredService<IBootstrapper>();
+            if (!bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
             message.SetStatus(MessageStatus.Scheduled);

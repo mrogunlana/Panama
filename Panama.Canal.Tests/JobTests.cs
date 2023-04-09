@@ -1,26 +1,17 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panama.Canal.Interfaces;
-using Panama.Security;
-using System.Reflection;
-using Panama.Canal.Initializers;
-using Panama.Interfaces;
-using Panama.Canal.Sagas.Stateless.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.Tests.Subscriptions;
-using Panama.Canal.Channels;
-using Panama.Models;
 using Panama.Canal.Extensions;
+using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
+using Panama.Canal.Models;
+using Panama.Security;
 using Quartz;
 using Quartz.Impl;
-using Quartz.Spi;
-using System.Threading;
-using System.Collections.Generic;
 using Quartz.Impl.Calendar;
 using Quartz.Impl.Triggers;
-using Microsoft.AspNetCore.Components;
+using Quartz.Spi;
+using System.Reflection;
 
 namespace Panama.Canal.Tests
 {
@@ -109,7 +100,7 @@ namespace Panama.Canal.Tests
 
             Assert.IsTrue(bootstraper.Online);
 
-            await bootstraper.Off();
+            await bootstraper.Off(source.Token);
 
             Assert.IsFalse(bootstraper.Online);
         }

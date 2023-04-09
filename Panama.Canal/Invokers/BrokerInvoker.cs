@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
@@ -15,7 +16,6 @@ namespace Panama.Canal.Invokers
         private readonly IBus _bus;
         private readonly IStore _store;
         private readonly CanalOptions _canal;
-        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
         private readonly ILogger<BrokerInvoker> _log;
         private readonly IEnumerable<IBroker> _brokers;
@@ -23,7 +23,6 @@ namespace Panama.Canal.Invokers
         public BrokerInvoker(
               IBus bus
             , IStore store
-            , IBootstrapper bootstrapper
             , IServiceProvider provider
             , IEnumerable<IBroker> brokers
             , ILogger<BrokerInvoker> log
@@ -35,7 +34,6 @@ namespace Panama.Canal.Invokers
             _brokers = brokers;
             _provider = provider;
             _canal = canal.Value;
-            _bootstrapper = bootstrapper;
         }
         public async Task<IResult> Invoke(IContext? context = null)
         {
@@ -46,7 +44,8 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            if (!_bootstrapper.Online)
+            var bootstrapper = _provider.GetRequiredService<IBootstrapper>();
+            if (!bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
             var metadata = message.GetData<Message>(_provider);

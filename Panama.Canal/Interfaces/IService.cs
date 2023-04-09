@@ -1,6 +1,6 @@
 ﻿namespace Panama.Canal.Interfaces
 {
-    public interface IBootstrapper 
+    public interface ICanalService 
     {
         bool Online { get; }
         Task On(CancellationToken cancellationToken);

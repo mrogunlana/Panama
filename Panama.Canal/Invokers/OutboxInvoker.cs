@@ -1,4 +1,5 @@
-﻿using Panama.Canal.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Extensions;
@@ -9,15 +10,15 @@ namespace Panama.Canal.Invokers
 {
     public class OutboxInvoker : IInvoke
     {
+        private readonly IServiceProvider _provider;
         private readonly IStore _store;
-        private readonly IBootstrapper _bootstrapper;
 
         public OutboxInvoker(
-              IStore store
-            , IBootstrapper bootstrapper)
+              IStore store,
+              IServiceProvider provider)
         {
             _store = store;
-            _bootstrapper = bootstrapper;
+            _provider = provider;
         }
         public async Task<IResult> Invoke(IContext? context = null)
         {
@@ -28,7 +29,8 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            if (!_bootstrapper.Online)
+            var bootstrapper = _provider.GetRequiredService<IBootstrapper>();
+            if (!bootstrapper.Online)
                 throw new InvalidOperationException("Panama Canal has not been started.");
 
             message.SetStatus(MessageStatus.Scheduled);
