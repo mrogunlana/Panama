@@ -14,7 +14,7 @@ using System.Threading.Channels;
 namespace Panama.Canal
 {
     [DisallowConcurrentExecution]
-    public class Dispatcher : IHostedService, ICanalService, IDispatcher
+    public class Dispatcher : IHostedService, IDispatcher
     {
         private bool _off;
         private CancellationTokenSource? _cts;

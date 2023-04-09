@@ -9,11 +9,11 @@ using Quartz.Spi;
 
 namespace Panama.Canal
 {
-    public class Scheduler : IHostedService, ICanalService
+    public class Scheduler : IHostedService, Interfaces.IScheduler
     {
         private bool _off;
         private CancellationTokenSource? _cts;
-        private IScheduler _scheduler = default!;
+        private Quartz.IScheduler _scheduler = default!;
         private IEnumerable<IInitialize> _initializers = default!;
 
         private readonly ILogger<Scheduler> _log;
@@ -23,7 +23,7 @@ namespace Panama.Canal
         private readonly ISchedulerFactory _schedulerFactory;
         
         public bool Online => !_cts?.IsCancellationRequested ?? false;
-
+        public Quartz.IScheduler? Current => _scheduler;
         public Scheduler(ISchedulerFactory schedulerFactory
             , IJobFactory jobFactory
             , ILogger<Scheduler> log

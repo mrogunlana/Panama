@@ -35,7 +35,7 @@ namespace Panama.Canal.Invokers
 
             var bootstrapper = _provider.GetRequiredService<IBootstrapper>();
             if (!bootstrapper.Online)
-                throw new InvalidOperationException("Panama Canal has not been started.");
+                throw new InvalidOperationException("Panama Canal services has not been started.");
 
             var metadata = message.GetData<Message>(_provider);
             var data = message.GetData<IList<IModel>>(_provider);

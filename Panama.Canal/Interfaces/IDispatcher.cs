@@ -1,9 +1,10 @@
-﻿using Panama.Canal.Models;
+﻿using Microsoft.Extensions.Hosting;
+using Panama.Canal.Models;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Interfaces
 {
-    public interface IDispatcher 
+    public interface IDispatcher : ICanalService
     {
         IInvoke Brokers { get; set; }
         IInvoke Subscriptions { get; set; }

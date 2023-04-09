@@ -27,6 +27,7 @@ namespace Panama.Canal
             services.AddHostedService<Scheduler>();
             services.AddSingleton<IBootstrapper, Bootstrapper>();
             services.AddSingleton<IDispatcher, Dispatcher>();
+            services.AddSingleton<Interfaces.IScheduler, Scheduler>();
 
             services.AddTransient<IProcessor, DefaultProcessor>();
             services.AddTransient<IProcessor, SagaProcessor>();
@@ -83,7 +84,6 @@ namespace Panama.Canal
             services.AddAssemblyType(typeof(ISagaEvent), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<ISubscribe>(Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<IInitialize>(Assembly.GetEntryAssembly()!, true);
-            services.AddAssemblyTypeByInterface<ICanalService>(Assembly.GetEntryAssembly()!, true);
         }
 
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
@@ -98,7 +98,6 @@ namespace Panama.Canal
             services.AddAssemblyTypes<ISagaEvent>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<ISubscribe>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<IInitialize>(assemblies.Distinct(), true);
-            services.AddAssemblyTypesByInterface<ICanalService>(assemblies.Distinct(), true);
         }
     }
 }

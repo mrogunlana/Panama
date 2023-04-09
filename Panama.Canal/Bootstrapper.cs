@@ -18,7 +18,7 @@ namespace Panama.Canal
             {
                 try
                 {
-                    var services = _provider.GetServices<ICanalService>();
+                    var services = GetServices();
                     if (services == null)
                         return false;
                     if (services.Count() == 0)
@@ -36,23 +36,23 @@ namespace Panama.Canal
             }
         }
 
+        public IEnumerable<ICanalService> GetServices()
+        {
+            var dispatcher = _provider.GetRequiredService<IDispatcher>();
+            var scheduler = _provider.GetRequiredService<IScheduler>();
+            
+            return new List<ICanalService>() { dispatcher, scheduler };
+        }
+
         public async Task Off(CancellationToken cancellationToken)
         {
-            var services = _provider.GetServices<ICanalService>();
-            if (services == null || services.Count() == 0)
-                throw new InvalidOperationException("Panama Canal Services cannot be located.");
-
-            foreach (var service in services)
+            foreach (var service in GetServices())
                 await service.Off(cancellationToken);
         }
 
         public async Task On(CancellationToken cancellationToken)
         {
-            var services = _provider.GetServices<ICanalService>();
-            if (services == null || services.Count() == 0)
-                throw new InvalidOperationException("Panama Canal Services cannot be located.");
-
-            foreach (var service in services)
+            foreach (var service in GetServices())
                 await service.On(cancellationToken);
         }
     }

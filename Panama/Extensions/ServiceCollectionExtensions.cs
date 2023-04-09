@@ -41,6 +41,8 @@ namespace Panama.Extensions
                         select t;
             foreach (var value in types)
             {
+                if (value.IsInterface)
+                    continue;
                 if (singleton)
                     services.AddSingleton(typeof(T), value);
                 else
