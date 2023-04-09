@@ -13,13 +13,13 @@ namespace Panama.Canal.Invokers
     {
         private readonly IBus _bus;
         private readonly ILogger<SubscriptionInvoker> _log;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
         private readonly ConsumerSubscriptions _subscriptions;
 
         public SubscriptionInvoker(
               IBus bus
-            , IBootstrap bootstrapper
+            , IBootstrapper bootstrapper
             , IServiceProvider provider
             , ConsumerSubscriptions subscriptions
             , ILogger<SubscriptionInvoker> log)

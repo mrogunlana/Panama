@@ -87,7 +87,7 @@ namespace Panama.Canal.Jobs
                                     provider: _provider,
                                     token: _cts.Token))
                                 .ConfigureAwait(false);
-                            
+
                             if (!result.Success)
                                 _log.LogError($"An exception occurred while publishing a message, reason(s):{string.Join(",", result.Messages)}. message id:{message.Id}");
                         }
@@ -200,21 +200,15 @@ namespace Panama.Canal.Jobs
             _cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, CancellationToken.None);
             _cts.Token.Register(() => _delay.Cancel());
 
-            var results = new List<Task>();
-
-            var tasks = await Task.WhenAll(Enumerable.Range(0, _options.Value.ProducerThreads)
-            .Select(_ => Task.Factory.StartNew(Publish, context.CancellationToken,
-                TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray());
-
-            results.AddRange(tasks);
+            await Task.WhenAll(Enumerable.Range(0, _options.Value.ProducerThreads)
+                .Select(_ => Task.Factory.StartNew(Publish, _cts.Token,
+                    TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray()).ConfigureAwait(false);
 
             GetOrAddReceiver(_options.Value.DefaultGroup);
 
-            var task = await Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+            await Task.Factory.StartNew(Dequeue, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
 
-            results.Add(task);
-
-            Task.WaitAll(tasks);
+            _log.LogDebug("Dispatcher exiting successfully.");
         }
         
         public async ValueTask Publish(InternalMessage message, CancellationToken? token = null)

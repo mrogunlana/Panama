@@ -9,7 +9,7 @@ using Quartz.Spi;
 
 namespace Panama.Canal
 {
-    public class Bootstrapper : IHostedService, IBootstrap
+    public class Bootstrapper : IHostedService, IBootstrapper
     {
         private bool _off;
         private CancellationTokenSource? _cts;

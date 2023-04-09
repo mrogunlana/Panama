@@ -12,12 +12,12 @@ namespace Panama.Canal.Invokers
     {
         private readonly IStore _store;
         private readonly IDispatcher _dispatcher;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
 
         public PollingPublisherInvoker(
               IStore store
-            , IBootstrap bootstrapper
+            , IBootstrapper bootstrapper
             , IDispatcher dispatcher
             , IServiceProvider provider)
         {

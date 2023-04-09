@@ -19,7 +19,7 @@ namespace Panama.Canal.Jobs
             var date = DateTime.UtcNow;
 
             await _store.DeleteExpiredPublishedAsync(date, token: context.CancellationToken);
-            await _store.DeleteExpiredOutboxAsync(date, token: context.CancellationToken);
+            await _store.DeleteExpiredReceivedAsync(date, token: context.CancellationToken);
             await _store.DeleteExpiredInboxAsync(date, token: context.CancellationToken);
             await _store.DeleteExpiredOutboxAsync(date, token: context.CancellationToken);
         }

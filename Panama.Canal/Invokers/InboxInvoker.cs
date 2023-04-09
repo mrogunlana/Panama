@@ -10,11 +10,11 @@ namespace Panama.Canal.Invokers
     public class InboxInvoker : IInvoke
     {
         private readonly IStore _store;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
 
         public InboxInvoker(
               IStore store
-            , IBootstrap bootstrapper)
+            , IBootstrapper bootstrapper)
         {
             _store = store;
             _bootstrapper = bootstrapper;

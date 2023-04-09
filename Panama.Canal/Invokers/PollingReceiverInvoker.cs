@@ -10,12 +10,12 @@ namespace Panama.Canal.Invokers
     public class PollingReceiverInvoker : IInvoke
     {
         private readonly IStore _store;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
 
         public PollingReceiverInvoker(
               IStore store
-            , IBootstrap bootstrapper
+            , IBootstrapper bootstrapper
             , IServiceProvider provider)
         {
             _store = store;

@@ -16,13 +16,11 @@ namespace Panama.Canal
         private readonly MemorySettings _settings;
         private readonly IOptions<CanalOptions> _canalOptions;
         private readonly IStringEncryptor _encryptor;
-
-        private readonly ConcurrentDictionary<string, InternalMessage> _published;
-        private readonly ConcurrentDictionary<string, InternalMessage> _received;
-        private readonly ConcurrentDictionary<string, InternalMessage> _inbox;
-        private readonly ConcurrentDictionary<string, InternalMessage> _outbox;
-        private readonly ConcurrentDictionary<string, SagaEvent> _saga;
-
+        public ConcurrentDictionary<string, InternalMessage> Published { get; }
+        public ConcurrentDictionary<string, InternalMessage> Received { get; }
+        public ConcurrentDictionary<string, InternalMessage> Inbox { get; }
+        public ConcurrentDictionary<string, InternalMessage> Outbox { get; }
+        public ConcurrentDictionary<string, SagaEvent> Saga { get; }
 
         public Store(
               ILogger<Store> log
@@ -35,11 +33,11 @@ namespace Panama.Canal
             _canalOptions = options;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
 
-            _published = new ConcurrentDictionary<string, InternalMessage>();
-            _received = new ConcurrentDictionary<string, InternalMessage>();
-            _inbox = new ConcurrentDictionary<string, InternalMessage>();
-            _outbox = new ConcurrentDictionary<string, InternalMessage>();
-            _saga = new ConcurrentDictionary<string, SagaEvent>();
+            Published = new ConcurrentDictionary<string, InternalMessage>();
+            Received = new ConcurrentDictionary<string, InternalMessage>();
+            Inbox = new ConcurrentDictionary<string, InternalMessage>();
+            Outbox = new ConcurrentDictionary<string, InternalMessage>();
+            Saga = new ConcurrentDictionary<string, SagaEvent>();
         }
 
         public Task<bool> AcquireLock(string key, TimeSpan ttl, string? instance = null, CancellationToken token = default)
@@ -59,21 +57,21 @@ namespace Panama.Canal
 
         public Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            _published[message.Id].Status = status.ToString();
+            Published[message.Id].Status = status.ToString();
 
             return Task.CompletedTask;
         }
 
         public Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            _published[message.Id].Status = status.ToString();
+            Published[message.Id].Status = status.ToString();
 
             return Task.CompletedTask;
         }
 
         public Task ChangePublishedStateToDelayed(int[] ids)
         {
-            var messages = _published.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
+            var messages = Published.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
             foreach (var message in messages)
                 message.Status = MessageStatus.Delayed.ToString();
 
@@ -82,14 +80,14 @@ namespace Panama.Canal
 
         public Task ChangeReceivedState(InternalMessage message, MessageStatus state, object? transaction = null)
         {
-            _received[message.Id].Status = state.ToString();
+            Received[message.Id].Status = state.ToString();
 
             return Task.CompletedTask;
         }
 
         public Task ChangeReceivedStateToDelayed(int[] ids)
         {
-            var messages = _received.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
+            var messages = Received.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
             foreach (var message in messages)
                 message.Status = MessageStatus.Delayed.ToString();
 
@@ -101,24 +99,24 @@ namespace Panama.Canal
             var removed = 0;
             if (table == nameof(_settings.PublishedTable))
             {
-                var ids = _published.Values
+                var ids = Published.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
                 foreach (var id in ids)
-                    if (_published.TryRemove(id, out _))
+                    if (Published.TryRemove(id, out _))
                         removed++;
             }
             else
             {
-                var ids = _received.Values
+                var ids = Received.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
                 foreach (var id in ids)
-                    if (_received.TryRemove(id, out _))
+                    if (Received.TryRemove(id, out _))
                         removed++;
             }
 
@@ -128,13 +126,13 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredInboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            var ids = _inbox.Values
+            var ids = Inbox.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
             foreach (var id in ids)
-                if (_inbox.TryRemove(id, out _))
+                if (Inbox.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -143,13 +141,13 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredOutboxAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            var ids = _outbox.Values
+            var ids = Outbox.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
             foreach (var id in ids)
-                if (_outbox.TryRemove(id, out _))
+                if (Outbox.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -158,13 +156,13 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredPublishedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            var ids = _published.Values
+            var ids = Published.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
             foreach (var id in ids)
-                if (_published.TryRemove(id, out _))
+                if (Published.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -173,13 +171,13 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredReceivedAsync(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            var ids = _received.Values
+            var ids = Received.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
             foreach (var id in ids)
-                if (_received.TryRemove(id, out _))
+                if (Received.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -188,13 +186,13 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredSagaEvents(DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            var ids = _saga.Values
+            var ids = Saga.Values
                     .Where(x => x.Expires < timeout)
                     .Select(x => x.Id)
                     .Take(batch);
 
             foreach (var id in ids)
-                if (_outbox.TryRemove(id, out _))
+                if (Outbox.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -202,7 +200,7 @@ namespace Panama.Canal
 
         public Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
-            var result = _published.Values.Where(x =>
+            var result = Published.Values.Where(x =>
                     (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
                     (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
                 .Select(x => x);
@@ -212,7 +210,7 @@ namespace Panama.Canal
 
         public Task GetDelayedPublishedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
-            var result = _published.Values.Where(x =>
+            var result = Published.Values.Where(x =>
                     (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
                     (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
                 .Select(x => x);
@@ -222,7 +220,7 @@ namespace Panama.Canal
 
         public Task GetDelayedReceivedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
-            var result = _received.Values.Where(x =>
+            var result = Received.Values.Where(x =>
                     (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
                     (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
                 .Select(x => x);
@@ -234,7 +232,7 @@ namespace Panama.Canal
         {
             if (table == _settings.PublishedTable)
             {
-                return Task.FromResult(_published.Values
+                return Task.FromResult(Published.Values
                     .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
                                 && x.Created < DateTime.Now.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
@@ -244,7 +242,7 @@ namespace Panama.Canal
             }
             else
             {
-                return Task.FromResult(_received.Values
+                return Task.FromResult(Received.Values
                     .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
                                 && x.Created < DateTime.Now.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
@@ -256,7 +254,7 @@ namespace Panama.Canal
 
         public Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry()
         {
-            var result = _published.Values
+            var result = Published.Values
                 .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
                             && x.Created < DateTime.Now.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
@@ -269,7 +267,7 @@ namespace Panama.Canal
 
         public Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry()
         {
-            var result = _received.Values
+            var result = Received.Values
                 .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
                             && x.Created < DateTime.Now.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
@@ -282,7 +280,7 @@ namespace Panama.Canal
 
         public Task<IEnumerable<SagaEvent>> GetSagaEvents(string id)
         {
-            var result = _saga.Values.Where(x => x.Id == id)
+            var result = Saga.Values.Where(x => x.Id == id)
                 .Select(x => x);
 
             return Task.FromResult(result);
@@ -328,7 +326,7 @@ namespace Panama.Canal
             if (!message.IsContentBase64())
                  message.Content = _encryptor.ToString(message.Content);
 
-            _inbox[message.Id] = message;
+            Inbox[message.Id] = message;
 
             return Task.FromResult(message);
         }
@@ -338,7 +336,7 @@ namespace Panama.Canal
             if (!message.IsContentBase64())
                 message.Content = _encryptor.ToString(message.Content);
 
-            _outbox[message.Id] = message;
+            Outbox[message.Id] = message;
 
             return Task.FromResult(message);
         }
@@ -348,7 +346,7 @@ namespace Panama.Canal
             if (!message.IsContentBase64())
                 message.Content = _encryptor.ToString(message.Content);
 
-            _published[message.Id] = message;
+            Published[message.Id] = message;
 
             return Task.FromResult(message);
         }
@@ -358,14 +356,14 @@ namespace Panama.Canal
             if (!message.IsContentBase64())
                 message.Content = _encryptor.ToString(message.Content);
 
-            _received[message.Id] = message;
+            Received[message.Id] = message;
 
             return Task.FromResult(message);
         }
 
         public Task<SagaEvent> StoreSagaEvent(SagaEvent saga)
         {
-            _saga[saga.Id] = saga;
+            Saga[saga.Id] = saga;
 
             return Task.FromResult(saga);
         }

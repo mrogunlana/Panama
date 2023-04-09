@@ -32,7 +32,7 @@ namespace Panama.Canal
             services.AddTransient<IBus, Bus>();
             
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
-            services.AddSingleton<IBootstrap, Bootstrapper>();
+            services.AddSingleton<IBootstrapper, Bootstrapper>();
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IDispatcher, Dispatcher>();
             services.AddSingleton<IStore, Store>();
@@ -50,7 +50,8 @@ namespace Panama.Canal
             services.AddSingleton<DeleteExpired>();
             services.AddSingleton<PublishedRetry>();
             services.AddSingleton<DelayedPublished>();
-            
+            services.AddSingleton<Dispatcher>();
+
             services.AddSingleton(new Job(
                 type: typeof(Dispatcher),
                 expression: "0/1 * * * * ?"));
@@ -81,12 +82,11 @@ namespace Panama.Canal
 
             services.AddAssemblyType(typeof(IInvoke), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyType(typeof(IChannel), Assembly.GetEntryAssembly()!, false);
-            services.AddAssemblyType(typeof(IInitialize), Assembly.GetEntryAssembly()!, true);
-            services.AddAssemblyType(typeof(ISubscribe), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyType(typeof(ISagaState), Assembly.GetEntryAssembly()!, true);
             services.AddAssemblyType(typeof(ISagaTrigger), Assembly.GetEntryAssembly()!, true);
             services.AddAssemblyType(typeof(ISagaEvent), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<ISubscribe>(Assembly.GetEntryAssembly()!, false);
+            services.AddAssemblyTypeByInterface<IInitialize>(Assembly.GetEntryAssembly()!, true);
         }
 
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
@@ -100,6 +100,7 @@ namespace Panama.Canal
             services.AddAssemblyTypes<ISagaTrigger>(assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaEvent>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<ISubscribe>(assemblies.Distinct(), false);
+            services.AddAssemblyTypesByInterface<IInitialize>(assemblies.Distinct(), true);
         }
     }
 }

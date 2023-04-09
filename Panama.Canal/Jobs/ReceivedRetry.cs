@@ -36,7 +36,7 @@ namespace Panama.Canal.Jobs
                 if (!await _store.AcquireReceivedRetryLock(ttl, token: context.CancellationToken))
                     return;
 
-            var retry = await _store.GetReceivedMessagesToRetry().ConfigureAwait(false); ;
+            var retry = await _store.GetReceivedMessagesToRetry().ConfigureAwait(false);
 
             foreach (var received in retry)
                 await _dispatcher.Execute(received, context.CancellationToken).ConfigureAwait(false);

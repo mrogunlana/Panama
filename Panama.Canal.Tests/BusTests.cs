@@ -1,24 +1,21 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Panama.Canal.Channels;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Models;
 using Panama.Security;
 using System.Reflection;
-using Panama.Canal.Initializers;
-using Panama.Interfaces;
-using Panama.Canal.Sagas.Stateless.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.Tests.Subscriptions;
-using Panama.Canal.Channels;
-using Panama.Models;
-using Panama.Canal.Extensions;
 
 namespace Panama.Canal.Tests
 {
     [TestClass]
     public class BusTests
     {
+        private CancellationTokenSource _cts; 
         private IServiceProvider _provider;
+        private IBootstrapper _bootstrapper;
 
         public BusTests()
         {
@@ -54,7 +51,27 @@ namespace Panama.Canal.Tests
             services.AddPanamaCanal(configuration, domain);
             services.AddPanamaSecurity();
 
+            _cts = new CancellationTokenSource();
             _provider = services.BuildServiceProvider();
+            _bootstrapper = _provider.GetRequiredService<IBootstrapper>();
+        }
+
+        [TestInitialize]
+        public async Task Init()
+        {
+            _cts = new CancellationTokenSource();
+
+            await _bootstrapper.On(_cts.Token);
+        }
+
+        [TestCleanup]
+        public async Task Cleanup()
+        {
+            _cts.Cancel();
+
+            await _bootstrapper.Off();
+
+            _cts.Dispose();
         }
 
         [TestMethod]

@@ -3,7 +3,7 @@ using Quartz;
 
 namespace Panama.Canal.Extensions
 {
-    internal static class ScheduleExtensions
+    public static class ScheduleExtensions
     {
         public static string GetKey(this Job schedule)
         {

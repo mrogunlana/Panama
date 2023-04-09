@@ -3,7 +3,7 @@ using Quartz;
 
 namespace Panama.Canal.Interfaces
 {
-    public interface IBootstrap : IHostedService
+    public interface IBootstrapper : IHostedService
     {
         bool Online { get; }
         IScheduler Scheduler { get; }

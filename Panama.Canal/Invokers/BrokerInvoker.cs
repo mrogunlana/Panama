@@ -15,7 +15,7 @@ namespace Panama.Canal.Invokers
         private readonly IBus _bus;
         private readonly IStore _store;
         private readonly CanalOptions _canal;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
         private readonly IServiceProvider _provider;
         private readonly ILogger<BrokerInvoker> _log;
         private readonly IEnumerable<IBroker> _brokers;
@@ -23,7 +23,7 @@ namespace Panama.Canal.Invokers
         public BrokerInvoker(
               IBus bus
             , IStore store
-            , IBootstrap bootstrapper
+            , IBootstrapper bootstrapper
             , IServiceProvider provider
             , IEnumerable<IBroker> brokers
             , ILogger<BrokerInvoker> log

@@ -10,11 +10,11 @@ namespace Panama.Canal.Invokers
     public class OutboxInvoker : IInvoke
     {
         private readonly IStore _store;
-        private readonly IBootstrap _bootstrapper;
+        private readonly IBootstrapper _bootstrapper;
 
         public OutboxInvoker(
               IStore store
-            , IBootstrap bootstrapper)
+            , IBootstrapper bootstrapper)
         {
             _store = store;
             _bootstrapper = bootstrapper;
