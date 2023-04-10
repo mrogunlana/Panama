@@ -4,6 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Jobs;
+using Panama.Canal.Models;
+using Panama.Canal.Tests.Jobs;
 using Panama.Models;
 using Panama.Security;
 using System.Reflection;
@@ -50,6 +53,16 @@ namespace Panama.Canal.Tests
             services.AddPanama(domain);
             services.AddPanamaCanal(configuration, domain);
             services.AddPanamaSecurity();
+
+            //add custom jobs to process outbox/inbox messages:
+            services.AddSingleton<PublishOutbox>();
+            services.AddSingleton<ReceiveInbox>();
+            services.AddSingleton(new Job(
+                type: typeof(PublishOutbox),
+                expression: "0/1 * * * * ?"));
+            services.AddSingleton(new Job(
+                type: typeof(ReceiveInbox),
+                expression: "0/1 * * * * ?"));
 
             _cts = new CancellationTokenSource();
             _provider = services.BuildServiceProvider();

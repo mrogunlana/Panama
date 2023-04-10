@@ -12,6 +12,7 @@ using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Quartz;
+using Quartz.Spi;
 using System.Reflection;
 
 namespace Panama.Canal
@@ -37,6 +38,7 @@ namespace Panama.Canal
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
             services.AddSingleton<ITarget, DefaultTarget>();
             services.AddSingleton<IStore, Store>();
+            services.AddSingleton<Store>();
             services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
@@ -54,16 +56,16 @@ namespace Panama.Canal
 
             services.AddSingleton(new Job(
                 type: typeof(DelayedPublished),
-                expression: "0/0 1 * * * ?"));
+                expression: "0 */1 * ? * *"));
             services.AddSingleton(new Job(
                 type: typeof(PublishedRetry),
-                expression: "0/0 1 * * * ?"));
+                expression: "0 */1 * ? * *"));
             services.AddSingleton(new Job(
                 type: typeof(ReceivedRetry),
-                expression: "0/0 1 * * * ?"));
+                expression: "0 */1 * ? * *"));
             services.AddSingleton(new Job(
                 type: typeof(DeleteExpired),
-                expression: "0/0 5 * * * ?"));
+                expression: "0 */5 * ? * *"));
 
             services.AddQuartz(q => {
                 q.SchedulerName = "panama-canal-services";

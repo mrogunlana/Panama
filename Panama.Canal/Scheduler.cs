@@ -78,6 +78,8 @@ namespace Panama.Canal
 
             _scheduler.JobFactory = _jobFactory;
 
+            await _scheduler.Start();
+
             foreach (var schedule in _schedules)
             {
                 var job = schedule.CreateJob();

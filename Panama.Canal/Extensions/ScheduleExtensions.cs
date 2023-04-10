@@ -45,7 +45,7 @@ namespace Panama.Canal.Extensions
             var trigger = TriggerBuilder.Create()
                 .ForJob(schedule.GetJobKey())
                 .WithIdentity(schedule.GetTriggerKey())
-                .WithCronSchedule(schedule.CronExpression 
+                .WithCronSchedule(schedule.CronExpression
                     , x => x.WithMisfireHandlingInstructionDoNothing())
                 .WithDescription(schedule.CronExpression)
                 .Build();

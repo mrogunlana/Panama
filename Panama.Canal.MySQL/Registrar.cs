@@ -28,6 +28,7 @@ namespace Panama.Canal.MySQL
             services.AddTransient<IGenericChannelFactory, MySqlChannelFactory>();
 
             services.Remove<IStore>();
+            services.Remove<Canal.Store>();
             services.AddSingleton(settings);
             services.AddSingleton<IStore, Store>();
             services.AddSingleton<IInitialize, Default>();
