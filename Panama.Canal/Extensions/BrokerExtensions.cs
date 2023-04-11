@@ -1,5 +1,4 @@
 ﻿using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
 
 namespace Panama.Canal.Extensions
 {
@@ -14,9 +13,9 @@ namespace Panama.Canal.Extensions
             if (selected != null)
                 return selected;
 
-            selected = broker.Where(b => b.Target == typeof(DefaultTarget)).FirstOrDefault();
+            selected = broker.Where(b => b.Default).FirstOrDefault();
             if (selected == null)
-                throw new InvalidOperationException("Default broker subscription targets could not be located.");
+                throw new InvalidOperationException("Default broker target could not be located.");
 
             return selected;
         }

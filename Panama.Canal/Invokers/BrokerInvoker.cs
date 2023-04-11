@@ -44,9 +44,9 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            var bootstrapper = _provider.GetRequiredService<IDispatcher>();
-            if (!bootstrapper.Online)
-                throw new InvalidOperationException("Panama Canal has not been started.");
+            var dispatcher = _provider.GetRequiredService<IDispatcher>();
+            if (!dispatcher.Online)
+                throw new InvalidOperationException("Panama Canal Dispatcher has not been started.");
 
             var metadata = message.GetData<Message>(_provider);
             var data = message.GetData<IList<IModel>>(_provider);

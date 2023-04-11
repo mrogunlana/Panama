@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Tests.Jobs;
 using Panama.Models;

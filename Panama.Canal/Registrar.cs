@@ -21,9 +21,6 @@ namespace Panama.Canal
     {
         private static void AddPanamaCanalBase(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<CanalOptions>(options =>
-                config.GetSection(CanalOptions.Section).Bind(options));
-
             services.AddHostedService<Dispatcher>();
             services.AddHostedService<Scheduler>();
             services.AddSingleton<IBootstrapper, Bootstrapper>();
@@ -44,10 +41,6 @@ namespace Panama.Canal
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
             services.AddSingleton(new ConsumerSubscriptions());
             
-            var settings = new MemorySettings();
-            config.GetSection("MemorySettings").Bind(settings);
-            
-            services.AddSingleton(settings);
             services.AddSingleton<MemorySettings>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
@@ -75,9 +68,22 @@ namespace Panama.Canal
             services.AddQuartzHostedService(
                 q => q.WaitForJobsToComplete = true);
         }
-        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config)
+
+        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, Action<CanalOptions>? setup = null)
         {
             AddPanamaCanalBase(services, config);
+
+            var settings = new MemorySettings();
+            config.GetSection("MemorySettings").Bind(settings);
+            
+            var options = new CanalOptions();
+            config.GetSection(CanalOptions.Section).Bind(options);
+
+            if (setup  != null) 
+                setup(options);
+
+            services.AddSingleton(options);
+            services.AddSingleton(settings);
 
             services.AddAssemblyType(typeof(IInvoke), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyType(typeof(IChannel), Assembly.GetEntryAssembly()!, false);
@@ -88,9 +94,21 @@ namespace Panama.Canal
             services.AddAssemblyTypeByInterface<IInitialize>(Assembly.GetEntryAssembly()!, true);
         }
 
-        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
+        public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies, Action<CanalOptions>? setup = null)
         {
             AddPanamaCanalBase(services, config);
+
+            var settings = new MemorySettings();
+            config.GetSection("MemorySettings").Bind(settings);
+
+            var options = new CanalOptions();
+            config.GetSection(CanalOptions.Section).Bind(options);
+
+            if (setup != null)
+                setup(options);
+
+            services.AddSingleton(options);
+            services.AddSingleton(settings);
 
             services.AddAssemblyTypes<IInvoke>(assemblies.Distinct(), false);
             services.AddAssemblyTypes<IChannel>(assemblies.Distinct(), false);
