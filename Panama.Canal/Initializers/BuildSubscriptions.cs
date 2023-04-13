@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Attributes;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Comparers;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
@@ -13,16 +14,20 @@ namespace Panama.Canal.Initializers
     {
         private readonly IServiceProvider _provider;
         private readonly ILogger<BuildSubscriptions> _log;
+        private readonly ITargetFactory _factory;
         private readonly Models.ConsumerSubscriptions _subscriptions;
         private readonly IOptions<CanalOptions> _options;
 
         public BuildSubscriptions(
-             IServiceProvider provider
+             ITargetFactory factory
+           , IServiceProvider provider
            , ILogger<BuildSubscriptions> log
            , IOptions<CanalOptions> options
+           
            , Models.ConsumerSubscriptions subscriptions)
         {
             _log = log;
+            _factory = factory;
             _options = options;
             _provider = provider;
             _subscriptions = subscriptions;
@@ -55,7 +60,7 @@ namespace Panama.Canal.Initializers
                     topic: topic.Name,
                     group: topic.Group ?? _options.Value.DefaultGroup,
                     subscriber: subscriber.GetType(),
-                    target: topic?.Target?.GetType() ?? typeof(DefaultTarget));
+                    target: topic?.Target?.GetType() ?? _factory.GetDefaultTarget().GetType());
 
                 subscriptions.Add(subscription);
             }

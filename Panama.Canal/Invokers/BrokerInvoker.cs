@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
@@ -57,7 +58,9 @@ namespace Panama.Canal.Invokers
             if (target == null)
                 throw new InvalidOperationException($"Subscription target: {metadata.GetBroker()} could not be located.");
 
-            var broker = _brokers.GetTargetBroker(target);
+            var broker = _brokers.Where(x => x.Target == target).FirstOrDefault();
+            if (broker == null)
+                throw new InvalidOperationException($"Broker could not be located from target: {target.Name}");
 
             try
             {

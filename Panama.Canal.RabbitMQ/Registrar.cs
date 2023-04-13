@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
-using Panama.Canal.Interfaces;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
 using RabbitMQ.Client;
@@ -27,19 +27,31 @@ namespace Panama.Canal.RabbitMQ
                 config.GetSection(RabbitMQOptions.Section).Bind(options));
         }
 
-        public static void AddPanamaCanalRabbitMQ(this IServiceCollection services, IConfiguration config)
+        public static void AddPanamaCanalRabbitMQ(this IServiceCollection services, IConfiguration config, Action<RabbitMQOptions>? setup = null)
         {
             AddPanamaCanalRabbitMQBase(services, config);
+
+            var options = new RabbitMQOptions();
+            config.GetSection(RabbitMQOptions.Section).Bind(options);
+
+            if (setup != null)
+                setup(options);
+
+            services.AddSingleton(options);
         }
 
-        public static void AddPanamaCanalRabbitMQ(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies)
+        public static void AddPanamaCanalRabbitMQ(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies, Action<RabbitMQOptions>? setup = null)
         {
-            var assembliesToScan = assemblies.Distinct();
-
             AddPanamaCanalRabbitMQBase(services, config);
 
-            //foreach (var assembly in assembliesToScan)
-            //    services.AddAssemblyType(typeof(ISubscribe), assembly, false);
+            var options = new RabbitMQOptions();
+            config.GetSection(RabbitMQOptions.Section).Bind(options);
+
+            if (setup != null)
+                setup(options);
+
+            services.AddSingleton(options);
+            services.AddSingleton<IBrokerOptions>(options);
         }
     }
 }

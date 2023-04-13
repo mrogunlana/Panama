@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Exceptions;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;

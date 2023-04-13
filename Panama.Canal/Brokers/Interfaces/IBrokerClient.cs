@@ -1,6 +1,6 @@
 ﻿using Panama.Canal.Models;
 
-namespace Panama.Canal.Interfaces
+namespace Panama.Canal.Brokers.Interfaces
 {
     public interface IBrokerClient : IDisposable
     {

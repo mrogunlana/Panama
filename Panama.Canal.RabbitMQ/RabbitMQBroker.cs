@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
-using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
@@ -15,6 +14,7 @@ namespace Panama.Canal.RabbitMQ
     public class RabbitMQBroker : IBroker
     {
         private readonly string _exchange;
+        private readonly RabbitMQPolicy _connections;
         private readonly CanalOptions _canal;
         private readonly ILogger<RabbitMQBroker> _log;
         private readonly RabbitMQOptions _options;
@@ -22,11 +22,7 @@ namespace Panama.Canal.RabbitMQ
 
         public Type Target => typeof(RabbitMQTarget);
 
-        public IPooledObjectPolicy<IModel> ConnectionPool { get; }
-
-        IPooledObjectPolicy<Panama.Interfaces.IModel> IBroker.ConnectionPool => throw new NotImplementedException();
-
-        public bool Default { get; set; } = false;
+        public IBrokerOptions Options => _options;
 
         public RabbitMQBroker(
               ILogger<RabbitMQBroker> log
@@ -39,8 +35,7 @@ namespace Panama.Canal.RabbitMQ
             _canal = canal.Value;
             _options = options.Value;
             _exchange = $"{_options.Exchange}.{_canal.Version}";
-
-            ConnectionPool = provider.GetRequiredService<RabbitMQPolicy>();
+            _connections = provider.GetRequiredService<RabbitMQPolicy>();
         }
 
         public Task<Panama.Interfaces.IResult> Publish(Panama.Interfaces.IContext context)
@@ -48,7 +43,7 @@ namespace Panama.Canal.RabbitMQ
             IModel? channel = null;
             try
             {
-                channel = ConnectionPool.Create();
+                channel = _connections.Create();
 
                 var metadata = context.Data.DataGetSingle<InternalMessage>();
                 var message = metadata.GetData<Message>(_provider);
@@ -74,7 +69,7 @@ namespace Panama.Canal.RabbitMQ
             finally
             {
                 if (channel != null)
-                    ConnectionPool.Return(channel);
+                    _connections.Return(channel);
             }
         }
     }

@@ -5,7 +5,6 @@ using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.TestApi;
 
 namespace Panama.TestApi.Commands
 {

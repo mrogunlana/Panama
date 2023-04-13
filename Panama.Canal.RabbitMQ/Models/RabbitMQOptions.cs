@@ -1,9 +1,8 @@
-﻿using Panama.Canal.Interfaces;
-using Panama.Interfaces;
+﻿using Panama.Canal.Brokers.Interfaces;
 
 namespace Panama.Canal.RabbitMQ.Models
 {
-    public class RabbitMQOptions : IModel 
+    public class RabbitMQOptions : IBrokerOptions
     {
         public static string Section { get; set; } = "Panama.Canal.RabbitMQ.RabbitMQOptions";
         public string UserName { get; set; } = "guest";
@@ -18,6 +17,7 @@ namespace Panama.Canal.RabbitMQ.Models
         public string QueueMode { get; set; } = default!;
         public ushort QosPrefetchCount { get; private set; } = 0;
         public bool QosGlobal { get; private set; } = false;
+        public bool Default { get; set; } = false;
 
         public RabbitMQOptions()
         {

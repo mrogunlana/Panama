@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Panama.Interfaces;
 
-namespace Panama.Canal.Interfaces
+namespace Panama.Canal.Brokers.Interfaces
 {
-    public interface IBroker 
+    public interface IBroker
     {
-        bool Default { get; set; }
+        IBrokerOptions Options { get; }
+
         Type Target { get; }
-        IPooledObjectPolicy<IModel> ConnectionPool { get; }
         Task<IResult> Publish(IContext context);
     }
 }

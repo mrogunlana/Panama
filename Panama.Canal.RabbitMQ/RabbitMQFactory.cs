@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Exceptions;
-using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
 using RabbitMQ.Client;

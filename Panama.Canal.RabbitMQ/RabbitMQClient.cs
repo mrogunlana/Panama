@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
-using Panama.Canal.Interfaces;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Extensions;
 using Panama.Canal.RabbitMQ.Models;

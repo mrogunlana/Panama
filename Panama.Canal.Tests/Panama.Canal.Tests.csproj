@@ -43,4 +43,8 @@
     <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Broker\" />
+  </ItemGroup>
+
 </Project>

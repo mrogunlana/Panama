@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
@@ -12,16 +13,19 @@ namespace Panama.Canal
     {
         private readonly ILogger<Bus> _log;
         private readonly IOptions<CanalOptions> _options;
+        private readonly ITargetFactory _targets;
 
         public BusContext Context { get; }
 
         public Bus(
               ILogger<Bus> log,
+              ITargetFactory targets,
               IServiceProvider provider,
               IOptions<CanalOptions> options)
         {
             _log = log;
             _options = options;
+            _targets = targets;
 
             Context = new BusContext(provider);
         }
@@ -33,7 +37,7 @@ namespace Panama.Canal
                 .AddMessageName(Context.Name)
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
-                .AddMessageBroker(Context.Target?.FullName)
+                .AddMessageBroker(Context.Target?.FullName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
                 .AddMessageInstance(Context.Instance)
                 .AddMessageType(nameof(Context.Data))
                 .AddCreatedTime()

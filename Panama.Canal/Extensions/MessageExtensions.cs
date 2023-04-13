@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Security.Resolvers;
@@ -61,7 +62,7 @@ namespace Panama.Canal.Extensions
             var text = value?.ToString() ?? string.Empty;
 
             if (string.IsNullOrEmpty(text))
-                text = typeof(DefaultTarget).FullName;
+                text = typeof(DefaultTarget).AssemblyQualifiedName;
 
             message.Headers.Add(Headers.Broker, text);
 
