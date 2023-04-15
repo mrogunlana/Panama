@@ -8,7 +8,11 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
 using Panama.Canal.RabbitMQ.Models;
+using Panama.Extensions;
+using Panama.Interfaces;
+using Panama.Models;
 using Quartz;
+using System.Text;
 
 namespace Panama.Canal.RabbitMQ.Jobs
 {
@@ -23,23 +27,25 @@ namespace Panama.Canal.RabbitMQ.Jobs
         private readonly CanalOptions _canal;
         private readonly ILogger<Default> _log;
         private readonly IBrokerFactory _factory;
+        private readonly IInvokeFactory _invokers;
         private readonly ConsumerSubscriptions _subscriptions;
         private readonly IServiceProvider _provider;
-
+        
         public Default(
               IStore store
             , ILogger<Default> log
-            , IBrokerFactory factory
+            , RabbitMQFactory factory
             , IServiceProvider provider
-            , ConsumerSubscriptions subscriptions
             , IOptions<CanalOptions> canal
-            , IOptions<RabbitMQOptions> options)
+            , ConsumerSubscriptions subscriptions
+            , ReceivedInvokerFactory processor)
         {
             _log = log;
-            _store = store; 
-            _provider = provider;
+            _store = store;
             _factory = factory;
+            _provider = provider;
             _canal = canal.Value;
+            _invokers = processor;
             _subscriptions = subscriptions;
         }
 
@@ -49,55 +55,76 @@ namespace Panama.Canal.RabbitMQ.Jobs
             _cts.Dispose();
         }
 
+        private IResult TryGetModels(TransientMessage message)
+        {
+            try
+            {
+                message.RemoveException();
+
+                var local = message.ToInternal(_provider);
+                if (local == null)
+                    throw new InvalidOperationException($"Internal Message ID: {message.Headers[Headers.Id]} could not be located.");
+
+                var external = local.GetData<Message>(_provider);
+                if (external == null)
+                    throw new InvalidOperationException($"Message could not be located in Internal Message ID: {message.Headers[Headers.Id]} .");
+
+                external.RemoveException();
+
+                var result = _subscriptions.HasSubscribers(external);
+                if (result == false)
+                    throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
+
+                return new Result()
+                    .Success()
+                    .Add(local)
+                    .Add(external)
+                    .Add(message);
+            }
+            catch (Exception ex)
+            {
+                message.AddException(ex);
+
+                var external = new Message(message.Headers, Encoding.UTF8.GetString(message.Body.ToArray()))
+                        .AddCreatedTime()
+                        .AddException(ex)
+                        .AddMessageId(Guid.NewGuid().ToString());
+                
+                return new Result()
+                    .Fail()
+                    .Add(message)
+                    .Add(external)
+                    .Add(external.ToInternal(_provider));
+            }
+        }
+        
         private void Register(IBrokerClient client)
         {
             client.OnCallback = async (message, sender) => {
 
                 try
                 {
-                    var local = message.ToInternal(_provider);
-                    if (local == null)
-                        throw new InvalidOperationException($"Message id: {message.Headers[Canal.Models.Headers.Id]} could not be located.");
+                    _log.LogInformation($"Received message. ID:{message.GetId()}.");
 
-                    var metadata = local.GetData<Message>(_provider);
+                    var result = TryGetModels(message);
+                    var transient = result.DataGetSingle<TransientMessage>();
+                    var external = result.DataGetSingle<Message>();
 
-                    _log.LogInformation($"Received message. id:{local.Id}, name: {local.Name}");
+                    await _provider.GetRequiredService<IBus>()
+                        .Id(Guid.NewGuid().ToString())
+                        .CorrelationId(external.GetCorrelationId())
+                        .Invoker(_invokers.GetInvoker())
+                        .Post(external
+                            .ResetId()
+                            .AddCreatedTime()
+                            .ToInternal(_provider)
+                            .SetStatus(result.Success
+                                ? MessageStatus.Scheduled
+                                : MessageStatus.Failed)
+                            .SetExpiration(_provider, DateTime.UtcNow))
+                        .ConfigureAwait(false);
 
-                    metadata.RemoveException();
-
-                    if (metadata.HasException())
-                    {
-                        await _provider.GetRequiredService<IBus>()
-                            .Id(Guid.NewGuid().ToString())
-                            .CorrelationId(metadata.GetCorrelationId())
-                            .Invoker<InboxInvoker>()
-                            .Post(metadata
-                                .ResetId()
-                                .AddCreatedTime()
-                                .ToInternal(_provider)
-                                .SetStatus(MessageStatus.Failed)
-                                .SetExpiration(_provider, DateTime.UtcNow))
-                            .ConfigureAwait(false);
-
-
-                        client.Commit(sender);
-                    }
-                    else
-                    {
-                        await _provider.GetRequiredService<IBus>()
-                            .Id(Guid.NewGuid().ToString())
-                            .CorrelationId(metadata.GetCorrelationId())
-                            .Invoker<InboxInvoker>()
-                            .Post(metadata
-                                .ResetId()
-                                .AddCreatedTime()
-                                .ToInternal(_provider)
-                                .SetStatus(MessageStatus.Scheduled)
-                                .SetExpiration(_provider))
-                            .ConfigureAwait(false);
-
-                        client.Commit(sender);
-                    }
+                    client.Commit(sender);
                 }
                 catch (Exception ex)
                 {

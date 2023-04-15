@@ -16,6 +16,7 @@ namespace Panama.Canal.RabbitMQ
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<IPooledObjectPolicy<IModel>, RabbitMQPolicy>();
             services.AddSingleton<IBroker, RabbitMQBroker>();
+            services.AddSingleton<RabbitMQFactory>();
             services.AddSingleton<IBrokerFactory, RabbitMQFactory>();
             services.AddSingleton<IBrokerProcess, Jobs.Default>();
             

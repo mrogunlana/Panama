@@ -171,6 +171,22 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
+        public static IBus Invoker(this IBus bus, Type type)
+        {
+            if (bus.Context.Provider == null)
+                throw new InvalidOperationException("Service provider could not be located.");
+
+            bus.Context.Invoker = (IInvoke)bus.Context.Provider.GetRequiredService(type);
+
+            return bus;
+        }
+        public static IBus Invoker(this IBus bus, IInvoke invoker)
+        {
+            bus.Context.Invoker = invoker;
+
+            return bus;
+        }
+
         public static IBus Polling(this IBus bus)
         {
             bus.Invoker<PollingPublisherInvoker>();

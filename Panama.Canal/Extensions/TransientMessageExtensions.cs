@@ -28,5 +28,49 @@ namespace Panama.Canal.Extensions
 
             return metadata.ToInternal(provider);
         }
+
+        public static TransientMessage AddException(this TransientMessage message, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return message;
+
+            message.Headers.Add(Headers.Exception, value);
+
+            return message;
+        }
+        public static TransientMessage AddException(this TransientMessage message, Exception? value)
+        {
+            if (value == null)
+                return message;
+
+            message.Headers.Add(Headers.Exception, $"Type: {value.GetType()}. Message: {value.Message}");
+
+            return message;
+        }
+
+        public static TransientMessage RemoveException(this TransientMessage message)
+        {
+            message.Headers.Remove(Headers.Exception);
+
+            return message;
+        }
+
+        public static bool HasException(this TransientMessage message)
+        {
+            return message.Headers.ContainsKey(Headers.Exception);
+        }
+
+        public static string GetId(this TransientMessage message)
+        {
+            if (message.Headers == null)
+                return string.Empty;
+
+            var result = message.Headers[Headers.Id];
+            if (result == null)
+                return string.Empty;
+
+            return result;
+        }
+
     }
 }

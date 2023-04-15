@@ -27,7 +27,7 @@ namespace Panama.Canal.Models
         {
             Origin = origin;
             Headers = new Dictionary<string, string?>();
-            Invoker = provider.GetRequiredService<OutboxInvoker>();
+            Invoker = provider.GetRequiredService<PublishedInvokerFactory>().GetInvoker();
         }
     }
 }

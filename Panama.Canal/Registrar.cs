@@ -5,6 +5,7 @@ using Panama.Canal.Brokers;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Invokers;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Processors;
@@ -33,7 +34,7 @@ namespace Panama.Canal
             
             services.AddTransient<IBus, Bus>();
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
-            services.AddSingleton<ITarget, DefaultTarget>();
+            services.AddSingleton<DefaultTarget>();
             services.AddSingleton<ITargetFactory, TargetFactory>();
             services.AddSingleton<IBroker, DefaultBroker>();
             services.AddSingleton<IBrokerClient, DefaultClient>();
@@ -45,8 +46,12 @@ namespace Panama.Canal
             services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
-            services.AddSingleton(new ConsumerSubscriptions());
-            
+            services.AddSingleton<ConsumerSubscriptions>();
+            services.AddSingleton<PublishedInvokerFactory>();
+            services.AddSingleton<ReceivedInvokerFactory>();
+            services.AddSingleton<DefaultBrokerFactory>();
+            services.AddSingleton<IBrokerFactory, DefaultBrokerFactory>();
+
             services.AddSingleton<MemorySettings>();
             services.AddSingleton<ReceivedRetry>();
             services.AddSingleton<DeleteExpired>();
@@ -103,6 +108,7 @@ namespace Panama.Canal
             services.AddAssemblyType(typeof(ISagaEvent), Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<ISubscribe>(Assembly.GetEntryAssembly()!, false);
             services.AddAssemblyTypeByInterface<IInitialize>(Assembly.GetEntryAssembly()!, true);
+            services.AddAssemblyTypeByInterface<IInvokeFactory>(Assembly.GetEntryAssembly()!, true);
         }
 
         public static void AddPanamaCanal(this IServiceCollection services, IConfiguration config, IEnumerable<Assembly> assemblies, Action<CanalOptions>? setup = null)
@@ -129,6 +135,7 @@ namespace Panama.Canal
             services.AddAssemblyTypes<ISagaEvent>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<ISubscribe>(assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<IInitialize>(assemblies.Distinct(), true);
+            services.AddAssemblyTypesByInterface<IInvokeFactory>(assemblies.Distinct(), true);
         }
     }
 }

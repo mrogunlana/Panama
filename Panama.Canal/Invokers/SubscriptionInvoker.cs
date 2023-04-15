@@ -11,18 +11,21 @@ namespace Panama.Canal.Invokers
 {
     public class SubscriptionInvoker : IInvoke
     {
-        private readonly ILogger<SubscriptionInvoker> _log;
+        private readonly IInvokeFactory _invokers;
         private readonly IServiceProvider _provider;
+        private readonly ILogger<SubscriptionInvoker> _log;
         private readonly ConsumerSubscriptions _subscriptions;
 
         public SubscriptionInvoker(
               IServiceProvider provider
-            , ConsumerSubscriptions subscriptions
-            , ILogger<SubscriptionInvoker> log)
+            , ReceivedInvokerFactory invokers
+            , ILogger<SubscriptionInvoker> log
+            , ConsumerSubscriptions subscriptions)
         {
             _log = log;
             _provider = provider;
             _subscriptions = subscriptions;
+            _invokers = invokers;
         }
         public async Task<IResult> Invoke(IContext? context = null)
         {
@@ -82,7 +85,7 @@ namespace Panama.Canal.Invokers
                         .Topic(metadata.GetReply())
                         .Group(group)
                         .Data(data)
-                        .Stream()
+                        .Invoker(_invokers.GetInvoker())
                         .Target(target)
                         .SagaId(metadata.GetSagaId())
                         .SagaType(metadata.GetSagaType())
@@ -102,7 +105,7 @@ namespace Panama.Canal.Invokers
                         .Topic(metadata.GetReply())
                         .Group(group)
                         .Data(data)
-                        .Stream()
+                        .Invoker(_invokers.GetInvoker())
                         .Target(target)
                         .SagaId(metadata.GetSagaId())
                         .SagaType(metadata.GetSagaType())

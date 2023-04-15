@@ -10,15 +10,6 @@ namespace Panama.Canal.Extensions
 {
     public static class InternalMessageExtensions
     {
-        public static bool IsContentBase64(this InternalMessage message)
-        {
-            //TODO: Do we need to consider padding?
-            //Convert.TryFromBase64String(message.Content.PadRight(message.Content.Length / 4 * 4 + (message.Content.Length % 4 == 0 ? 0 : 4), '='), new Span<byte>(new byte[message.Content.Length]), out _);
-
-            var buffer = new Span<byte>(new byte[message.Content.Length]);
-            return Convert.TryFromBase64String(message.Content, buffer, out int _);
-        }
-
         public static bool IsContentBase64(this string? message)
         {
             //TODO: Do we need to consider padding?
@@ -29,6 +20,23 @@ namespace Panama.Canal.Extensions
 
             var buffer = new Span<byte>(new byte[message.Length]);
             return Convert.TryFromBase64String(message, buffer, out int _);
+        }
+
+        public static bool IsContentBase64(this InternalMessage message)
+        {
+            return message.Content.IsContentBase64();
+        }
+
+        public static bool IsContentBase64(this object value)
+        {
+            if (value == null)
+                return false;
+
+            var result = value.ToString();
+            if (string.IsNullOrEmpty(result))
+                return false;
+
+            return result.IsContentBase64();
         }
 
         public static InternalMessage AddCorrelationId(this InternalMessage message, Message value)
@@ -154,7 +162,10 @@ namespace Panama.Canal.Extensions
             if (value.Value == null)
                 return message;
 
-            message.Content = encryptor.ToString(JsonConvert.SerializeObject(value.Value));
+            if (value.Value.IsContentBase64())
+                message.Content = value.Value?.ToString() ?? string.Empty;
+            else
+                message.Content = encryptor.ToString(JsonConvert.SerializeObject(value.Value));
 
             return message;
         }

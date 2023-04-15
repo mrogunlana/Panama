@@ -243,6 +243,14 @@ namespace Panama.Canal.Extensions
             return result;
         }
 
+        public static Type GetBrokerType(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            return Type.GetType(message.GetBroker());
+        }
+
         public static string GetSagaType(this Message message)
         {
             if (message.Headers == null)
