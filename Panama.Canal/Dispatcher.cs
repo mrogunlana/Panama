@@ -6,6 +6,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Interfaces;
 using Quartz;
 using System.Collections.Concurrent;

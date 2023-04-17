@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
-using Panama.Canal.Invokers;
 using Panama.Canal.Models;
-using Panama.Extensions;
-using Panama.Models;
 
 namespace Panama.Canal.Brokers
 {
@@ -12,12 +10,14 @@ namespace Panama.Canal.Brokers
     {
         private readonly string _topic;
         private IDisposable? _unsubscriber;
+        private readonly IBrokerClient _client;
         private readonly IServiceProvider _provider;
         private readonly ILogger<DefaultSubscriber> _log;
 
-        public DefaultSubscriber(string topic, IServiceProvider provider)
+        public DefaultSubscriber(string topic, IBrokerClient client, IServiceProvider provider)
         {
             _topic = topic;
+            _client = client;
             _provider = provider;
             _log = provider.GetRequiredService<ILogger<DefaultSubscriber>>();
         }
@@ -28,18 +28,9 @@ namespace Panama.Canal.Brokers
 
         public virtual void OnNext(InternalMessage message)
         {
-            var local = message.GetData<Message>(_provider);
-            if (local == null)
-                throw new InvalidOperationException($"Observered external message cannot be located. Message ID: {message.Id}.");
+            var transient = message.ToTransient(_provider);
 
-            var invoker = _provider.GetRequiredService<ReceivedInvokerFactory>().GetInvoker();
-            var context = new Context(
-                correlationId: local.GetCorrelationId(),
-                provider: _provider)
-                    .Add(message)
-                    .Add(local);
-
-            invoker.Invoke(context);
+            _client?.OnCallback!(transient, message.Id).GetAwaiter().GetResult();
         }
     }
 }

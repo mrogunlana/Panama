@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Invokers

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Extensions;
 using Panama.Security.Resolvers;
 using System.Text;

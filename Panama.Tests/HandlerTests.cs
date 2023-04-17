@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
-using Panama.Security;
 using Panama.Tests.Commands;
 using System;
 using System.Collections.Generic;
@@ -49,8 +48,9 @@ namespace Panama.Tests
 
             var domain = assemblies.ToArray();
 
-            services.AddPanama(domain);
-            services.AddPanamaSecurity();
+            services.AddPanama(
+                assemblies: domain,
+                configuration: configuration);
 
             _provider = services.BuildServiceProvider();
         }

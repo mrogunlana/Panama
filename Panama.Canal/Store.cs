@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Canal.Sagas.Models;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
@@ -13,7 +14,7 @@ namespace Panama.Canal
     public class Store : IStore
     {
         private readonly ILogger<Store> _log;
-        private readonly MemorySettings _settings;
+        private readonly StoreOptions _options;
         private readonly IOptions<CanalOptions> _canalOptions;
         private readonly IStringEncryptor _encryptor;
         public ConcurrentDictionary<string, InternalMessage> Published { get; }
@@ -24,12 +25,12 @@ namespace Panama.Canal
 
         public Store(
               ILogger<Store> log
-            , MemorySettings settings
+            , StoreOptions settings
             , IOptions<CanalOptions> options
             , StringEncryptorResolver stringEncryptorResolver)
         {
             _log = log;
-            _settings = settings;
+            _options = settings;
             _canalOptions = options;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
 
@@ -97,7 +98,7 @@ namespace Panama.Canal
         public Task<int> DeleteExpiredAsync(string table, DateTime timeout, int batch = 1000, CancellationToken token = default)
         {
             var removed = 0;
-            if (table == nameof(_settings.PublishedTable))
+            if (table == nameof(_options.PublishedTable))
             {
                 var ids = Published.Values
                     .Where(x => x.Expires < timeout)
@@ -230,7 +231,7 @@ namespace Panama.Canal
 
         public Task<IEnumerable<InternalMessage>> GetMessagesToRetry(string table)
         {
-            if (table == _settings.PublishedTable)
+            if (table == _options.PublishedTable)
             {
                 return Task.FromResult(Published.Values
                     .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount

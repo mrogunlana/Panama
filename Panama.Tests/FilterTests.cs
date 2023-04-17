@@ -5,7 +5,6 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +47,9 @@ namespace Panama.Tests
 
             var domain = assemblies.ToArray();
 
-            services.AddPanama(domain);
-            services.AddPanamaSecurity();
+            services.AddPanama(
+                assemblies: domain,
+                configuration: configuration);
 
             _provider = services.BuildServiceProvider();
         }

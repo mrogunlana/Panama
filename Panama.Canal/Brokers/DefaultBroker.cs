@@ -2,14 +2,16 @@
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
+using Panama.Extensions;
 using Panama.Interfaces;
+using Panama.Models;
 
 namespace Panama.Canal.Brokers
 {
     public class DefaultBroker : IBroker
     {
         private readonly DefaultOptions _options;
-        private readonly IPooledObjectPolicy<DefaultConnection> _connections;
+        private readonly IDefaultObservable _observable;
 
         public bool Default { get; set; }
 
@@ -18,16 +20,22 @@ namespace Panama.Canal.Brokers
         public IBrokerOptions Options => _options;
 
         public DefaultBroker(
-            IOptions<DefaultOptions> options,
-            IPooledObjectPolicy<DefaultConnection> connections)
+            IDefaultObservable observable,
+            IOptions<DefaultOptions> options)
         {
+            _observable = observable;
             _options = options.Value;
-            _connections = connections;
         }
 
         public Task<IResult> Publish(IContext context)
         {
-            throw new NotImplementedException();
+            var message = context.DataGetSingle<InternalMessage>();
+            if (message == null)
+                throw new ArgumentNullException(nameof(InternalMessage));
+
+            _observable.Publish(message);
+
+            return Task.FromResult(new Result().Success());
         }
     }
 }

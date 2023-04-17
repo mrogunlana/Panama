@@ -49,9 +49,14 @@ namespace Panama.Canal.Tests
 
             var domain = assemblies.ToArray();
 
-            services.AddPanama(domain);
-            services.AddPanamaCanal(configuration, domain);
-            services.AddPanamaSecurity();
+            services.AddPanama(
+                assemblies: domain,
+                configuration: configuration,
+                setup: options => {
+                    options.UseCanal();
+                    options.UseDefaultBroker();
+                    options.UseDefaultStore();
+                });
 
             //add custom jobs to process outbox/inbox messages:
             services.AddSingleton<PublishOutbox>();

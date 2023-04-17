@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Panama.Canal.Models;
 using Panama.Extensions;
+using Panama.Interfaces;
+using Panama.Models;
 using Panama.Security.Resolvers;
 using System.Text;
 
@@ -72,5 +74,50 @@ namespace Panama.Canal.Extensions
             return result;
         }
 
+        public static IResult TryGetModels(this TransientMessage message, IServiceProvider provider)
+        {
+            try
+            {
+                if (provider == null)
+                    throw new ArgumentNullException(nameof(IServiceProvider));
+
+                message.RemoveException();
+
+                var local = message.ToInternal(provider);
+                if (local == null)
+                    throw new InvalidOperationException($"Internal Message ID: {message.Headers[Headers.Id]} could not be located.");
+
+                var external = local.GetData<Message>(provider);
+                if (external == null)
+                    throw new InvalidOperationException($"Message could not be located in Internal Message ID: {message.Headers[Headers.Id]} .");
+
+                external.RemoveException();
+
+                var result = provider.GetRequiredService<ConsumerSubscriptions>().HasSubscribers(external);
+                if (result == false)
+                    throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
+
+                return new Result()
+                    .Success()
+                    .Add(local)
+                    .Add(external)
+                    .Add(message);
+            }
+            catch (Exception ex)
+            {
+                message.AddException(ex);
+
+                var external = new Message(message.Headers, Encoding.UTF8.GetString(message.Body.ToArray()))
+                        .AddCreatedTime()
+                        .AddException(ex)
+                        .AddMessageId(Guid.NewGuid().ToString());
+
+                return new Result()
+                    .Fail()
+                    .Add(message)
+                    .Add(external)
+                    .Add(external.ToInternal(provider));
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Panama.Security.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
+using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System;
 using System.Configuration;
@@ -20,11 +21,11 @@ namespace Panama.Security
 
         public StringEncryptorResolverKey Key { get { return StringEncryptorResolverKey.AES; } }
 
-        public AESEncryptor()
+        public AESEncryptor(IConfiguration configuration)
         {
-            _secret = ConfigurationManager.AppSettings["Secret"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET");
-            _salt = ConfigurationManager.AppSettings["Salt"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT");
-            _vector = ConfigurationManager.AppSettings["Vector"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR");
+            _secret = configuration.GetValue<string>("Panama:Security:AES:Secret") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET") ?? string.Empty;
+            _salt = configuration.GetValue<string>("Panama:Security:AES:Salt") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT") ?? string.Empty;
+            _vector = configuration.GetValue<string>("Panama:Security:AES:Vector") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR") ?? string.Empty;
         }
 
         public string ToString(string value)

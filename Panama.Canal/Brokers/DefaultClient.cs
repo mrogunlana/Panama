@@ -42,7 +42,11 @@ namespace Panama.Canal.Brokers
 
         public void Listen(TimeSpan timeout, CancellationToken cancellationToken)
         {
-            // ignore
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.WaitHandle.WaitOne(timeout);
+            }
         }
 
         public void Reject(object? sender)
@@ -53,7 +57,7 @@ namespace Panama.Canal.Brokers
         public void Subscribe(IEnumerable<string> topics)
         {
             foreach (var topic in topics)
-                _subscriptions.Add(_observable.Subscribe(new DefaultSubscriber(topic, _provider)));
+                _subscriptions.Add(_observable.Subscribe(new DefaultSubscriber(topic, this, _provider)));
         }
     }
 }

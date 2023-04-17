@@ -1,8 +1,8 @@
 ﻿using Panama.Interfaces;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Options
 {
-    public class MemorySettings : IModel
+    public class StoreOptions : IModel
     {
         public string PublishedTable { set; get; } = "Published";
         public string ReceivedTable { set; get; } = "Received";

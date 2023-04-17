@@ -55,8 +55,9 @@ namespace Panama.Tests.MySQL
 
             var domain = assemblies.ToArray();
 
-            services.AddPanama(domain);
-            services.AddPanamaSecurity();
+            services.AddPanama(
+                assemblies: domain,
+                configuration: configuration);
 
             services.AddDbContext<AppDbContext>(options =>
             {

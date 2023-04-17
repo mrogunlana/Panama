@@ -50,9 +50,14 @@ namespace Panama.Canal.Tests
 
             var domain = assemblies.ToArray();
 
-            services.AddPanama(domain);
-            services.AddPanamaCanal(configuration, domain);
-            services.AddPanamaSecurity();
+            services.AddPanama(
+                assemblies: domain,
+                configuration: configuration,
+                setup: options => {
+                    options.UseCanal();
+                    options.UseDefaultBroker();
+                    options.UseDefaultStore();
+                });
 
             _cts = new CancellationTokenSource();
             _provider = services.BuildServiceProvider();

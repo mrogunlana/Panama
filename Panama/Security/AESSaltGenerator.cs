@@ -1,6 +1,5 @@
-﻿using Panama.Security.Interfaces;
-using System;
-using System.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Panama.Security.Interfaces;
 using System.Security.Cryptography;
 
 namespace Panama.Security
@@ -11,11 +10,11 @@ namespace Panama.Security
         private string _salt;
         private string _vector;
 
-        public AESSaltGenerator()
+        public AESSaltGenerator(IConfiguration configuration)
         {
-            _secret = ConfigurationManager.AppSettings["Secret"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET");
-            _salt = ConfigurationManager.AppSettings["Salt"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT");
-            _vector = ConfigurationManager.AppSettings["Vector"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR");
+            _secret = configuration.GetValue<string>("Panama:Security:AES:Secret") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SECRET") ?? string.Empty;
+            _salt = configuration.GetValue<string>("Panama:Security:AES:Salt") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_SALT") ?? string.Empty;
+            _vector = configuration.GetValue<string>("Panama:Security:AES:Vector") ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENCRYPTION_VECTOR") ?? string.Empty;
         }
 
         public string Salt()

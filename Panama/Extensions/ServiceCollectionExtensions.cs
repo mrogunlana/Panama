@@ -79,7 +79,12 @@ namespace Panama.Extensions
 
         public static bool Exist<T>(this IServiceCollection services)
         {
-            var descriptors = services.Where(descriptor => descriptor.ServiceType == typeof(T));
+            return services.Exist(typeof(T));
+        }
+
+        public static bool Exist(this IServiceCollection services, Type type)
+        {
+            var descriptors = services.Where(descriptor => descriptor.ServiceType == type);
             if (descriptors == null)
                 return false;
             if (descriptors.Count() == 0)

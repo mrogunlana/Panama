@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Models;
 using RabbitMQ.Client;
 using System.Reflection;

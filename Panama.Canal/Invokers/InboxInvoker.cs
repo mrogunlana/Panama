@@ -5,7 +5,6 @@ using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
-using Quartz.Impl.AdoJobStore.Common;
 
 namespace Panama.Canal.Invokers
 {

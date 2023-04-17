@@ -4,7 +4,7 @@ namespace Panama.Canal.RabbitMQ.Models
 {
     public class RabbitMQOptions : IBrokerOptions
     {
-        public static string Section { get; set; } = "Panama.Canal.RabbitMQ.RabbitMQOptions";
+        public static string Section { get; set; } = "Panama:Canal:RabbitMQ";
         public string UserName { get; set; } = "guest";
         public string Password { get; set; } = "guest";
         public string HostName { get; set; } = "localhost";

@@ -7,6 +7,7 @@ using Panama.Canal.Comparers;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 
 namespace Panama.Canal.Initializers
 {

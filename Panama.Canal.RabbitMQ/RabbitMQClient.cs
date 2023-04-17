@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Extensions;
 using Panama.Canal.RabbitMQ.Models;
 using RabbitMQ.Client;

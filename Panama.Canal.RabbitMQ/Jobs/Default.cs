@@ -7,12 +7,10 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
-using Panama.Interfaces;
-using Panama.Models;
 using Quartz;
-using System.Text;
 
 namespace Panama.Canal.RabbitMQ.Jobs
 {
@@ -37,15 +35,15 @@ namespace Panama.Canal.RabbitMQ.Jobs
             , RabbitMQFactory factory
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
-            , ConsumerSubscriptions subscriptions
-            , ReceivedInvokerFactory processor)
+            , ReceivedInvokerFactory invokers
+            , ConsumerSubscriptions subscriptions)
         {
             _log = log;
             _store = store;
             _factory = factory;
             _provider = provider;
             _canal = canal.Value;
-            _invokers = processor;
+            _invokers = invokers;
             _subscriptions = subscriptions;
         }
 
@@ -55,49 +53,6 @@ namespace Panama.Canal.RabbitMQ.Jobs
             _cts.Dispose();
         }
 
-        private IResult TryGetModels(TransientMessage message)
-        {
-            try
-            {
-                message.RemoveException();
-
-                var local = message.ToInternal(_provider);
-                if (local == null)
-                    throw new InvalidOperationException($"Internal Message ID: {message.Headers[Headers.Id]} could not be located.");
-
-                var external = local.GetData<Message>(_provider);
-                if (external == null)
-                    throw new InvalidOperationException($"Message could not be located in Internal Message ID: {message.Headers[Headers.Id]} .");
-
-                external.RemoveException();
-
-                var result = _subscriptions.HasSubscribers(external);
-                if (result == false)
-                    throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
-
-                return new Result()
-                    .Success()
-                    .Add(local)
-                    .Add(external)
-                    .Add(message);
-            }
-            catch (Exception ex)
-            {
-                message.AddException(ex);
-
-                var external = new Message(message.Headers, Encoding.UTF8.GetString(message.Body.ToArray()))
-                        .AddCreatedTime()
-                        .AddException(ex)
-                        .AddMessageId(Guid.NewGuid().ToString());
-                
-                return new Result()
-                    .Fail()
-                    .Add(message)
-                    .Add(external)
-                    .Add(external.ToInternal(_provider));
-            }
-        }
-        
         private void Register(IBrokerClient client)
         {
             client.OnCallback = async (message, sender) => {
@@ -106,7 +61,7 @@ namespace Panama.Canal.RabbitMQ.Jobs
                 {
                     _log.LogInformation($"Received message. ID:{message.GetId()}.");
 
-                    var result = TryGetModels(message);
+                    var result = message.TryGetModels(_provider);
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
 

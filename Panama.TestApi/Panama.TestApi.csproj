@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Panama.Canal.MySQL\Panama.Canal.MySQL.csproj" />
     <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
-    <ProjectReference Include="..\Panama.Security\Panama.Security.csproj" />
     <ProjectReference Include="..\Panama\Panama.csproj" />
   </ItemGroup>
 

@@ -2,12 +2,11 @@
 using Panama.Interfaces;
 using System.Reflection;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Options
 {
     public class CanalOptions : IModel
     {
         public string Instance { get; }
-        public static string Section { get; set; } = "Panama.Canal.CanalOptions";
         public bool UseLock { get; set; }
         public string? GroupPrefix { get; set; }
         public int ProducerThreads { get; set; } = 1;
@@ -22,6 +21,7 @@ namespace Panama.Canal.Models
         public int FailedRetryCount { get; set; }
         public int SuccessfulMessageExpiredAfter { get; set; }
         public ProcessingType ProcessingType { get; set; }
+
         public CanalOptions()
         {
             Instance = this.GetInstance();

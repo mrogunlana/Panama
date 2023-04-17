@@ -5,6 +5,7 @@ using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
@@ -53,7 +54,7 @@ namespace Panama.Canal.Invokers
             var data = message.GetData<IList<IModel>>(_provider);
             var group = metadata.GetGroup();
             var ack = metadata.GetReply();
-            var target = Type.GetType(metadata.GetBroker());
+            var target = metadata.GetBrokerType();
             
             if (target == null)
                 throw new InvalidOperationException($"Subscription target: {metadata.GetBroker()} could not be located.");
@@ -82,9 +83,7 @@ namespace Panama.Canal.Invokers
 
                         var result = await broker.Publish(new MessageContext(message, token: token)).ConfigureAwait(false);
 
-                        metadata
-                            .AddException($"Exception(s): {string.Join(",", result.Messages)}")
-                            .ToInternal(_provider);
+                        metadata.ToInternal(_provider);
 
                         if (result.Success)
                             await _store.ChangePublishedState(metadata

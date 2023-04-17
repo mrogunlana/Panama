@@ -3,7 +3,7 @@ using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Exceptions;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Brokers
