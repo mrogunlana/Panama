@@ -62,7 +62,7 @@ namespace Panama.Canal.Tests
         [TestMethod]
         public async Task DetectSubscriptions()
         {
-            var initializer = _provider.GetRequiredService<BuildSubscriptions>();
+            var initializer = _provider.GetRequiredService<Initializers.Subscriptions>();
 
             await initializer.Invoke(CancellationToken.None);
 

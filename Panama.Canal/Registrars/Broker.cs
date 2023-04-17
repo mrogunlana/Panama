@@ -34,6 +34,7 @@ namespace Panama.Canal.Registrars
 
             services.AddSingleton<DefaultBrokerFactory>();
             services.AddSingleton<IBrokerFactory, DefaultBrokerFactory>();
+            services.AddSingleton<IBrokerProcess, DefaultBrokerProcess>();
         }
 
         public void AddAssemblies(IServiceCollection services)

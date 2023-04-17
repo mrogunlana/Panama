@@ -11,18 +11,18 @@ using Panama.Canal.Models.Options;
 
 namespace Panama.Canal.Initializers
 {
-    public class BuildSubscriptions : IInitialize
+    public class Subscriptions : IInitialize
     {
         private readonly IServiceProvider _provider;
-        private readonly ILogger<BuildSubscriptions> _log;
+        private readonly ILogger<Subscriptions> _log;
         private readonly ITargetFactory _factory;
         private readonly Models.ConsumerSubscriptions _subscriptions;
         private readonly IOptions<CanalOptions> _options;
 
-        public BuildSubscriptions(
+        public Subscriptions(
              ITargetFactory factory
            , IServiceProvider provider
-           , ILogger<BuildSubscriptions> log
+           , ILogger<Subscriptions> log
            , IOptions<CanalOptions> options
            
            , Models.ConsumerSubscriptions subscriptions)

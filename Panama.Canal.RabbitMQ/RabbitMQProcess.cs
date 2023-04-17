@@ -10,12 +10,11 @@ using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
-using Quartz;
+using Panama.Interfaces;
 
-namespace Panama.Canal.RabbitMQ.Jobs
+namespace Panama.Canal.RabbitMQ
 {
-    [DisallowConcurrentExecution]
-    public class Default : IJob, IBrokerProcess
+    public class RabbitMQProcess : IBrokerProcess
     {
         private Task? _task;
         private bool _isHealthy = true;
@@ -23,15 +22,15 @@ namespace Panama.Canal.RabbitMQ.Jobs
 
         private readonly IStore _store;
         private readonly CanalOptions _canal;
-        private readonly ILogger<Default> _log;
+        private readonly ILogger<RabbitMQProcess> _log;
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
         private readonly ConsumerSubscriptions _subscriptions;
         private readonly IServiceProvider _provider;
-        
-        public Default(
+
+        public RabbitMQProcess(
               IStore store
-            , ILogger<Default> log
+            , ILogger<RabbitMQProcess> log
             , RabbitMQFactory factory
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
@@ -55,7 +54,8 @@ namespace Panama.Canal.RabbitMQ.Jobs
 
         private void Register(IBrokerClient client)
         {
-            client.OnCallback = async (message, sender) => {
+            client.OnCallback = async (message, sender) =>
+            {
 
                 try
                 {
@@ -83,17 +83,16 @@ namespace Panama.Canal.RabbitMQ.Jobs
                 }
                 catch (Exception ex)
                 {
-                    _log.LogError(ex, $"Exception occurred processing received message id: {message.Headers[Canal.Models.Headers.Id]}");
+                    _log.LogError(ex, $"Exception occurred processing received message id: {message.Headers[Headers.Id]}");
 
                     client.Reject(sender);
                 }
             };
         }
 
-        private async Task Execute()
+        private Task Execute()
         {
             var subscriptions = _subscriptions.GetSubscriptions(typeof(RabbitMQTarget));
-            var tasks = new List<Task>();
 
             foreach (var subscription in subscriptions)
             {
@@ -107,12 +106,14 @@ namespace Panama.Canal.RabbitMQ.Jobs
                 {
                     _isHealthy = false;
                     _log.LogError(e, e.Message);
-                    return;
+
+                    return Task.CompletedTask;
                 }
 
                 for (var i = 0; i < _canal.ConsumerThreads; i++)
                 {
-                    tasks.Add(Task.Factory.StartNew(() => {
+                    _ = Task.Factory.StartNew(() =>
+                    {
                         try
                         {
                             using (var client = _factory.Create(subscription.Key))
@@ -137,11 +138,11 @@ namespace Panama.Canal.RabbitMQ.Jobs
                         {
                             _log.LogError(e, e.Message);
                         }
-                    }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+                    }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                 }
             }
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         public bool IsHealthy()
@@ -162,18 +163,17 @@ namespace Panama.Canal.RabbitMQ.Jobs
             }
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Start(IContext context)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            context.Token.ThrowIfCancellationRequested();
 
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, CancellationToken.None);
-            _cts.Token.Register(() => {
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(context.Token, CancellationToken.None);
+            _cts.Token.Register(() =>
+            {
                 Pulse();
             });
 
-            Task.WaitAll(Execute());
-
-            return Task.CompletedTask;
+            await Execute();
         }
     }
 }
