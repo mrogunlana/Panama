@@ -43,7 +43,7 @@ namespace Panama.Canal.Registrars
 
             var storeOptions = new StoreOptions();
             _builder.Configuration.GetSection("Panama:Canal:Store").Bind(storeOptions);
-
+            
             services.Configure(_setup);
         }
     }

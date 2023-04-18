@@ -32,6 +32,8 @@ namespace Panama
 
             services.Configure(setup);
 
+            options.Builder?.Assemblies?.Clear();
+
             return services;
         }
     }

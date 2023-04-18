@@ -1,33 +1,28 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Exceptions;
 using Panama.Canal.Models.Options;
-using Panama.Interfaces;
 
 namespace Panama.Canal.Brokers
 {
     public class DefaultBrokerFactory : IBrokerFactory
     {
         private readonly ILogger<DefaultBrokerFactory> _log;
-        private readonly IOptions<CanalOptions> _canal;
-        private readonly IPooledObjectPolicy<IModel> _models;
-        private readonly IOptions<DefaultOptions> _options;
+        private readonly CanalOptions _canal;
+        private readonly DefaultOptions _options;
         private readonly IServiceProvider _provider;
 
         public DefaultBrokerFactory(
               IServiceProvider provider
             , ILogger<DefaultBrokerFactory> log
             , IOptions<CanalOptions> canal
-            , IOptions<DefaultOptions> options
-            , IPooledObjectPolicy<IModel> models)
+            , IOptions<DefaultOptions> options)
         {
             _log = log;
-            _canal = canal;
-            _models = models;
-            _options = options;
             _provider = provider;
+            _canal = canal.Value;
+            _options = options.Value;
         }
         public IBrokerClient Create(string group)
         {

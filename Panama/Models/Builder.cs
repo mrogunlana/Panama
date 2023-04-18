@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Panama.Extensions;
 using Panama.Interfaces;
 using System.Reflection;
 
@@ -6,14 +7,13 @@ namespace Panama.Models
 {
     public class Builder : IModel 
     {
-        public Options.PanamaOptions Options { get; }
+        public Options.PanamaOptions? Options { get; }
         public IList<IRegistrar> Registrars { get; }
         public IConfiguration? Configuration { get; }
-        public IEnumerable<Assembly>? Assemblies { get; }
+        public IList<Assembly>? Assemblies { get; }
 
         public Builder()
         {
-            Options = new Options.PanamaOptions();
             Registrars = new List<IRegistrar>();
         }
 
@@ -24,8 +24,8 @@ namespace Panama.Models
             : this()
         {
             Options = options;
-            Assemblies = assemblies;
             Configuration = configuration;
+            Assemblies = new List<Assembly>(assemblies.GetServiceAssemblies());
         }
 
         public void Register(IRegistrar registrar)

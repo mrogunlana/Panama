@@ -15,7 +15,7 @@ namespace Panama.Canal
     {
         private readonly ILogger<Store> _log;
         private readonly StoreOptions _options;
-        private readonly IOptions<CanalOptions> _canalOptions;
+        private readonly CanalOptions _canalOptions;
         private readonly IStringEncryptor _encryptor;
         public ConcurrentDictionary<string, InternalMessage> Published { get; }
         public ConcurrentDictionary<string, InternalMessage> Received { get; }
@@ -25,13 +25,13 @@ namespace Panama.Canal
 
         public Store(
               ILogger<Store> log
-            , StoreOptions settings
-            , IOptions<CanalOptions> options
+            , IOptions<StoreOptions> store
+            , IOptions<CanalOptions> canal
             , StringEncryptorResolver stringEncryptorResolver)
         {
             _log = log;
-            _options = settings;
-            _canalOptions = options;
+            _options = store.Value;
+            _canalOptions = canal.Value;
             _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
 
             Published = new ConcurrentDictionary<string, InternalMessage>();
@@ -234,7 +234,7 @@ namespace Panama.Canal
             if (table == _options.PublishedTable)
             {
                 return Task.FromResult(Published.Values
-                    .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
+                    .Where(x => x.Retries < _canalOptions.FailedRetryCount
                                 && x.Created < DateTime.Now.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
                                     x.Status == MessageStatus.Failed.ToString()))
@@ -244,7 +244,7 @@ namespace Panama.Canal
             else
             {
                 return Task.FromResult(Received.Values
-                    .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
+                    .Where(x => x.Retries < _canalOptions.FailedRetryCount
                                 && x.Created < DateTime.Now.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
                                     x.Status == MessageStatus.Failed.ToString()))
@@ -256,7 +256,7 @@ namespace Panama.Canal
         public Task<IEnumerable<InternalMessage>> GetPublishedMessagesToRetry()
         {
             var result = Published.Values
-                .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
+                .Where(x => x.Retries < _canalOptions.FailedRetryCount
                             && x.Created < DateTime.Now.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
                                 x.Status == MessageStatus.Failed.ToString()))
@@ -269,7 +269,7 @@ namespace Panama.Canal
         public Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry()
         {
             var result = Received.Values
-                .Where(x => x.Retries < _canalOptions.Value.FailedRetryCount
+                .Where(x => x.Retries < _canalOptions.FailedRetryCount
                             && x.Created < DateTime.Now.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
                                 x.Status == MessageStatus.Failed.ToString()))

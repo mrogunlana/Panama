@@ -33,23 +33,7 @@ namespace Panama.Tests
             services.AddSingleton(configuration);
             services.AddSingleton<IConfiguration>(configuration);
 
-            var assemblies = new List<Assembly>();
-
-            // domain built like so to overcome .net core .dll discovery issue 
-            // within container:
-            assemblies.Add(Assembly.GetExecutingAssembly());
-            assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
-            assemblies.AddRange(Assembly
-                .GetExecutingAssembly()
-                .GetReferencedAssemblies()
-                .Select(x => Assembly.Load(x))
-                .ToList());
-
-            var domain = assemblies.ToArray();
-
-            services.AddPanama(
-                assemblies: domain,
-                configuration: configuration);
+            services.AddPanama(configuration);
 
             _provider = services.BuildServiceProvider();
         }
