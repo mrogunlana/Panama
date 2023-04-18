@@ -1,10 +1,10 @@
 ﻿using Panama.Canal.Extensions;
-using Panama.Interfaces;
+using Panama.Models.Options;
 using System.Reflection;
 
 namespace Panama.Canal.Models.Options
 {
-    public class CanalOptions : IModel
+    public class CanalOptions : OptionBuilder
     {
         public string Instance { get; }
         public bool UseLock { get; set; }
@@ -23,6 +23,7 @@ namespace Panama.Canal.Models.Options
         public ProcessingType ProcessingType { get; set; }
 
         public CanalOptions()
+            : base()
         {
             Instance = this.GetInstance();
             SuccessfulMessageExpiredAfter = 24 * 3600;

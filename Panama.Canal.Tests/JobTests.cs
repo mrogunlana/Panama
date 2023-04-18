@@ -43,9 +43,11 @@ namespace Panama.Canal.Tests
             services.AddPanama(
                 configuration: configuration,
                 setup: options => {
-                    options.UseCanal();
-                    options.UseDefaultBroker();
-                    options.UseDefaultStore();
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler();
+                    });
                 });
 
             //add custom jobs to process outbox/inbox messages:

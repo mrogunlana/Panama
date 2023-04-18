@@ -29,9 +29,11 @@ namespace Panama.Canal.Tests
             services.AddPanama(
                 configuration: configuration,
                 setup: options => {
-                    options.UseCanal();
-                    options.UseDefaultBroker();
-                    options.UseDefaultStore();
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler();
+                    });
                 });
 
             _provider = services.BuildServiceProvider();

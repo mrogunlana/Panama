@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Tests.Jobs;
 using Panama.Models;
@@ -35,38 +36,22 @@ namespace Panama.Canal.Tests
             services.AddSingleton(configuration);
             services.AddSingleton<IConfiguration>(configuration);
 
-            var assemblies = new List<Assembly>();
-
-            // domain built like so to overcome .net core .dll discovery issue 
-            // within container:
-            assemblies.Add(Assembly.GetExecutingAssembly());
-            assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
-            assemblies.AddRange(Assembly
-                .GetExecutingAssembly()
-                .GetReferencedAssemblies()
-                .Select(x => Assembly.Load(x))
-                .ToList());
-
-            var domain = assemblies.ToArray();
-
             services.AddPanama(
-                assemblies: domain,
                 configuration: configuration,
                 setup: options => {
-                    options.UseCanal();
-                    options.UseDefaultBroker();
-                    options.UseDefaultStore();
-                });
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler(scheduler => {
+                            scheduler.RemoveJob<DelayedPublished>();
+                            scheduler.AddJob<DelayedPublished>("0 */2 * ? * *");
 
-            //add custom jobs to process outbox/inbox messages:
-            services.AddSingleton<PublishOutbox>();
-            services.AddSingleton<ReceiveInbox>();
-            services.AddSingleton(new Job(
-                type: typeof(PublishOutbox),
-                expression: "0/1 * * * * ?"));
-            services.AddSingleton(new Job(
-                type: typeof(ReceiveInbox),
-                expression: "0/1 * * * * ?"));
+                            //add custom jobs to process outbox/inbox messages:
+                            scheduler.AddJob<PublishOutbox>("0/1 * * * * ?");
+                            scheduler.AddJob<ReceiveInbox>("0/1 * * * * ?");
+                        });
+                    });
+                });
 
             _cts = new CancellationTokenSource();
             _provider = services.BuildServiceProvider();

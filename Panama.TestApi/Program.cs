@@ -2,6 +2,7 @@ using Panama;
 using Panama.Canal;
 using Panama.Canal.Extensions;
 using Panama.Canal.MySQL;
+using System.Configuration;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +20,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddPanama(
     configuration: builder.Configuration,
     setup: options => {
-        options.UseCanal();
         options.UseMysql();
-        options.UseDefaultBroker();
+        options.UseCanal(canal => {
+            canal.UseDefaultStore();
+            canal.UseDefaultBroker();
+            canal.UseDefaultScheduler();
+        });
     });
 
 var app = builder.Build();

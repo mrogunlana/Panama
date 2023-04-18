@@ -64,10 +64,17 @@ namespace Panama.Extensions
 
         public static IServiceCollection Remove<T>(this IServiceCollection services)
         {
+            services.Remove(typeof(T));
+
+            return services;
+        }
+
+        public static IServiceCollection Remove(this IServiceCollection services, Type type)
+        {
             if (services.IsReadOnly)
                 throw new Exception($"{nameof(services)} is read only");
 
-            var descriptors = services.Where(descriptor => descriptor.ServiceType == typeof(T));
+            var descriptors = services.Where(descriptor => descriptor.ServiceType == type);
             if (descriptors == null)
                 return services;
 

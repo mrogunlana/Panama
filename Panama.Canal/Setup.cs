@@ -18,7 +18,7 @@ namespace Panama.Canal
             return options;
         }
 
-        public static Panama.Models.Options.PanamaOptions UseDefaultBroker(this Panama.Models.Options.PanamaOptions options, Action<DefaultOptions>? setup = null)
+        public static CanalOptions UseDefaultBroker(this CanalOptions options, Action<DefaultOptions>? setup = null)
         {
             options.Register(new Registrars.Broker(
                 builder: options.Builder,
@@ -30,9 +30,21 @@ namespace Panama.Canal
             return options;
         }
 
-        public static Panama.Models.Options.PanamaOptions UseDefaultStore(this Panama.Models.Options.PanamaOptions options, Action<StoreOptions>? setup = null)
+        public static CanalOptions UseDefaultStore(this CanalOptions options, Action<StoreOptions>? setup = null)
         {
             options.Register(new Registrars.Store(
+                builder: options.Builder,
+                setup: (options) => {
+                    if (setup == null) return;
+                    setup(options);
+                }));
+
+            return options;
+        }
+
+        public static CanalOptions UseDefaultScheduler(this CanalOptions options, Action<SchedulerOptions>? setup = null)
+        {
+            options.Register(new Registrars.Scheduler(
                 builder: options.Builder,
                 setup: (options) => {
                     if (setup == null) return;

@@ -14,7 +14,7 @@ namespace Panama
 
             var options = new Models.Options.PanamaOptions();
             
-            options.SetBuilder(new Models.Builder(options, configuration, assemblies));
+            options.SetBuilder(new Models.Builder(configuration, assemblies));
             options.Register(new Registrars.Default(builder: options.Builder));
             options.Register(new Registrars.Security(builder: options.Builder));
 

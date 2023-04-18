@@ -7,7 +7,6 @@ namespace Panama.Models
 {
     public class Builder : IModel 
     {
-        public Options.PanamaOptions? Options { get; }
         public IList<IRegistrar> Registrars { get; }
         public IConfiguration? Configuration { get; }
         public IList<Assembly>? Assemblies { get; }
@@ -18,12 +17,10 @@ namespace Panama.Models
         }
 
         public Builder(
-            Options.PanamaOptions options, 
             IConfiguration? configuration = null, 
             IEnumerable<Assembly>? assemblies = null)
             : this()
         {
-            Options = options;
             Configuration = configuration;
             Assemblies = new List<Assembly>(assemblies.GetServiceAssemblies());
         }

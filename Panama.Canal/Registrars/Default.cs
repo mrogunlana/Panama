@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.ObjectPool;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Brokers;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
-using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
@@ -15,7 +12,6 @@ using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Quartz;
 
 namespace Panama.Canal.Registrars
 {
@@ -39,10 +35,8 @@ namespace Panama.Canal.Registrars
             services.AddSingleton(new CanalMarker());
 
             services.AddHostedService<Dispatcher>();
-            services.AddHostedService<Scheduler>();
             services.AddSingleton<IBootstrapper, Bootstrapper>();
             services.AddSingleton<IDispatcher, Dispatcher>();
-            services.AddSingleton<Interfaces.IScheduler, Scheduler>();
 
             services.AddTransient<IProcessor, DefaultProcessor>();
             services.AddTransient<IProcessor, SagaProcessor>();
@@ -59,32 +53,6 @@ namespace Panama.Canal.Registrars
             services.AddSingleton<ConsumerSubscriptions>();
             services.AddSingleton<PublishedInvokerFactory>();
             services.AddSingleton<ReceivedInvokerFactory>();
-
-            services.AddSingleton<ReceivedRetry>();
-            services.AddSingleton<DeleteExpired>();
-            services.AddSingleton<PublishedRetry>();
-            services.AddSingleton<DelayedPublished>();
-
-            services.AddSingleton(new Job(
-                type: typeof(DelayedPublished),
-                expression: "0 */1 * ? * *"));
-            services.AddSingleton(new Job(
-                type: typeof(PublishedRetry),
-                expression: "0 */1 * ? * *"));
-            services.AddSingleton(new Job(
-                type: typeof(ReceivedRetry),
-                expression: "0 */1 * ? * *"));
-            services.AddSingleton(new Job(
-                type: typeof(DeleteExpired),
-                expression: "0 */5 * ? * *"));
-
-            services.AddQuartz(q => {
-                q.SchedulerName = "panama-canal-services";
-                q.UseMicrosoftDependencyInjectionJobFactory();
-            });
-
-            services.AddQuartzHostedService(
-                q => q.WaitForJobsToComplete = true);
         }
 
         public void AddAssemblies(IServiceCollection services)
@@ -107,8 +75,26 @@ namespace Panama.Canal.Registrars
         {
             if (_builder.Configuration == null)
                 return;
-            
+
+            var options = new CanalOptions();
+
+            options.SetBuilder(new Panama.Models.Builder(_builder.Configuration, _builder.Assemblies));
+
+            _setup(options);
+
+            foreach (var registrar in options.Builder.Registrars)
+            {
+                if (services.Exist(registrar.Marker))
+                    continue;
+
+                registrar.AddServices(services);
+                registrar.AddAssemblies(services);
+                registrar.AddConfigurations(services);
+            }
+
             services.Configure(_setup);
+
+            options.Builder?.Assemblies?.Clear();
         }
     }
 }

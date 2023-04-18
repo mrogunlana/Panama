@@ -5,6 +5,7 @@ using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Tests.Jobs;
 using Panama.Models;
@@ -39,9 +40,11 @@ namespace Panama.Canal.Tests
             services.AddPanama(
                 configuration: configuration,
                 setup: options => {
-                    options.UseCanal();
-                    options.UseDefaultBroker();
-                    options.UseDefaultStore();
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler();
+                    });
                 });
 
             _cts = new CancellationTokenSource();
