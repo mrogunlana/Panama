@@ -16,16 +16,16 @@ namespace Panama.Canal.Models.Options
             Current = new List<Job> {
                 new Job(
                     type: typeof(DelayedPublished),
-                    expression: "0 */1 * ? * *"),
+                    expression: "0 */1 * * * ?"),
                 new Job(
                     type: typeof(PublishedRetry),
-                    expression: "0 */1 * ? * *"),
+                    expression: "0 */1 * * * ?"),
                 new Job(
                     type: typeof(ReceivedRetry),
-                    expression: "0 */1 * ? * *"),
+                    expression: "0 */1 * * * ?"),
                 new Job(
                     type: typeof(DeleteExpired),
-                    expression: "0 */5 * ? * *")
+                    expression: "0 */5 * * * ?")
             };
         }
     }

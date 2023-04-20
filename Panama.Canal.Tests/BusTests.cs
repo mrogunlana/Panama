@@ -44,11 +44,11 @@ namespace Panama.Canal.Tests
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler(scheduler => {
                             scheduler.RemoveJob<DelayedPublished>();
-                            scheduler.AddJob<DelayedPublished>("0 */2 * ? * *");
+                            scheduler.AddJob<DelayedPublished>("* * * * * ?");
 
                             //add custom jobs to process outbox/inbox messages:
-                            scheduler.AddJob<PublishOutbox>("0/1 * * * * ?");
-                            scheduler.AddJob<ReceiveInbox>("0/1 * * * * ?");
+                            scheduler.AddJob<PublishOutbox>("* * * * * ?");
+                            scheduler.AddJob<ReceiveInbox>("* * * * * ?");
                         });
                     });
                 });
@@ -88,6 +88,8 @@ namespace Panama.Canal.Tests
                     .Topic("foo.created")
                     .Channel(channel)
                     .Post();
+
+                await Task.Delay(TimeSpan.FromSeconds(2));
 
                 Assert.IsTrue(result.Success);
             }

@@ -46,24 +46,17 @@ namespace Panama.Canal.Tests
                     options.UseCanal(canal => {
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
-                        canal.UseDefaultScheduler();
+                        canal.UseDefaultScheduler(scheduler => {
+                            
+                            //add custom jobs to process outbox/inbox messages:
+                            scheduler.AddJob<EchoJob>("* * * * * ?");
+                            scheduler.AddJob<PublishOutbox>("* * * * * ?");
+                            scheduler.AddJob<ReceiveInbox>("* * * * * ?");
+                        });
                     });
                 });
 
-            //add custom jobs to process outbox/inbox messages:
-            services.AddSingleton<EchoJob>();
-            services.AddSingleton<PublishOutbox>();
-            services.AddSingleton<ReceiveInbox>();
-            services.AddSingleton(new Job(
-                type: typeof(EchoJob),
-                expression: "* * * ? * *"));
-            services.AddSingleton(new Job(
-                type: typeof(PublishOutbox),
-                expression: "* * * ? * *"));
-            services.AddSingleton(new Job(
-                type: typeof(ReceiveInbox),
-                expression: "* * * ? * *"));
-
+            
             _provider = services.BuildServiceProvider();
         }
 
@@ -156,7 +149,7 @@ namespace Panama.Canal.Tests
             await scheduler.Start();
             
             // define the job and tie it to our Echo 
-            IJobDetail job = JobBuilder.Create<PublishOutbox>()
+            IJobDetail job = JobBuilder.Create(typeof(PublishOutbox))
                 .WithIdentity("job1", "group1")
                 .Build();
 

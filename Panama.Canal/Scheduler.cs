@@ -78,7 +78,7 @@ namespace Panama.Canal
 
             _scheduler.JobFactory = _jobFactory;
 
-            await _scheduler.Start();
+            await _scheduler.Start(cancellationToken);
 
             foreach (var schedule in _schedules)
             {
@@ -89,10 +89,6 @@ namespace Panama.Canal
                     .ScheduleJob(job, trigger, cancellationToken)
                     .ConfigureAwait(false);
             }
-
-            await _scheduler
-                .Start(cancellationToken)
-                .ConfigureAwait(false);
 
             _off = false;
             _log.LogInformation("### Panama Canal Scheduler started!");

@@ -20,7 +20,7 @@ namespace Panama.Canal.Jobs
         {
             _store = store;
             _factory = factory;
-            _dispatcher = dispatcher; 
+            _dispatcher = dispatcher;
         }
 
         public async Task Execute(IJobExecutionContext context)
