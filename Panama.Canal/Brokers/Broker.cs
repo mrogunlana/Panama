@@ -8,10 +8,10 @@ using Panama.Models;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultBroker : IBroker
+    public class Broker : IBroker
     {
-        private readonly DefaultOptions _options;
-        private readonly IDefaultObservable _observable;
+        private readonly BrokerOptions _options;
+        private readonly IBrokerObservable _observable;
 
         public bool Default { get; set; }
 
@@ -19,9 +19,9 @@ namespace Panama.Canal.Brokers
 
         public IBrokerOptions Options => _options;
 
-        public DefaultBroker(
-            IDefaultObservable observable,
-            IOptions<DefaultOptions> options)
+        public Broker(
+            IBrokerObservable observable,
+            IOptions<BrokerOptions> options)
         {
             _observable = observable;
             _options = options.Value;

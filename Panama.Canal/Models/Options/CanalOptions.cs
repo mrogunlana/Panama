@@ -20,7 +20,6 @@ namespace Panama.Canal.Models.Options
         public int FailedRetryInterval { get; set; }
         public int FailedRetryCount { get; set; }
         public int SuccessfulMessageExpiredAfter { get; set; }
-        public ProcessingType ProcessingType { get; set; }
 
         public CanalOptions()
             : base()
@@ -30,7 +29,6 @@ namespace Panama.Canal.Models.Options
             FailedMessageExpiredAfter = 15 * 24 * 3600;
             FailedRetryInterval = 60;
             FailedRetryCount = 50;
-            ProcessingType = ProcessingType.Stream;
         }
     }
 }

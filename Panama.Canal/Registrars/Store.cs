@@ -41,10 +41,15 @@ namespace Panama.Canal.Registrars
             if (_builder.Configuration == null)
                 return;
 
-            var storeOptions = new StoreOptions();
-            _builder.Configuration.GetSection("Panama:Canal:Store").Bind(storeOptions);
-            
+            services.Configure<StoreOptions>(options =>
+                _builder.Configuration.GetSection("Panama:Canal:Stores:Default:Options").Bind(options));
+
             services.Configure(_setup);
+
+            services.PostConfigure<StoreOptions>(options => {
+                options.ProcessingType = Models.ProcessingType.Poll;
+                services.AddSingleton<IStoreOptions>(options);
+            });
         }
     }
 }

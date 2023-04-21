@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Markers;
 using Panama.Canal.MySQL.Channels;
 using Panama.Canal.MySQL.Jobs;
 using Panama.Canal.MySQL.Models;
-using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
 using System.Data;
@@ -19,7 +20,7 @@ namespace Panama.Canal.MySQL.Registrars
         private readonly Panama.Models.Builder _builder;
         private readonly Action<MySqlOptions> _setup;
 
-        public Type Marker => typeof(MySqlMarker);
+        public Type Marker => typeof(StoreMarker);
 
         public Default(
             Panama.Models.Builder builder,
@@ -63,13 +64,14 @@ namespace Panama.Canal.MySQL.Registrars
                 return;
 
             services.Configure<MySqlOptions>(options =>
-                _builder.Configuration.GetSection(MySqlOptions.Section).Bind(options));
+                _builder.Configuration.GetSection("Panama:Canal:Stores:Mysql:Options").Bind(options));
 
-            var settings = new MySqlSettings();
-            _builder.Configuration.GetSection("MySqlSettings").Bind(settings);
+            services.PostConfigure<MySqlOptions>(options => {
+                services.AddSingleton<IStoreOptions>(options);
+            });
 
-            services.AddSingleton(settings);
-
+            services.Configure<MySqlSettings>(options =>
+                _builder.Configuration.GetSection("Panama:Canal:Stores:Mysql:Settings").Bind(options));
         }
     }
 }

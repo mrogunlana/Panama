@@ -13,7 +13,7 @@ using Panama.Interfaces;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultBrokerProcess : IBrokerProcess
+    public class BrokerProcess : IBrokerProcess
     {
         private Task? _task;
         private bool _isHealthy = true;
@@ -21,16 +21,16 @@ namespace Panama.Canal.Brokers
 
         private readonly IStore _store;
         private readonly CanalOptions _canal;
-        private readonly ILogger<DefaultBrokerProcess> _log;
+        private readonly ILogger<BrokerProcess> _log;
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
         private readonly ConsumerSubscriptions _subscriptions;
         private readonly IServiceProvider _provider;
 
-        public DefaultBrokerProcess(
+        public BrokerProcess(
               IStore store
-            , ILogger<DefaultBrokerProcess> log
-            , DefaultBrokerFactory factory
+            , ILogger<BrokerProcess> log
+            , BrokerFactory factory
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers

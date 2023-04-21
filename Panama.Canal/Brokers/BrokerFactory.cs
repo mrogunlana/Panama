@@ -6,18 +6,18 @@ using Panama.Canal.Models.Options;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultBrokerFactory : IBrokerFactory
+    public class BrokerFactory : IBrokerFactory
     {
-        private readonly ILogger<DefaultBrokerFactory> _log;
+        private readonly ILogger<BrokerFactory> _log;
         private readonly CanalOptions _canal;
-        private readonly DefaultOptions _options;
+        private readonly BrokerOptions _options;
         private readonly IServiceProvider _provider;
 
-        public DefaultBrokerFactory(
+        public BrokerFactory(
               IServiceProvider provider
-            , ILogger<DefaultBrokerFactory> log
+            , ILogger<BrokerFactory> log
             , IOptions<CanalOptions> canal
-            , IOptions<DefaultOptions> options)
+            , IOptions<BrokerOptions> options)
         {
             _log = log;
             _provider = provider;
@@ -28,7 +28,7 @@ namespace Panama.Canal.Brokers
         {
             try
             {
-                var client = new DefaultClient(group, _provider);
+                var client = new BrokerClient(group, _provider);
 
                 return client;
             }

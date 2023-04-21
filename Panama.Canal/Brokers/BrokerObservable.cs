@@ -3,10 +3,10 @@ using Panama.Canal.Models;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultObservable : IDefaultObservable
+    public class BrokerObservable : IBrokerObservable
     {
         private List<IObserver<InternalMessage>> _observers;
-        public DefaultObservable()
+        public BrokerObservable()
         {
             _observers = new List<IObserver<InternalMessage>>();
         }
@@ -21,7 +21,7 @@ namespace Panama.Canal.Brokers
             if (!_observers.Contains(observer))
                 _observers.Add(observer);
 
-            return new DefaultUnsubscriber(_observers, observer);
+            return new UnsubscriptionObserver(_observers, observer);
         }
     }
 }

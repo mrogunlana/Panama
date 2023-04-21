@@ -6,20 +6,20 @@ using Panama.Canal.Models;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultSubscriber : IObserver<InternalMessage>
+    public class SubscriptionObserver : IObserver<InternalMessage>
     {
         private readonly string _topic;
         private IDisposable? _unsubscriber;
         private readonly IBrokerClient _client;
         private readonly IServiceProvider _provider;
-        private readonly ILogger<DefaultSubscriber> _log;
+        private readonly ILogger<SubscriptionObserver> _log;
 
-        public DefaultSubscriber(string topic, IBrokerClient client, IServiceProvider provider)
+        public SubscriptionObserver(string topic, IBrokerClient client, IServiceProvider provider)
         {
             _topic = topic;
             _client = client;
             _provider = provider;
-            _log = provider.GetRequiredService<ILogger<DefaultSubscriber>>();
+            _log = provider.GetRequiredService<ILogger<SubscriptionObserver>>();
         }
 
         public virtual void OnCompleted() => _log.LogTrace($"Topic {_topic} observation completed.");

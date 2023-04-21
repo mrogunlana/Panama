@@ -1,10 +1,9 @@
-﻿using Panama.Interfaces;
+﻿using Panama.Canal.Models.Options;
 
 namespace Panama.Canal.MySQL.Models
 {
-    public class MySqlOptions : IModel
+    public class MySqlOptions : StoreOptions
     {
-        public static string Section { get; set; } = "Panama.Canal.MySQL.MySqlOptions";
         public int Port { get; set; } = 3306;
         public string TablePrefix { get; set; } = "Panama";
         public string Host { get; set; } = string.Empty;

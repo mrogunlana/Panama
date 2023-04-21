@@ -6,16 +6,12 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Tests.Jobs;
-using Panama.Security;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Calendar;
 using Quartz.Impl.Matchers;
 using Quartz.Impl.Triggers;
 using Quartz.Spi;
-using System.ComponentModel;
-using System.Reflection;
-using System.Threading;
 
 namespace Panama.Canal.Tests
 {

@@ -2,7 +2,7 @@
 
 namespace Panama.Canal.Brokers.Interfaces
 {
-    public interface IDefaultObservable : IObservable<InternalMessage>
+    public interface IBrokerObservable : IObservable<InternalMessage>
     {
         void Publish(InternalMessage message);
     }

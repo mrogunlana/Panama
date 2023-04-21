@@ -10,14 +10,14 @@ namespace Panama.Canal.Invokers
     public class ReceivedInvokerFactory : IInvokeFactory
     {
         private readonly IServiceProvider _provider;
-        private readonly CanalOptions _options;
+        private readonly IStoreOptions _options;
 
         public ReceivedInvokerFactory(
             IServiceProvider provider,
-            IOptions<CanalOptions> options)
+            IStoreOptions options)
         {
             _provider = provider;
-            _options = options.Value;
+            _options = options;
         }
         public IInvoke GetInvoker()
         {

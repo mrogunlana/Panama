@@ -2,11 +2,11 @@
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultConnection : IDisposable, IModel
+    public class BrokerConnection : IDisposable, IModel
     {
         public bool IsOpen { get; set; } = false;
 
-        public DefaultConnection()
+        public BrokerConnection()
         {
             IsOpen = true;
         }

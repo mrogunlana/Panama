@@ -26,11 +26,11 @@ namespace Panama.Canal.MySQL.Jobs
         private readonly IServiceProvider _provider;
 
         public LogTailingJob(
-              MySqlSettings settings
-            , IDispatcher dispatcher
+              IDispatcher dispatcher
             , IInitialize initializer
             , IProcessorFactory factory
             , IOptions<MySqlOptions> options
+            , IOptions<MySqlSettings> settings
             , IServiceProvider serviceProvider
 
             , StringEncryptorResolver stringEncryptorResolver)
@@ -41,8 +41,8 @@ namespace Panama.Canal.MySQL.Jobs
 
             _factory = factory;
             _options = options;
-            _settings = settings;
             _dispatcher = dispatcher;
+            _settings = settings.Value;
             _provider = serviceProvider;
             
             /*  NOTES: 

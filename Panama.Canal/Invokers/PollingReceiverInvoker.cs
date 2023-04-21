@@ -35,14 +35,14 @@ namespace Panama.Canal.Invokers
 
             message.SetStatus(MessageStatus.Scheduled);
 
-            var published = await _store.StoreReceivedMessage(
+            var received = await _store.StoreReceivedMessage(
                 message: message,
                 transaction: context.Transaction)
                 .ConfigureAwait(false);
 
             var result = new Result()
                 .Success()
-                .Queue(published);
+                .Queue(received);
 
             return result;
         }

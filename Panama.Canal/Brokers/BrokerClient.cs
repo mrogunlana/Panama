@@ -5,25 +5,25 @@ using Panama.Canal.Models;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultClient : IBrokerClient
+    public class BrokerClient : IBrokerClient
     {
         private readonly string _queue;
-        private readonly DefaultOptions _options;
+        private readonly BrokerOptions _options;
         private readonly IServiceProvider _provider;
-        private readonly IDefaultObservable _observable;
+        private readonly IBrokerObservable _observable;
         private readonly IList<IDisposable> _subscriptions;
 
         public Func<TransientMessage, object?, Task>? OnCallback { get; set; }
 
-        public DefaultClient(
+        public BrokerClient(
               string queue
             , IServiceProvider provider)
         {
             _queue = queue;
             _provider = provider;
             _subscriptions = new List<IDisposable>();
-            _observable = provider.GetRequiredService<IDefaultObservable>();
-            _options = provider.GetRequiredService<IOptions<DefaultOptions>>().Value;
+            _observable = provider.GetRequiredService<IBrokerObservable>();
+            _options = provider.GetRequiredService<IOptions<BrokerOptions>>().Value;
         }
 
         public void Commit(object? sender)
@@ -57,7 +57,7 @@ namespace Panama.Canal.Brokers
         public void Subscribe(IEnumerable<string> topics)
         {
             foreach (var topic in topics)
-                _subscriptions.Add(_observable.Subscribe(new DefaultSubscriber(topic, this, _provider)));
+                _subscriptions.Add(_observable.Subscribe(new SubscriptionObserver(topic, this, _provider)));
         }
     }
 }

@@ -15,13 +15,13 @@ namespace Panama.Canal.MySQL.Initializers
         public Default(
              IStore store
            , IServiceProvider provider
-           , MySqlSettings settings
+           , IOptions<MySqlSettings> settings
            , IOptions<MySqlOptions> options)
         {
             _store = store;
             _options = options;
-            _settings = settings;
             _provider = provider;
+            _settings = settings.Value;
         }
 
         public async Task Invoke(CancellationToken token)

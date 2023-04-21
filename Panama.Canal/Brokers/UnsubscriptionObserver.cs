@@ -2,12 +2,12 @@
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultUnsubscriber : IDisposable
+    public class UnsubscriptionObserver : IDisposable
     {
         private List<IObserver<InternalMessage>> _observers;
         private IObserver<InternalMessage> _observer;
 
-        public DefaultUnsubscriber(List<IObserver<InternalMessage>> observers,
+        public UnsubscriptionObserver(List<IObserver<InternalMessage>> observers,
                             IObserver<InternalMessage> observer)
         {
             _observers = observers;

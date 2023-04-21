@@ -11,13 +11,13 @@ namespace Panama.Canal.Registrars
     public class Broker : IRegistrar
     {
         private readonly Panama.Models.Builder _builder;
-        private readonly Action<DefaultOptions> _setup;
+        private readonly Action<BrokerOptions> _setup;
 
         public Type Marker => typeof(BrokerMarker);
 
         public Broker(
             Panama.Models.Builder builder,
-            Action<DefaultOptions>? setup = null)
+            Action<BrokerOptions>? setup = null)
         {
             _builder = builder;
             _setup = setup ?? ((options) => { });
@@ -27,15 +27,15 @@ namespace Panama.Canal.Registrars
         {
             services.AddSingleton(new BrokerMarker());
 
-            services.AddSingleton<IBroker, DefaultBroker>();
-            services.AddSingleton<IBrokerClient, DefaultClient>();
+            services.AddSingleton<IBroker, Brokers.Broker>();
+            services.AddSingleton<IBrokerClient, BrokerClient>();
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            services.AddSingleton<IPooledObjectPolicy<DefaultConnection>, DefaultPolicy>();
+            services.AddSingleton<IPooledObjectPolicy<BrokerConnection>, BrokerPolicy>();
 
-            services.AddSingleton<DefaultBrokerFactory>();
-            services.AddSingleton<IBrokerFactory, DefaultBrokerFactory>();
-            services.AddSingleton<IBrokerProcess, DefaultBrokerProcess>();
-            services.AddSingleton<IDefaultObservable, DefaultObservable>();
+            services.AddSingleton<BrokerFactory>();
+            services.AddSingleton<IBrokerFactory, BrokerFactory>();
+            services.AddSingleton<IBrokerProcess, BrokerProcess>();
+            services.AddSingleton<IBrokerObservable, BrokerObservable>();
         }
 
         public void AddAssemblies(IServiceCollection services)
@@ -48,9 +48,9 @@ namespace Panama.Canal.Registrars
         {
             if (_builder.Configuration == null)
                 return;
-            
-            var brokerOptions = new DefaultOptions();
-            _builder.Configuration.GetSection("Panama:Canal:Broker").Bind(brokerOptions);
+
+            services.Configure<BrokerOptions>(options =>
+                _builder.Configuration.GetSection("Panama:Canal:Brokers:Default:Options").Bind(options));
 
             services.Configure(_setup);
         }

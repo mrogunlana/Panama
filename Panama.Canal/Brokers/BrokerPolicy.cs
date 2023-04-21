@@ -6,17 +6,17 @@ using System.Reflection;
 
 namespace Panama.Canal.Brokers
 {
-    public class DefaultPolicy : IPooledObjectPolicy<DefaultConnection>
+    public class BrokerPolicy : IPooledObjectPolicy<BrokerConnection>
     {
-        private readonly ILogger<DefaultPolicy> _log;
+        private readonly ILogger<BrokerPolicy> _log;
         private readonly CanalOptions _canal;
-        private readonly DefaultOptions _options;
+        private readonly BrokerOptions _options;
         private readonly string _exchange;
 
-        public DefaultPolicy(
-              ILogger<DefaultPolicy> log
+        public BrokerPolicy(
+              ILogger<BrokerPolicy> log
             , IOptions<CanalOptions> canal
-            , IOptions<DefaultOptions> options)
+            , IOptions<BrokerOptions> options)
         {
             _log = log;
             _canal = canal.Value;
@@ -24,12 +24,12 @@ namespace Panama.Canal.Brokers
             _exchange = $"{_options.Exchange}.{_canal.Version}";
         }
 
-        public DefaultConnection Create()
+        public BrokerConnection Create()
         {
-            return new DefaultConnection();
+            return new BrokerConnection();
         }
 
-        public bool Return(DefaultConnection obj)
+        public bool Return(BrokerConnection obj)
         {
             if (obj.IsOpen)
             {

@@ -18,7 +18,7 @@ namespace Panama.Canal
             return options;
         }
 
-        public static CanalOptions UseDefaultBroker(this CanalOptions options, Action<DefaultOptions>? setup = null)
+        public static CanalOptions UseDefaultBroker(this CanalOptions options, Action<BrokerOptions>? setup = null)
         {
             options.Register(new Registrars.Broker(
                 builder: options.Builder,

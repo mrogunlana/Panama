@@ -19,7 +19,7 @@ namespace Panama.Canal.Tests
         private CancellationTokenSource _cts; 
         private IServiceProvider _provider;
         private IBootstrapper _bootstrapper;
-
+        
         public BusTests()
         {
             var services = new ServiceCollection();
