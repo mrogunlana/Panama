@@ -2,12 +2,11 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic.FileIO;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.MySQL.Channels;
-using Panama.Canal.MySQL.Jobs;
 using Panama.Canal.MySQL.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -32,20 +31,19 @@ namespace Panama.Canal.MySQL.Registrars
         
         public void AddServices(IServiceCollection services)
         {
-            services.AddSingleton(new MySqlMarker());
+            services.AddSingleton(new StoreMarker());
 
             services.AddTransient<IChannel<DatabaseFacade, IDbContextTransaction>, MySqlContextChannel>();
             services.AddTransient<IChannel<IDbConnection, IDbTransaction>, MySqlChannel>();
             services.AddTransient<IGenericChannelFactory, MySqlChannelFactory>();
 
-            services.Remove<IStore>();
-            services.Remove<Canal.Store>();
+            services.AddSingleton<Tailer>();
+            services.AddHostedService(p => p.GetRequiredService<Tailer>());
+            services.AddSingleton<ITailer, Tailer>(p => p.GetRequiredService<Tailer>());
+            services.AddSingleton<ICanalService, Tailer>(p => p.GetRequiredService<Tailer>());
+
             services.AddSingleton<IStore, Store>();
             services.AddSingleton<IInitialize, Initializers.Default>();
-            services.AddSingleton<LogTailingJob>();
-            services.AddSingleton(new Job(
-                type: typeof(LogTailingJob),
-                expression: "0/1 * * * * ?"));
         }
 
         public void AddAssemblies(IServiceCollection services)
@@ -69,6 +67,7 @@ namespace Panama.Canal.MySQL.Registrars
             services.PostConfigure<MySqlOptions>(options => {
                 services.AddSingleton<IStoreOptions>(options);
             });
+            services.AddSingleton<IOptions<IStoreOptions>>(p => p.GetRequiredService<IOptions<MySqlOptions>>());
 
             services.Configure<MySqlSettings>(options =>
                 _builder.Configuration.GetSection("Panama:Canal:Stores:Mysql:Settings").Bind(options));

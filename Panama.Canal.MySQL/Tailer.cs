@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MySqlCdc;
 using MySqlCdc.Constants;
 using MySqlCdc.Events;
@@ -9,42 +11,44 @@ using Panama.Canal.MySQL.Extensions;
 using Panama.Canal.MySQL.Models;
 using Panama.Extensions;
 using Panama.Models;
-using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
-using Quartz;
 
-namespace Panama.Canal.MySQL.Jobs
+namespace Panama.Canal
 {
-    [DisallowConcurrentExecution]
-    public class LogTailingJob : IJob
+    public class Tailer : IHostedService, ITailer
     {
+        private bool _off;
+        private CancellationTokenSource? _cts;
+
         private readonly BinlogClient _client;
         private readonly MySqlSettings _settings;
         private readonly IDispatcher _dispatcher;
+        private readonly ILogger<Tailer> _log;
         private readonly IProcessorFactory _factory;
         private readonly IOptions<MySqlOptions> _options;
         private readonly IServiceProvider _provider;
 
-        public LogTailingJob(
-              IDispatcher dispatcher
-            , IInitialize initializer
+        public bool Online => !_cts?.IsCancellationRequested ?? false;
+
+        public Tailer(
+              ILogger<Tailer> log
+            , IDispatcher dispatcher
             , IProcessorFactory factory
             , IOptions<MySqlOptions> options
             , IOptions<MySqlSettings> settings
             , IServiceProvider serviceProvider
-
             , StringEncryptorResolver stringEncryptorResolver)
         {
             //TODO: check the existance of MySqlCdCOptions in the 
             //registrar and if it's null, throw an exception as 
             //its table and database specific values below are required
-
+            _log = log;
             _factory = factory;
             _options = options;
             _dispatcher = dispatcher;
             _settings = settings.Value;
             _provider = serviceProvider;
-            
+
             /*  NOTES: 
              * 
              *  #Use for MySQL GTID below
@@ -78,12 +82,12 @@ namespace Panama.Canal.MySQL.Jobs
             });
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        private async Task Listen()
         {
-            await foreach (var binlogEvent in _client.Replicate(context.CancellationToken))
+            await foreach (var binlogEvent in _client.Replicate(_cts!.Token))
             {
-                if (context.CancellationToken.IsCancellationRequested)
-                    context.CancellationToken.ThrowIfCancellationRequested();
+                if (_cts.Token.IsCancellationRequested)
+                    _cts.Token.ThrowIfCancellationRequested();
 
                 //TODO: Handle Other Events ? e.g: 
                 //if tableMap
@@ -93,14 +97,14 @@ namespace Panama.Canal.MySQL.Jobs
                 //if PrintEventAsync 
 
                 if (binlogEvent is WriteRowsEvent writeRows)
-                    await HandleWriteRowsEvent(writeRows, context);
+                    await Handle(writeRows);
             }
         }
 
-        private async Task HandleWriteRowsEvent(WriteRowsEvent writeRows, IJobExecutionContext context)
+        private async Task Handle(WriteRowsEvent writeRows)
         {
-            if (context.CancellationToken.IsCancellationRequested)
-                context.CancellationToken.ThrowIfCancellationRequested();
+            if (_cts!.Token.IsCancellationRequested)
+                _cts!.Token.ThrowIfCancellationRequested();
 
             // TODO: should we leave the message base64 
             // encrypted and let the consumer decode?
@@ -116,11 +120,11 @@ namespace Panama.Canal.MySQL.Jobs
             foreach (var received in inbox)
                 await _dispatcher.Execute(
                     message: received,
-                    token: context.CancellationToken);
+                    token: _cts.Token);
 
             //publish to message brokers
             foreach (var publish in outbox)
-            { 
+            {
                 var message = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
                 if (message == null)
                     throw new InvalidOperationException("Message headers cannot be found.");
@@ -129,8 +133,54 @@ namespace Panama.Canal.MySQL.Jobs
                     .GetProcessor(publish)
                     .Execute(new Context()
                         .Add(message)
-                        .Token(context.CancellationToken));
+                        .Token(_cts.Token));
             }
+        }
+
+        public Task Off(CancellationToken cancellationToken)
+        {
+            if (_off)
+                return Task.CompletedTask;
+
+            _cts?.Cancel();
+
+            _cts?.Dispose();
+            _cts = null;
+            _off = true;
+
+            return Task.CompletedTask;
+        }
+
+        public Task On(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (_cts != null)
+            {
+                _log.LogInformation("### Panama Canal MySql Stream Service is already started!");
+
+                return Task.CompletedTask;
+            }
+
+            _log.LogDebug("### Panama Canal MySql Stream Service is starting.");
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            _ = Task.Factory.StartNew(async () => await Listen(), _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+
+            _off = false;
+            _log.LogInformation("### Panama Canal MySql Stream Service started!");
+
+            return Task.CompletedTask;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await On(cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await Off(cancellationToken).ConfigureAwait(false);
         }
     }
 }

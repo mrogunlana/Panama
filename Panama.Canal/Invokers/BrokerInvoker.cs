@@ -15,7 +15,6 @@ namespace Panama.Canal.Invokers
 {
     public class BrokerInvoker : IInvoke
     {
-        private readonly IBus _bus;
         private readonly IStore _store;
         private readonly CanalOptions _canal;
         private readonly IServiceProvider _provider;
@@ -23,14 +22,12 @@ namespace Panama.Canal.Invokers
         private readonly IEnumerable<IBroker> _brokers;
 
         public BrokerInvoker(
-              IBus bus
-            , IStore store
+              IStore store
             , IServiceProvider provider
             , IEnumerable<IBroker> brokers
             , ILogger<BrokerInvoker> log
             , IOptions<CanalOptions> canal)
         {
-            _bus = bus;
             _log = log;
             _store = store;
             _brokers = brokers;

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Panama.Canal.Brokers;
 using Panama.Canal.Brokers.Interfaces;
+using Panama.Canal.Models;
 using Panama.Canal.Models.Markers;
 using Panama.Interfaces;
 
@@ -27,8 +28,10 @@ namespace Panama.Canal.Registrars
         {
             services.AddSingleton(new BrokerMarker());
 
+            services.AddSingleton<DefaultTarget>();
             services.AddSingleton<IBroker, Brokers.Broker>();
             services.AddSingleton<IBrokerClient, BrokerClient>();
+            services.AddSingleton<ITargetFactory, TargetFactory>();
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<IPooledObjectPolicy<BrokerConnection>, BrokerPolicy>();
 

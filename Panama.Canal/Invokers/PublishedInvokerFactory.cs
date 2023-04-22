@@ -14,10 +14,10 @@ namespace Panama.Canal.Invokers
 
         public PublishedInvokerFactory(
             IServiceProvider provider,
-            IStoreOptions options)
+            IOptions<IStoreOptions> options)
         {
             _provider = provider;
-            _options = options;
+            _options = options.Value;
         }
         public IInvoke GetInvoker()
         {

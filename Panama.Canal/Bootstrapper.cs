@@ -36,13 +36,7 @@ namespace Panama.Canal
             }
         }
 
-        public IEnumerable<ICanalService> GetServices()
-        {
-            var dispatcher = _provider.GetRequiredService<IDispatcher>();
-            var scheduler = _provider.GetRequiredService<IScheduler>();
-            
-            return new List<ICanalService>() { dispatcher, scheduler };
-        }
+        public IEnumerable<ICanalService> GetServices() => _provider.GetServices<ICanalService>();
 
         public async Task Off(CancellationToken cancellationToken)
         {

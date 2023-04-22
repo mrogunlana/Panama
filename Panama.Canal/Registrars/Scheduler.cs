@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
+using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Markers;
@@ -30,26 +31,10 @@ namespace Panama.Canal.Registrars
         {
             services.AddSingleton(new SchedulerMarker());
 
-            services.AddHostedService<Canal.Scheduler>();
-            services.AddSingleton<Interfaces.IScheduler, Canal.Scheduler>();
-
-            //services.AddSingleton<ReceivedRetry>();
-            //services.AddSingleton<DeleteExpired>();
-            //services.AddSingleton<PublishedRetry>();
-            //services.AddSingleton<DelayedPublished>();
-
-            //services.AddSingleton(new Job(
-            //    type: typeof(DelayedPublished),
-            //    expression: "0 */1 * ? * *"));
-            //services.AddSingleton(new Job(
-            //    type: typeof(PublishedRetry),
-            //    expression: "0 */1 * ? * *"));
-            //services.AddSingleton(new Job(
-            //    type: typeof(ReceivedRetry),
-            //    expression: "0 */1 * ? * *"));
-            //services.AddSingleton(new Job(
-            //    type: typeof(DeleteExpired),
-            //    expression: "0 */5 * ? * *"));
+            services.AddSingleton<Canal.Scheduler>();
+            services.AddHostedService(p => p.GetRequiredService<Canal.Scheduler>());
+            services.AddSingleton<Interfaces.IScheduler, Canal.Scheduler>(p => p.GetRequiredService<Canal.Scheduler>());
+            services.AddSingleton<ICanalService, Canal.Scheduler>(p => p.GetRequiredService<Canal.Scheduler>());
 
             services.AddQuartz(q => {
                 q.SchedulerName = "panama-canal-services";

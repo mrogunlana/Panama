@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Brokers;
-using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
@@ -33,10 +31,8 @@ namespace Panama.Canal.Registrars
         public void AddServices(IServiceCollection services)
         {
             services.AddSingleton(new CanalMarker());
-
-            services.AddHostedService<Dispatcher>();
+            
             services.AddSingleton<IBootstrapper, Bootstrapper>();
-            services.AddSingleton<IDispatcher, Dispatcher>();
 
             services.AddTransient<IProcessor, DefaultProcessor>();
             services.AddTransient<IProcessor, SagaProcessor>();
@@ -44,12 +40,11 @@ namespace Panama.Canal.Registrars
 
             services.AddTransient<IBus, Bus>();
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
-            services.AddSingleton<DefaultTarget>();
-            services.AddSingleton<ITargetFactory, TargetFactory>();
 
             services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
+
             services.AddSingleton<ConsumerSubscriptions>();
             services.AddSingleton<PublishedInvokerFactory>();
             services.AddSingleton<ReceivedInvokerFactory>();

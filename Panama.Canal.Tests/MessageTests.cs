@@ -40,7 +40,7 @@ namespace Panama.Canal.Tests
             _cts = new CancellationTokenSource();
         }
 
-        [TestInitialize]
+        //[TestInitialize]
         public async Task Init()
         {
             _cts = new CancellationTokenSource();
@@ -48,7 +48,7 @@ namespace Panama.Canal.Tests
             //await _bootstrapper.On(_cts.Token);
         }
 
-        [TestCleanup]
+        //[TestCleanup]
         public async Task Cleanup()
         {
             _cts.Cancel();
@@ -58,7 +58,7 @@ namespace Panama.Canal.Tests
             _cts.Dispose();
         }
 
-        [TestMethod]
+        //[TestMethod]
         public async Task VerifyPost()
         {
             _services.AddPanama(

@@ -15,6 +15,9 @@ namespace Panama.Canal
                     setup(options);
                 }));
 
+            options.Register(new Registrars.Dispatcher(
+                builder: options.Builder));
+
             return options;
         }
 

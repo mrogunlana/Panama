@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
@@ -43,13 +44,11 @@ namespace Panama.Canal.Registrars
 
             services.Configure<StoreOptions>(options =>
                 _builder.Configuration.GetSection("Panama:Canal:Stores:Default:Options").Bind(options));
-
             services.Configure(_setup);
-
             services.PostConfigure<StoreOptions>(options => {
                 options.ProcessingType = Models.ProcessingType.Poll;
-                services.AddSingleton<IStoreOptions>(options);
             });
+            services.AddSingleton<IOptions<IStoreOptions>>(p => p.GetRequiredService<IOptions<StoreOptions>>());
         }
     }
 }
