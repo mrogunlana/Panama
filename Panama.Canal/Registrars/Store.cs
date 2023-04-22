@@ -27,8 +27,8 @@ namespace Panama.Canal.Registrars
         {
             services.AddSingleton(new StoreMarker());
 
-            services.AddSingleton<IStore, Canal.Store>();
             services.AddSingleton<Canal.Store>();
+            services.AddSingleton<IStore, Canal.Store>(p => p.GetRequiredService<Canal.Store>());
         }
 
         public void AddAssemblies(IServiceCollection services)

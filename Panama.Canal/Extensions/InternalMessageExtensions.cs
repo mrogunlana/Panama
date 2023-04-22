@@ -160,14 +160,11 @@ namespace Panama.Canal.Extensions
 
             if (value == null)
                 return message;
-            if (value.Value == null)
-                return message;
 
-            if (value.Value.IsContentBase64())
-                message.Content = value.Value?.ToString() ?? string.Empty;
-            else
-                message.Content = encryptor.ToString(JsonConvert.SerializeObject(value.Value));
-
+            message.Content = encryptor.ToString(JsonConvert.SerializeObject(value, new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.All
+            }));
+            
             return message;
         }
         public static T GetData<T>(this InternalMessage message, IServiceProvider provider)
@@ -181,7 +178,9 @@ namespace Panama.Canal.Extensions
                 throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
 
             var value = encryptor.FromString(message.Content);
-            var result = JsonConvert.DeserializeObject<T>(value);
+            var result = JsonConvert.DeserializeObject<T>(value, new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.All
+            });
             if (result == null)
                 throw new InvalidOperationException($"Message context could not be decoded.");
 
@@ -210,7 +209,9 @@ namespace Panama.Canal.Extensions
         public static InternalMessage SetStatus<T>(this InternalMessage message, T value)
             where T : struct
         {
-            var result = nameof(value).ToString();
+            var result = value.ToString();
+            if (result == null)
+                throw new InvalidOperationException($"Message status cannot be set using type: {typeof(T)} of {value}");
 
             message.Status = result;
 

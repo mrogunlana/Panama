@@ -10,8 +10,8 @@ namespace Panama.Canal.Extensions
     {
         public static IBus Bus(this IContext context)
         {
-            return context.Provider.GetRequiredService<IBus>()
-                .Token(context.Token);
+            return context.Provider.GetRequiredService<IMarina>()
+                .GetBus(context.Token);
         }
 
         public static SagaContext Saga<T>(this IContext context)

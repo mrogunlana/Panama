@@ -57,9 +57,12 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
-        public static IBus Token(this IBus bus, CancellationToken token)
+        public static IBus Token(this IBus bus, CancellationToken? token = null)
         {
-            bus.Context.Token = token;
+            if (token == null)
+                return bus;
+
+            bus.Context.Token = token.Value;
 
             return bus;
         }

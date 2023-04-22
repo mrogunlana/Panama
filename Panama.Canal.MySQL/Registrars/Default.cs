@@ -42,7 +42,8 @@ namespace Panama.Canal.MySQL.Registrars
             services.AddSingleton<ITailer, Tailer>(p => p.GetRequiredService<Tailer>());
             services.AddSingleton<ICanalService, Tailer>(p => p.GetRequiredService<Tailer>());
 
-            services.AddSingleton<IStore, Store>();
+            services.AddSingleton<Store>();
+            services.AddSingleton<IStore, Store>(p => p.GetRequiredService<Store>());
             services.AddSingleton<IInitialize, Initializers.Default>();
         }
 

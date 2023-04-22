@@ -1,12 +1,15 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
 using Panama.Canal.Tests.Jobs;
+using Panama.Canal.Tests.Models;
 using Panama.Models;
 using Panama.Security;
 using System.Configuration;
@@ -40,26 +43,22 @@ namespace Panama.Canal.Tests
             _cts = new CancellationTokenSource();
         }
 
-        //[TestInitialize]
-        public async Task Init()
+        [TestMethod]
+        public void VerifyMessageDeserialization()
         {
-            _cts = new CancellationTokenSource();
+            _services.AddPanama(_configuration);
+            var provider = _services.BuildServiceProvider();
 
-            //await _bootstrapper.On(_cts.Token);
+            var message = new Message();
+            message.AddData(new Foo());
+            var that = message.ToInternal(provider);
+            var @this = that.GetData<Message>(provider);
+
+            Assert.AreEqual(message.Value?.To<Foo>()?.Value, @this.Value?.To<Foo>()?.Value);
         }
 
-        //[TestCleanup]
-        public async Task Cleanup()
-        {
-            _cts.Cancel();
-
-            //await _bootstrapper.Off(_cts.Token);
-
-            _cts.Dispose();
-        }
-
-        //[TestMethod]
-        public async Task VerifyPost()
+        [TestMethod]
+        public async Task VerifyInitialStreamPublishMessageState()
         {
             _services.AddPanama(
                 configuration: _configuration,
@@ -69,11 +68,9 @@ namespace Panama.Canal.Tests
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler(scheduler => {
                             scheduler.RemoveJob<DelayedPublished>();
-                            scheduler.AddJob<DelayedPublished>("* * * * * ?");
-
-                            //add custom jobs to process outbox/inbox messages:
-                            scheduler.AddJob<PublishOutbox>("* * * * * ?");
-                            scheduler.AddJob<ReceiveInbox>("* * * * * ?");
+                            scheduler.RemoveJob<DeleteExpired>();
+                            scheduler.RemoveJob<PublishedRetry>();
+                            scheduler.RemoveJob<ReceivedRetry>();
                         });
                     });
                 });
@@ -83,21 +80,39 @@ namespace Panama.Canal.Tests
             var provider = _services.BuildServiceProvider();
             var bootstrapper = provider.GetRequiredService<IBootstrapper>();
 
+            await bootstrapper.On(_cts.Token);
 
-
+            var options = provider.GetRequiredService<IOptions<CanalOptions>>();
             var channels = provider.GetRequiredService<IDefaultChannelFactory>();
             var context = new Context(provider);
-            
+            var foo = new Foo();
+            var id = Guid.NewGuid().ToString();
+
             using (var channel = channels.CreateChannel<DefaultChannel>())
             {
                 var result = await context.Bus()
+                    .Id(id)
+                    .Data(foo)
                     .Topic("foo.created")
                     .Channel(channel)
                     .Post();
 
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                var store = provider.GetRequiredService<Store>();
 
-                Assert.IsTrue(result.Success);
+                Assert.IsTrue(store.Published.Count == 1);
+                Assert.IsNotNull(store.Published[id]);
+                Assert.IsTrue(store.Published[id].Retries == 0);
+                Assert.IsNull(store.Published[id].Expires);
+                Assert.IsTrue(store.Published[id].Status == MessageStatus.Scheduled.ToString());
+                Assert.IsNotNull(store.Published[id].Created);
+
+                var message = store.Published[id].GetData<Message>(provider);
+
+                Assert.IsNotNull(message);
+                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
         }
     }

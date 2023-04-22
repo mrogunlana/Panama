@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
@@ -18,15 +19,11 @@ namespace Panama.Canal
 
         public BusContext Context { get; }
 
-        public Bus(
-              ILogger<Bus> log,
-              ITargetFactory targets,
-              IServiceProvider provider,
-              IOptions<CanalOptions> options)
+        public Bus(IServiceProvider provider)
         {
-            _log = log;
-            _options = options;
-            _targets = targets;
+            _log = provider.GetRequiredService<ILogger<Bus>>();
+            _targets = provider.GetRequiredService<ITargetFactory>();
+            _options = provider.GetRequiredService<IOptions<CanalOptions>>();
 
             Context = new BusContext(provider);
         }
@@ -34,7 +31,7 @@ namespace Panama.Canal
         public async Task<IResult> Post(CancellationToken? token = null)
         {
             var message = new Message()
-                .AddMessageId(Guid.NewGuid().ToString())
+                .AddMessageId(Context.Id)
                 .AddMessageName(Context.Name)
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)

@@ -5,11 +5,8 @@ using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
-using Panama.Canal.Models;
 using Panama.Canal.Tests.Jobs;
 using Panama.Models;
-using Panama.Security;
-using System.Reflection;
 
 namespace Panama.Canal.Tests
 {

@@ -38,7 +38,7 @@ namespace Panama.Canal.Registrars
             services.AddTransient<IProcessor, SagaProcessor>();
             services.AddSingleton<IProcessorFactory, ProcessorFactory>();
 
-            services.AddTransient<IBus, Bus>();
+            services.AddTransient<IMarina, Marina>();
             services.AddTransient<IDefaultChannelFactory, DefaultChannelFactory>();
 
             services.AddSingleton<ISagaFactory, StatelessSagaFactory>();
