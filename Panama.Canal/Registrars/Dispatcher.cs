@@ -33,8 +33,11 @@ namespace Panama.Canal.Registrars
             services.AddSingleton<IDispatcher, Canal.Dispatcher>(p => p.GetRequiredService<Canal.Dispatcher>());
             services.AddSingleton<ICanalService, Canal.Dispatcher>(p => p.GetRequiredService<Canal.Dispatcher>());
 
-            services.AddSingleton<IInitialize, Initializers.Subscriptions>();
-            services.AddSingleton<IInitialize, Initializers.Brokers>();
+            services.AddSingleton<Initializers.Subscriptions>();
+            services.AddSingleton<Initializers.Brokers>();
+
+            services.AddSingleton<IInitialize, Initializers.Subscriptions>(p => p.GetRequiredService<Initializers.Subscriptions>());
+            services.AddSingleton<IInitialize, Initializers.Brokers>(p => p.GetRequiredService<Initializers.Brokers>());
         }
 
         public void AddAssemblies(IServiceCollection services)
