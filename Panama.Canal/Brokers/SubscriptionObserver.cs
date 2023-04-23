@@ -28,6 +28,9 @@ namespace Panama.Canal.Brokers
 
         public virtual void OnNext(InternalMessage message)
         {
+            if (!message.Name.Equals(_topic, StringComparison.OrdinalIgnoreCase))
+                return;
+
             var transient = message.ToTransient(_provider);
 
             _client?.OnCallback!(transient, message.Id).GetAwaiter().GetResult();

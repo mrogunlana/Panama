@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Exceptions;
@@ -64,19 +63,23 @@ namespace Panama.Canal.Brokers
                     var result = message.TryGetModels(_provider);
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
+                    var local = result.DataGetSingle<InternalMessage>();
+
+                    //received id = published id
+                    var value = external
+                        .AddCreatedTime()
+                        .ToInternal(_provider)
+                        .SetStatus(MessageStatus.Scheduled);
+
+                    if (!result.Success)
+                        value = value
+                            .SetStatus(MessageStatus.Failed)
+                            .SetFailedExpiration(_provider, DateTime.UtcNow);
 
                     await new Context(_provider).Bus()
-                        .Id(Guid.NewGuid().ToString())
                         .CorrelationId(external.GetCorrelationId())
                         .Invoker(_invokers.GetInvoker())
-                        .Post(external
-                            .ResetId()
-                            .AddCreatedTime()
-                            .ToInternal(_provider)
-                            .SetStatus(result.Success
-                                ? MessageStatus.Scheduled
-                                : MessageStatus.Failed)
-                            .SetExpiration(_provider, DateTime.UtcNow))
+                        .Post(value)
                         .ConfigureAwait(false);
 
                     client.Commit(sender);

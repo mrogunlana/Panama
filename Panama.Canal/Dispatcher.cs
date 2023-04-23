@@ -25,6 +25,7 @@ namespace Panama.Canal
         private readonly IServiceProvider _provider;
         private readonly IOptions<CanalOptions> _options;
         private readonly CancellationTokenSource _delay = new();
+        private IEnumerable<IInitialize> _initializers = default!;
         private readonly PriorityQueue<InternalMessage, DateTime> _scheduled;
 
         private DateTime _next = DateTime.MaxValue;
@@ -62,6 +63,25 @@ namespace Panama.Canal
 
             Brokers = _provider.GetRequiredService<BrokerInvoker>();
             Subscriptions = _provider.GetRequiredService<SubscriptionInvoker>();
+        }
+
+        private async Task Initialize()
+        {
+            foreach (var initialize in _initializers)
+            {
+                try
+                {
+                    _cts!.Token.ThrowIfCancellationRequested();
+
+                    await initialize.Invoke(_cts!.Token);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is InvalidOperationException) throw;
+
+                    _log.LogError(ex, "Initializing the processors!");
+                }
+            }
         }
 
         private void Delayed()
@@ -227,6 +247,9 @@ namespace Panama.Canal
             _log.LogDebug("### Panama Canal Dispatcher is starting.");
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _cts.Token.Register(() => _delay.Cancel());
+            _initializers = _provider.GetServices<IInitialize>();
+
+            await Initialize().ConfigureAwait(false);
 
             await Task.WhenAll(Enumerable.Range(0, _options.Value.ProducerThreads)
                 .Select(_ => Task.Factory.StartNew(Publish, _cts.Token,

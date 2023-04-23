@@ -8,6 +8,7 @@ using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
 using Panama.Interfaces;
 using Panama.Models;
+using Quartz.Impl.AdoJobStore.Common;
 
 namespace Panama.Canal
 {
@@ -15,12 +16,14 @@ namespace Panama.Canal
     {
         private readonly ILogger<Bus> _log;
         private readonly IOptions<CanalOptions> _options;
+        private readonly IServiceProvider _provider;
         private readonly ITargetFactory _targets;
 
         public BusContext Context { get; }
 
         public Bus(IServiceProvider provider)
         {
+            _provider = provider;
             _log = provider.GetRequiredService<ILogger<Bus>>();
             _targets = provider.GetRequiredService<ITargetFactory>();
             _options = provider.GetRequiredService<IOptions<CanalOptions>>();

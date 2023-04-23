@@ -61,7 +61,7 @@ namespace Panama.Canal.Initializers
                     topic: topic.Name,
                     group: topic.Group ?? _options.Value.DefaultGroup,
                     subscriber: subscriber.GetType(),
-                    target: topic?.Target?.GetType() ?? _factory.GetDefaultTarget().GetType());
+                    target: topic?.Target ?? _factory.GetDefaultTarget().GetType());
 
                 subscriptions.Add(subscription);
             }

@@ -240,17 +240,28 @@ namespace Panama.Canal.Extensions
             if (encryptor == null)
                 throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
 
-            var encrypted = encryptor.ToString(message.Content) ?? string.Empty;
+            var encrypted = message.IsContentBase64() 
+                ? message.Content 
+                : encryptor.ToString(message.Content) ?? string.Empty;
             var bytes = Encoding.UTF8.GetBytes(encrypted);
 
             return new TransientMessage(metadata.Headers, bytes);
         }
 
-        public static InternalMessage SetExpiration(this InternalMessage message, IServiceProvider provider, DateTime? value = null)
+        public static InternalMessage SetFailedExpiration(this InternalMessage message, IServiceProvider provider, DateTime? value = null)
         {
             var options = provider.GetRequiredService<IOptions<CanalOptions>>();
 
-            message.Expires = (value?.ToUniversalTime())?.AddSeconds(options.Value.FailedMessageExpiredAfter);
+            message.Expires = ((value ?? DateTime.UtcNow).ToUniversalTime()).AddSeconds(options.Value.FailedMessageExpiredAfter);
+
+            return message;
+        }
+
+        public static InternalMessage SetSucceedExpiration(this InternalMessage message, IServiceProvider provider, DateTime? value = null)
+        {
+            var options = provider.GetRequiredService<IOptions<CanalOptions>>();
+
+            message.Expires = ((value ?? DateTime.UtcNow).ToUniversalTime()).AddSeconds(options.Value.SucceedMessageExpiredAfter);
 
             return message;
         }

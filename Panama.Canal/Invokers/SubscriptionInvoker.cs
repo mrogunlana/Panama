@@ -98,7 +98,8 @@ namespace Panama.Canal.Invokers
 
                         await _store.ChangeReceivedState(metadata
                                 .RemoveException()
-                                .ToInternal(_provider), MessageStatus.Succeeded)
+                                .ToInternal(_provider)
+                                .SetSucceedExpiration(_provider), MessageStatus.Succeeded)
                             .ConfigureAwait(false);
 
                         return new Result().Success();
@@ -133,7 +134,7 @@ namespace Panama.Canal.Invokers
                         .AddException($"Exception: {ex.Message}")
                         .ToInternal(_provider)
                         .SetRetries((int)local["retry-count"])
-                        .SetExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
+                        .SetFailedExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
                     .ConfigureAwait(false);
 
                 if (metadata.HasReply())

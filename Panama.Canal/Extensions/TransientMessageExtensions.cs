@@ -31,6 +31,26 @@ namespace Panama.Canal.Extensions
             return metadata.ToInternal(provider);
         }
 
+        public static Message ToMessage(this TransientMessage message, IServiceProvider provider)
+        {
+            var resolver = provider.GetService<StringEncryptorResolver>();
+            if (resolver == null)
+                throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
+
+            var encryptor = resolver(StringEncryptorResolverKey.Base64);
+            if (encryptor == null)
+                throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
+
+            var encrypted = Encoding.UTF8.GetString(message.Body.ToArray());
+            var value = encryptor.FromString(encrypted);
+
+            var metadata = JsonConvert.DeserializeObject<Message>(value);
+            if (metadata == null)
+                throw new InvalidOperationException($"Message could not be located from transient.");
+
+            return metadata;
+        }
+
         public static TransientMessage AddException(this TransientMessage message, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -83,23 +103,39 @@ namespace Panama.Canal.Extensions
 
                 message.RemoveException();
 
-                var local = message.ToInternal(provider);
-                if (local == null)
-                    throw new InvalidOperationException($"Internal Message ID: {message.Headers[Headers.Id]} could not be located.");
+                var resolver = provider.GetService<StringEncryptorResolver>();
+                if (resolver == null)
+                    throw new ArgumentNullException($"{nameof(StringEncryptorResolver)} must be registered to process Messages.");
 
-                var external = local.GetData<Message>(provider);
+                var encryptor = resolver(StringEncryptorResolverKey.Base64);
+                if (encryptor == null)
+                    throw new ArgumentNullException($"Base64 encryptor must be registered to process Messages.");
+
+                var body = Encoding.UTF8.GetString(message.Body.ToArray());
+                var result = encryptor.FromString(body);
+                var external = JsonConvert.DeserializeObject<Message>(result, new JsonSerializerSettings() {
+                    TypeNameHandling = TypeNameHandling.All
+                });
+
                 if (external == null)
-                    throw new InvalidOperationException($"Message could not be located in Internal Message ID: {message.Headers[Headers.Id]} .");
+                    throw new InvalidOperationException($"Message ID: {message.Headers[Headers.Id]} could not be located.");
+                
+                var local = external.ToInternal(provider);
+                if (local == null)
+                    throw new InvalidOperationException($"Interal message ID: {message.Headers[Headers.Id]} could not be located.");
 
+                var data = external.GetData<IList<IModel>>();
+                
                 external.RemoveException();
 
-                var result = provider.GetRequiredService<ConsumerSubscriptions>().HasSubscribers(external);
-                if (result == false)
+                var subscriptions = provider.GetRequiredService<ConsumerSubscriptions>().HasSubscribers(external);
+                if (subscriptions == false)
                     throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
 
                 return new Result()
                     .Success()
                     .Add(local)
+                    .Add(data)
                     .Add(external)
                     .Add(message);
             }

@@ -48,7 +48,7 @@ namespace Panama.Canal.Invokers
                 throw new InvalidOperationException("Panama Canal Dispatcher has not been started.");
 
             var metadata = message.GetData<Message>(_provider);
-            var data = message.GetData<IList<IModel>>(_provider);
+            var data = metadata.GetData<IList<IModel>>();
             var group = metadata.GetGroup();
             var ack = metadata.GetReply();
             var target = metadata.GetBrokerType();
@@ -85,14 +85,15 @@ namespace Panama.Canal.Invokers
                         if (result.Success)
                             await _store.ChangePublishedState(metadata
                                 .RemoveException()
-                                .ToInternal(_provider), MessageStatus.Succeeded)
+                                .ToInternal(_provider)
+                                .SetSucceedExpiration(_provider), MessageStatus.Succeeded)
                             .ConfigureAwait(false);
                         else
                             await _store.ChangePublishedState(metadata
                                 .AddException($"Exception(s): {string.Join(",", result.Messages)}")
                                 .ToInternal(_provider)
                                 .SetRetries((int)context["retry-count"])
-                                .SetExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
+                                .SetFailedExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
                             .ConfigureAwait(false);
 
                         return result;

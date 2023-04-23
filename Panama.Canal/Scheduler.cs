@@ -14,7 +14,6 @@ namespace Panama.Canal
         private bool _off;
         private CancellationTokenSource? _cts;
         private Quartz.IScheduler _scheduler = default!;
-        private IEnumerable<IInitialize> _initializers = default!;
 
         private readonly ILogger<Scheduler> _log;
         private readonly IServiceProvider _provider;
@@ -37,25 +36,6 @@ namespace Panama.Canal
             _schedulerFactory = schedulerFactory;
         }
 
-        private async Task Initialize()
-        {
-            foreach (var initialize in _initializers)
-            {
-                try
-                {
-                    _cts!.Token.ThrowIfCancellationRequested();
-
-                    await initialize.Invoke(_cts!.Token);
-                }
-                catch (Exception ex)
-                {
-                    if (ex is InvalidOperationException) throw;
-
-                    _log.LogError(ex, "Initializing the processors!");
-                }
-            }
-        }
-
         public async Task On(CancellationToken cancellationToken)
         {
             if (_cts != null)
@@ -68,9 +48,6 @@ namespace Panama.Canal
             _log.LogDebug("### Panama Canal Scheduler is starting.");
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _initializers = _provider.GetServices<IInitialize>();
-            
-            await Initialize().ConfigureAwait(false);
 
             _scheduler = await _schedulerFactory
                 .GetScheduler(cancellationToken)

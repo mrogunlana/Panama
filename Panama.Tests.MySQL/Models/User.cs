@@ -9,7 +9,7 @@ namespace Panama.Tests.MySQL.Models
         {
             ID = Guid.NewGuid().ToString();
             if (Created == DateTime.MinValue)
-                Created = DateTime.Now;
+                Created = DateTime.UtcNow;
         }
         public int _ID { get; set; }
         public string ID { get; set; }

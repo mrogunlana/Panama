@@ -26,6 +26,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(value))
                 return message;
 
+            if (message.Headers.ContainsKey(Headers.CorrelationId))
+                message.Headers.Remove(Headers.CorrelationId);
+
             message.Headers.Add(Headers.CorrelationId, value);
 
             return message;
@@ -34,6 +37,9 @@ namespace Panama.Canal.Extensions
         {
             if (string.IsNullOrEmpty(value))
                 return message;
+
+            if (message.Headers.ContainsKey(Headers.Id))
+                message.Headers.Remove(Headers.Id);
 
             message.Headers.Add(Headers.Id, value);
 
@@ -44,6 +50,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(value))
                 return message;
 
+            if (message.Headers.ContainsKey(Headers.Name))
+                message.Headers.Remove(Headers.Name);
+
             message.Headers.Add(Headers.Name, value);
 
             return message;
@@ -52,6 +61,9 @@ namespace Panama.Canal.Extensions
         {
             if (string.IsNullOrEmpty(value))
                 return message;
+
+            if (message.Headers.ContainsKey(Headers.Group))
+                message.Headers.Remove(Headers.Group);
 
             message.Headers.Add(Headers.Group, value);
 
@@ -64,6 +76,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(text))
                 text = typeof(DefaultTarget).AssemblyQualifiedName;
 
+            if (message.Headers.ContainsKey(Headers.Broker))
+                message.Headers.Remove(Headers.Broker);
+
             message.Headers.Add(Headers.Broker, text);
 
             return message;
@@ -74,6 +89,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(value))
                 return message;
 
+            if (message.Headers.ContainsKey(Headers.Instance))
+                message.Headers.Remove(Headers.Instance);
+
             message.Headers.Add(Headers.Instance, value);
 
             return message;
@@ -82,6 +100,9 @@ namespace Panama.Canal.Extensions
         {
             if (string.IsNullOrEmpty(value))
                 return message;
+
+            if (message.Headers.ContainsKey(Headers.Name))
+                message.Headers.Remove(Headers.Name);
 
             message.Headers.Add(Headers.Name, value);
 
@@ -92,6 +113,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(value))
                 return message;
 
+            if (message.Headers.ContainsKey(Headers.Type))
+                message.Headers.Remove(Headers.Type);
+
             message.Headers.Add(Headers.Type, value);
 
             return message;
@@ -100,6 +124,9 @@ namespace Panama.Canal.Extensions
         {
             if (string.IsNullOrEmpty(value))
                 return message;
+            
+            if (message.Headers.ContainsKey(Headers.Reply))
+                message.Headers.Remove(Headers.Reply);
 
             message.Headers.Add(Headers.Reply, value);
 
@@ -110,7 +137,10 @@ namespace Panama.Canal.Extensions
         {
             if (value == null)
                 return message;
-            
+
+            if (message.Headers.ContainsKey(Headers.SagaTrigger))
+                message.Headers.Remove(Headers.SagaTrigger);
+
             message.Headers.Add(Headers.SagaTrigger, value.GetType().AssemblyQualifiedName);
 
             return message;
@@ -119,6 +149,9 @@ namespace Panama.Canal.Extensions
         {
             if (string.IsNullOrEmpty(value))
                 return message;
+
+            if (message.Headers.ContainsKey(Headers.Exception))
+                message.Headers.Remove(Headers.Exception);
 
             message.Headers.Add(Headers.Exception, value);
 
@@ -129,12 +162,18 @@ namespace Panama.Canal.Extensions
             if (value == null)
                 return message;
 
+            if (message.Headers.ContainsKey(Headers.Exception))
+                message.Headers.Remove(Headers.Exception);
+
             message.Headers.Add(Headers.Exception, value.Message);
 
             return message;
         }
         public static Message AddCreatedTime(this Message message, DateTime? value = null)
         {
+            if (message.Headers.ContainsKey(Headers.Created))
+                message.Headers.Remove(Headers.Created);
+
             message.Headers.Add(Headers.Created, value?.ToUniversalTime().ToString() ?? DateTime.UtcNow.ToString());
 
             return message;
@@ -143,13 +182,21 @@ namespace Panama.Canal.Extensions
         {
             if (value == null)
                 return message;
+            if (value == DateTime.MinValue)
+                return message;
 
+            if (message.Headers.ContainsKey(Headers.Delay))
+                message.Headers.Remove(Headers.Delay);
+            
             message.Headers.Add(Headers.Delay, value?.ToUniversalTime().ToString());
 
             return message;
         }
         public static Message AddSentTime(this Message message, DateTime value)
         {
+            if (message.Headers.ContainsKey(Headers.Sent))
+                message.Headers.Remove(Headers.Sent);
+
             message.Headers.Add(Headers.Sent, value.ToUniversalTime().ToString());
 
             return message;
@@ -184,8 +231,8 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.Reply];
-            
+            message.Headers.TryGetValue(Headers.Reply, out var result);
+
             return result ?? string.Empty;
         }
         public static bool HasReply(this Message message)
@@ -220,7 +267,7 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.Instance];
+            message.Headers.TryGetValue(Headers.Instance, out var result);
 
             return result ?? string.Empty;
         }
@@ -229,11 +276,10 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.Delay];
-            if (result == null)
-                throw new InvalidOperationException($"Header: {Headers.Delay} cannot be found.");
+            if (!message.Headers.TryGetValue(Headers.Delay, out var result))
+                return DateTime.MinValue;
 
-            if (!DateTime.TryParse(message.Headers[Headers.Delay], out var delay))
+            if (!DateTime.TryParse(result, out var delay))
                 throw new InvalidOperationException($"Header: {Headers.Delay} could not be parsed.");
 
             return delay;
@@ -243,7 +289,8 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.Broker];
+            message.Headers.TryGetValue(Headers.Broker, out var result);
+            
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.Broker} cannot be found.");
 
@@ -254,8 +301,12 @@ namespace Panama.Canal.Extensions
         {
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
+          
+            var result = Type.GetType(message.GetBroker());
+            if (result == null)
+                throw new InvalidOperationException("Broker type cannot be located.");
 
-            return Type.GetType(message.GetBroker());
+            return result;
         }
 
         public static string GetSagaType(this Message message)
@@ -263,9 +314,9 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.SagaType];
+            message.Headers.TryGetValue(Headers.SagaType, out var result);
             if (result == null)
-                throw new InvalidOperationException($"Header: {Headers.SagaType} cannot be found.");
+                return string.Empty;
 
             return result;
         }
@@ -275,7 +326,8 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.SagaId];
+            message.Headers.TryGetValue(Headers.SagaId, out var result);
+
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.SagaId} cannot be found.");
 
@@ -287,24 +339,12 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.SagaTrigger];
+            message.Headers.TryGetValue(Headers.SagaTrigger, out var result);
+
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.SagaTrigger} cannot be found.");
 
             return result;
-        }
-
-        public static bool IsSagaParticipant(this Message message)
-        {
-            var id = message.GetSagaId();
-            var type = message.GetSagaType();
-
-            if (string.IsNullOrEmpty(id))
-                return false;
-            if (string.IsNullOrEmpty(type))
-                return false;
-
-            return true;
         }
 
         public static bool IsSagaReply(this Message message)
@@ -341,6 +381,7 @@ namespace Panama.Canal.Extensions
 
             return new TransientMessage(message.Headers, bytes);
         }
+
         public static Message RemoveException(this Message message)
         {
             message.Headers.Remove(Headers.Exception);

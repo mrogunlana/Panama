@@ -77,7 +77,7 @@ namespace Panama.Canal.RabbitMQ
                             .SetStatus(result.Success
                                 ? MessageStatus.Scheduled
                                 : MessageStatus.Failed)
-                            .SetExpiration(_provider, DateTime.UtcNow))
+                            .SetFailedExpiration(_provider, DateTime.UtcNow))
                         .ConfigureAwait(false);
 
                     client.Commit(sender);

@@ -165,7 +165,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
-                    Value = DateTime.MinValue,
+                    Value = DBNull.Value,
                 });
 
                 //2. Initialize Panama tables
@@ -385,7 +385,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
-                    Value = DateTime.MinValue,
+                    Value = DBNull.Value,
                 });
                 command.Parameters.Add(new MySqlParameter
                 {

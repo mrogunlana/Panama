@@ -25,8 +25,8 @@ namespace Panama.Canal.Models.Options
             : base()
         {
             Instance = this.GetInstance();
-            SuccessfulMessageExpiredAfter = 24 * 3600;
-            FailedMessageExpiredAfter = 15 * 24 * 3600;
+            SuccessfulMessageExpiredAfter = 24 * 3600;  //seconds = 1 day
+            FailedMessageExpiredAfter = 15 * 24 * 3600; //seconds = 15 days
             FailedRetryInterval = 60;
             FailedRetryCount = 50;
         }

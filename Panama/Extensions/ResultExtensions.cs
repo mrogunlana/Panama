@@ -89,8 +89,11 @@ namespace Panama.Extensions
 
             return result;
         }
-        public static IResult Add(this IResult result, IEnumerable<IModel> models)
+        public static IResult Add(this IResult result, IEnumerable<IModel>? models)
         {
+            if (models == null)
+                return result;
+
             foreach (var model in models)
                 result.Data.Add(model);
 

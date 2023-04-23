@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Initializers;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
+using Panama.Extensions;
 using Panama.Interfaces;
 
 
@@ -30,6 +32,9 @@ namespace Panama.Canal.Registrars
             services.AddHostedService(p => p.GetRequiredService<Canal.Dispatcher>());
             services.AddSingleton<IDispatcher, Canal.Dispatcher>(p => p.GetRequiredService<Canal.Dispatcher>());
             services.AddSingleton<ICanalService, Canal.Dispatcher>(p => p.GetRequiredService<Canal.Dispatcher>());
+
+            services.AddSingleton<IInitialize, Initializers.Subscriptions>();
+            services.AddSingleton<IInitialize, Initializers.Brokers>();
         }
 
         public void AddAssemblies(IServiceCollection services)

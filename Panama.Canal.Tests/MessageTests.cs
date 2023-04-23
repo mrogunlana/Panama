@@ -58,7 +58,7 @@ namespace Panama.Canal.Tests
         }
 
         [TestMethod]
-        public async Task VerifyInitialStreamPublishMessageState()
+        public async Task VerifyScheduledPollingPublishMessageState()
         {
             _services.AddPanama(
                 configuration: _configuration,
@@ -97,6 +97,129 @@ namespace Panama.Canal.Tests
                     .Channel(channel)
                     .Post();
                 
+                var store = provider.GetRequiredService<Store>();
+
+                Assert.IsTrue(store.Published.Count == 1);
+                Assert.IsNotNull(store.Published[id]);
+                Assert.IsTrue(store.Published[id].Retries == 0);
+                Assert.IsNull(store.Published[id].Expires);
+                Assert.IsTrue(store.Published[id].Status == MessageStatus.Scheduled.ToString());
+                Assert.IsNotNull(store.Published[id].Created);
+
+                var message = store.Published[id].GetData<Message>(provider);
+
+                Assert.IsNotNull(message);
+                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
+            }
+        }
+
+        [TestMethod]
+        public async Task VerifySucceededPollingPublishMessageState()
+        {
+            _services.AddPanama(
+                configuration: _configuration,
+                setup: options => {
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                    });
+                });
+
+            _cts = new CancellationTokenSource();
+
+            var provider = _services.BuildServiceProvider();
+            var bootstrapper = provider.GetRequiredService<IBootstrapper>();
+
+            await bootstrapper.On(_cts.Token);
+
+            var options = provider.GetRequiredService<IOptions<CanalOptions>>();
+            var channels = provider.GetRequiredService<IDefaultChannelFactory>();
+            var context = new Context(provider);
+            var foo = new Foo();
+            var id = Guid.NewGuid().ToString();
+
+            using (var channel = channels.CreateChannel<DefaultChannel>())
+            {
+                var result = await context.Bus()
+                    .Id(id)
+                    .Data(foo)
+                    .Topic("foo.created")
+                    .Channel(channel)
+                    .Post();
+
+                var store = provider.GetRequiredService<Store>();
+
+                await channel.Commit();
+                await Task.Delay(TimeSpan.FromSeconds(2));
+
+                Assert.IsTrue(store.Published.Count == 1);
+                Assert.IsNotNull(store.Published[id]);
+                Assert.IsTrue(store.Published[id].Retries == 0);
+                Assert.IsNotNull(store.Published[id].Expires);
+                Assert.IsTrue(store.Published[id].Status == MessageStatus.Succeeded.ToString());
+                Assert.IsNotNull(store.Published[id].Created);
+
+                Assert.IsTrue(store.Received.Count == 1);
+                Assert.IsNotNull(store.Received[id]);
+                Assert.IsTrue(store.Received[id].Retries == 0);
+                Assert.IsNotNull(store.Received[id].Expires);
+                Assert.IsTrue(store.Received[id].Status == MessageStatus.Succeeded.ToString());
+                Assert.IsNotNull(store.Received[id].Created);
+
+                var message = store.Published[id].GetData<Message>(provider);
+
+                Assert.IsNotNull(message);
+                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
+            }
+        }
+
+
+        [TestMethod]
+        public async Task VerifySucceededPollingReceivedMessageState()
+        {
+            _services.AddPanama(
+                configuration: _configuration,
+                setup: options => {
+                    options.UseCanal(canal => {
+                        canal.UseDefaultStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler(scheduler => {
+                            scheduler.RemoveJob<DelayedPublished>();
+                            scheduler.RemoveJob<DeleteExpired>();
+                            scheduler.RemoveJob<PublishedRetry>();
+                            scheduler.RemoveJob<ReceivedRetry>();
+                        });
+                    });
+                });
+
+            _cts = new CancellationTokenSource();
+
+            var provider = _services.BuildServiceProvider();
+            var bootstrapper = provider.GetRequiredService<IBootstrapper>();
+
+            await bootstrapper.On(_cts.Token);
+
+            var options = provider.GetRequiredService<IOptions<CanalOptions>>();
+            var channels = provider.GetRequiredService<IDefaultChannelFactory>();
+            var context = new Context(provider);
+            var foo = new Foo();
+            var id = Guid.NewGuid().ToString();
+
+            using (var channel = channels.CreateChannel<DefaultChannel>())
+            {
+                var result = await context.Bus()
+                    .Id(id)
+                    .Data(foo)
+                    .Topic("foo.created")
+                    .Channel(channel)
+                    .Post();
+
                 var store = provider.GetRequiredService<Store>();
 
                 Assert.IsTrue(store.Published.Count == 1);

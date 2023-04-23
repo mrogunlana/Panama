@@ -12,8 +12,8 @@ namespace Panama.Tests.SQLServer.Models
         }
         public int _ID { get; set; }
         public Guid ID { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public string? Key { get; set; }
+        public string? Value { get; set; }
         public DateTime Created { get; set; }
     }
 }

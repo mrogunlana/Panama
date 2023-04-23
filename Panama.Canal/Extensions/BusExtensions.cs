@@ -96,7 +96,7 @@ namespace Panama.Canal.Extensions
             if (delay == null)
                 return bus;
 
-            bus.Context.Delay = delay.Value;
+            bus.Context.Delay = delay.Value.ToUniversalTime();
 
             return bus;
         }

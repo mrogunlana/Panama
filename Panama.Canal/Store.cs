@@ -66,6 +66,7 @@ namespace Panama.Canal
         public Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
         {
             Published[message.Id].Status = status.ToString();
+            Published[message.Id].Expires = message.Expires ?? Published[message.Id].Expires;
 
             return Task.CompletedTask;
         }
@@ -82,6 +83,7 @@ namespace Panama.Canal
         public Task ChangeReceivedState(InternalMessage message, MessageStatus state, object? transaction = null)
         {
             Received[message.Id].Status = state.ToString();
+            Received[message.Id].Expires = message.Expires ?? Received[message.Id].Expires;
 
             return Task.CompletedTask;
         }

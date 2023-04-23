@@ -34,8 +34,10 @@ namespace Panama.Canal.Registrars
             
             services.AddSingleton<IBootstrapper, Bootstrapper>();
 
-            services.AddTransient<IProcessor, DefaultProcessor>();
-            services.AddTransient<IProcessor, SagaProcessor>();
+            services.AddTransient<DefaultProcessor>();
+            services.AddTransient<SagaProcessor>();
+            services.AddTransient<IProcessor, DefaultProcessor>(p => p.GetRequiredService<DefaultProcessor>());
+            services.AddTransient<IProcessor, SagaProcessor>(p => p.GetRequiredService<SagaProcessor>());
             services.AddSingleton<IProcessorFactory, ProcessorFactory>();
 
             services.AddTransient<IMarina, Marina>();
@@ -57,12 +59,11 @@ namespace Panama.Canal.Registrars
 
             services.AddAssemblyTypes<IInvoke>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypes<IChannel>(_builder.Assemblies.Distinct(), false);
-            services.AddAssemblyTypes<IInitialize>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaState>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaTrigger>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaEvent>(_builder.Assemblies.Distinct(), false);
-            services.AddAssemblyTypesByInterface<ISubscribe>(_builder.Assemblies.Distinct(), false);
-            services.AddAssemblyTypesByInterface<IInitialize>(_builder.Assemblies.Distinct(), true);
+            services.AddAssemblyTypes<ISubscribe>(_builder.Assemblies.Distinct(), false);
+            services.AddAssemblyTypesWithInterface<ISubscribe>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<IInvokeFactory>(_builder.Assemblies.Distinct(), true);
         }
 
