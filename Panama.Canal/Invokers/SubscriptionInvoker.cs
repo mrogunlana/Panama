@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Options;
+using Panama.Canal.Registrars;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
@@ -13,17 +16,23 @@ namespace Panama.Canal.Invokers
     {
         private readonly IInvokeFactory _invokers;
         private readonly IServiceProvider _provider;
+        private readonly CanalOptions _canal;
         private readonly ILogger<SubscriptionInvoker> _log;
+        private readonly IStore _store;
         private readonly ConsumerSubscriptions _subscriptions;
 
         public SubscriptionInvoker(
-              IServiceProvider provider
+              IStore store
+            , IServiceProvider provider
+            , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers
             , ILogger<SubscriptionInvoker> log
             , ConsumerSubscriptions subscriptions)
         {
             _log = log;
+            _store = store;
             _provider = provider;
+            _canal = canal.Value;
             _subscriptions = subscriptions;
             _invokers = invokers;
         }
@@ -68,12 +77,25 @@ namespace Panama.Canal.Invokers
 
                     await subscriber.Event(local).ConfigureAwait(false);
                 }
+                
+                await _store.ChangeReceivedState(metadata
+                        .RemoveException()
+                        .ToInternal(_provider), MessageStatus.Succeeded)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 var reason = $"Subscription target: {metadata.GetBroker()} failed processing in subscribers.";
                 
                 _log.LogError(ex, reason);
+
+                await _store.ChangeReceivedState(metadata
+                        .AddException($"Exception: {ex.Message}")
+                        .ToInternal(_provider)
+                        //TODO: add polly retries for subscribers
+                        //.SetRetries((int)context["retry-count"])
+                        .SetExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
+                    .ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(metadata.GetReply()))
                     await new Context(_provider).Bus()
