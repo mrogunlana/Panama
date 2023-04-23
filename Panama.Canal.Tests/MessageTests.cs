@@ -96,7 +96,7 @@ namespace Panama.Canal.Tests
                     .Topic("foo.created")
                     .Channel(channel)
                     .Post();
-
+                
                 var store = provider.GetRequiredService<Store>();
 
                 Assert.IsTrue(store.Published.Count == 1);

@@ -10,6 +10,7 @@ using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
 using Panama.Extensions;
 using Panama.Interfaces;
+using Panama.Models;
 
 namespace Panama.Canal.Brokers
 {
@@ -64,7 +65,7 @@ namespace Panama.Canal.Brokers
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
 
-                    await _provider.GetRequiredService<IBus>()
+                    await new Context(_provider).Bus()
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(external.GetCorrelationId())
                         .Invoker(_invokers.GetInvoker())

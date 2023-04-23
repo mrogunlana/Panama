@@ -11,6 +11,7 @@ using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
+using Panama.Models;
 
 namespace Panama.Canal.RabbitMQ
 {
@@ -65,7 +66,7 @@ namespace Panama.Canal.RabbitMQ
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
 
-                    await _provider.GetRequiredService<IBus>()
+                    await new Context(_provider).Bus()
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(external.GetCorrelationId())
                         .Invoker(_invokers.GetInvoker())

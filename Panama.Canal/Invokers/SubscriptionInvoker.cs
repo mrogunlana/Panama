@@ -76,7 +76,7 @@ namespace Panama.Canal.Invokers
                 _log.LogError(ex, reason);
 
                 if (!string.IsNullOrEmpty(metadata.GetReply()))
-                    await _provider.GetRequiredService<IBus>()
+                    await new Context(_provider).Bus()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
@@ -97,7 +97,7 @@ namespace Panama.Canal.Invokers
             }
 
             if (!string.IsNullOrEmpty(metadata.GetReply()))
-                await _provider.GetRequiredService<IBus>()
+                await new Context(_provider).Bus()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Id(Guid.NewGuid().ToString())
