@@ -9,6 +9,7 @@ using Panama.Canal.Registrars;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
+using Polly;
 
 namespace Panama.Canal.Invokers
 {
@@ -50,12 +51,16 @@ namespace Panama.Canal.Invokers
                 throw new InvalidOperationException("Panama Canal services has not been started.");
 
             var metadata = message.GetData<Message>(_provider);
-            var data = message.GetData<IList<IModel>>(_provider);
+            var data = metadata.GetData<IList<IModel>>() ?? new List<IModel>();
             var group = metadata.GetGroup();
 
             var target = Type.GetType(metadata.GetBroker());
             if (target == null)
                 throw new InvalidOperationException($"Subscription target: {metadata.GetBroker()} could not be located.");
+
+            var local = new Polly.Context("subscription-invocation") {
+                { "retry-count", 0}
+            };
 
             try
             {
@@ -63,25 +68,60 @@ namespace Panama.Canal.Invokers
                 if (subscriptions == null)
                     return new Result().Success();
 
-                foreach (var subscription in subscriptions)
-                {
-                    var subscriber = (ISubscribe)_provider.GetRequiredService(subscription.Subscriber);
-                    if (subscriber == null)
-                        throw new InvalidOperationException($"Subscriber: {subscription.Subscriber.Name} could not be located.");
+                var polly = await Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryAsync(
+                        _canal.FailedRetryCount,
+                        _ => TimeSpan.FromSeconds(_canal.FailedRetryInterval),
+                        (result, timespan, retryNo, context) => {
+                            _log.LogWarning($"{context.OperationKey}: Rety #{retryNo} for message: {message.Id} within {timespan.TotalMilliseconds}ms.");
+                            context["retry-count"] = retryNo;
+                        }
+                    ).ExecuteAndCaptureAsync(async (context, token) => {
+                        if (token.IsCancellationRequested)
+                            return new Result().Cancel();
 
-                    var local = new Context(data.AsEnumerable(),
-                        id: message.Id,
-                        correlationId: message.CorrelationId,
-                        provider: _provider,
-                        token: context.Token);
+                        foreach (var subscription in subscriptions)
+                        {
+                            var subscriber = (ISubscribe)_provider.GetRequiredService(subscription.Subscriber);
+                            if (subscriber == null)
+                                throw new InvalidOperationException($"Subscriber: {subscription.Subscriber.Name} could not be located.");
 
-                    await subscriber.Event(local).ConfigureAwait(false);
-                }
-                
-                await _store.ChangeReceivedState(metadata
-                        .RemoveException()
-                        .ToInternal(_provider), MessageStatus.Succeeded)
-                    .ConfigureAwait(false);
+                            var local = new Panama.Models.Context(data.AsEnumerable(),
+                                id: message.Id,
+                                correlationId: message.CorrelationId,
+                                provider: _provider,
+                                token: token);
+
+                            await subscriber.Event(local).ConfigureAwait(false);
+                        }
+
+                        await _store.ChangeReceivedState(metadata
+                                .RemoveException()
+                                .ToInternal(_provider), MessageStatus.Succeeded)
+                            .ConfigureAwait(false);
+
+                        return new Result().Success();
+
+                    }, local, context.Token);
+
+                if (metadata.HasReply())
+                    await new Panama.Models.Context(_provider).Bus()
+                            .Instance(metadata.GetInstance())
+                            .Token(context.Token)
+                            .Id(Guid.NewGuid().ToString())
+                            .CorrelationId(metadata.GetCorrelationId())
+                            .Topic(metadata.GetReply())
+                            .Group(group)
+                            .Data(data)
+                            .Invoker(_invokers.GetInvoker())
+                            .Target(target)
+                            .SagaId(metadata.GetSagaId())
+                            .SagaType(metadata.GetSagaType())
+                            .Post()
+                            .ConfigureAwait(false);
+
+                return polly.Result;
             }
             catch (Exception ex)
             {
@@ -92,13 +132,12 @@ namespace Panama.Canal.Invokers
                 await _store.ChangeReceivedState(metadata
                         .AddException($"Exception: {ex.Message}")
                         .ToInternal(_provider)
-                        //TODO: add polly retries for subscribers
-                        //.SetRetries((int)context["retry-count"])
+                        .SetRetries((int)local["retry-count"])
                         .SetExpiration(_provider, message.Created.AddSeconds(_canal.FailedMessageExpiredAfter)), MessageStatus.Failed)
                     .ConfigureAwait(false);
 
-                if (!string.IsNullOrEmpty(metadata.GetReply()))
-                    await new Context(_provider).Bus()
+                if (metadata.HasReply())
+                    await new Panama.Models.Context(_provider).Bus()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
@@ -117,25 +156,6 @@ namespace Panama.Canal.Invokers
                 return new Result()
                     .Fail(reason);
             }
-
-            if (!string.IsNullOrEmpty(metadata.GetReply()))
-                await new Context(_provider).Bus()
-                        .Instance(metadata.GetInstance())
-                        .Token(context.Token)
-                        .Id(Guid.NewGuid().ToString())
-                        .CorrelationId(metadata.GetCorrelationId())
-                        .Topic(metadata.GetReply())
-                        .Group(group)
-                        .Data(data)
-                        .Invoker(_invokers.GetInvoker())
-                        .Target(target)
-                        .SagaId(metadata.GetSagaId())
-                        .SagaType(metadata.GetSagaType())
-                        .Post()
-                        .ConfigureAwait(false);
-
-            return new Result()
-                .Success();
         }
     }
 }

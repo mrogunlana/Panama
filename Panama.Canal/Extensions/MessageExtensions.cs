@@ -188,6 +188,13 @@ namespace Panama.Canal.Extensions
             
             return result ?? string.Empty;
         }
+        public static bool HasReply(this Message message)
+        {
+            if (string.IsNullOrEmpty(GetReply(message)))
+                return false;
+
+            return true;
+        }
         public static string GetCorrelationId(this Message message)
         {
             if (message.Headers == null)
