@@ -30,10 +30,8 @@ namespace Panama.TestApi.Commands
             {
                 await context.Bus()
                     .Channel(channel)
-                    .Topic("foo.event")
-                    .Group("foo")
+                    .Topic("foo.created")
                     .Data(models)
-                    .Reply("foo.event.success")
                     .Post();
 
                 await context.Saga<CreateWeatherForcastSaga>()

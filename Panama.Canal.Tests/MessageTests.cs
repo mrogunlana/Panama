@@ -8,14 +8,10 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
-using Panama.Canal.Tests.Jobs;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
-using Panama.Security;
-using System.Configuration;
-using System.Reflection;
 
 namespace Panama.Canal.Tests
 {

@@ -78,6 +78,9 @@ namespace Panama.Canal.Sagas.Stateless
 
             var data = message.GetData<IList<IModel>>();
 
+            if (string.IsNullOrEmpty(message.GetSagaTrigger()))
+                return Task.FromResult(new Result().Success());
+
             Configure(new Context(
                 token: context.Token,
                 provider: _provider,

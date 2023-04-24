@@ -29,7 +29,10 @@ namespace Panama.Canal.Extensions
         }
         public static IBus Header(this IBus bus, string key, string? value)
         {
-            bus.Context.Headers.Add(key, value);
+            if (bus.Context.Headers.TryGetValue(key, out _))
+                bus.Context.Headers.Remove(key);
+
+            bus.Context.Headers.TryAdd(key, value);
 
             return bus;
         }
