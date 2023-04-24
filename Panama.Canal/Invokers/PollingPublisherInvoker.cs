@@ -5,7 +5,6 @@ using Panama.Canal.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
-using System.Transactions;
 
 namespace Panama.Canal.Invokers
 {
@@ -14,13 +13,16 @@ namespace Panama.Canal.Invokers
         private readonly IStore _store;
         private readonly IDispatcher _dispatcher;
         private readonly IServiceProvider _provider;
+        private readonly IProcessorFactory _factory;
 
         public PollingPublisherInvoker(
               IStore store
             , IDispatcher dispatcher
+            , IProcessorFactory factory
             , IServiceProvider provider)
         {
             _store = store;
+            _factory = factory;
             _provider = provider;
             _dispatcher = dispatcher;
         }
@@ -33,8 +35,7 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            var dispatcher = _provider.GetRequiredService<IDispatcher>();
-            if (!dispatcher.Online)
+            if (!_dispatcher.Online)
                 throw new InvalidOperationException("Panama Canal Dispatch service has not been started.");
 
             message.SetStatus(MessageStatus.Scheduled);
@@ -43,6 +44,13 @@ namespace Panama.Canal.Invokers
                 message: message,
                 transaction: context.Transaction)
                 .ConfigureAwait(false);
+
+            if (context.Transaction == null)
+                await _factory
+                    .GetProcessor(message)
+                    .Execute(new Context()
+                        .Add(message)
+                        .Token(context.Token));
 
             var result = new Result()
                 .Success()

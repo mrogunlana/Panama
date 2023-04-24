@@ -247,7 +247,7 @@ namespace Panama.Canal.Extensions
             if (message.Headers == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            var result = message.Headers[Headers.CorrelationId];
+            message.Headers.TryGetValue(Headers.CorrelationId, out var result);
 
             return result ?? string.Empty;
         }
@@ -315,10 +315,8 @@ namespace Panama.Canal.Extensions
                 throw new InvalidOperationException("Message headers cannot be found.");
 
             message.Headers.TryGetValue(Headers.SagaType, out var result);
-            if (result == null)
-                return string.Empty;
-
-            return result;
+            
+            return result ?? string.Empty;
         }
 
         public static string GetSagaId(this Message message)
@@ -328,10 +326,7 @@ namespace Panama.Canal.Extensions
 
             message.Headers.TryGetValue(Headers.SagaId, out var result);
 
-            if (result == null)
-                throw new InvalidOperationException($"Header: {Headers.SagaId} cannot be found.");
-
-            return result;
+            return result ?? string.Empty;
         }
 
         public static string GetSagaTrigger(this Message message)
@@ -341,10 +336,7 @@ namespace Panama.Canal.Extensions
 
             message.Headers.TryGetValue(Headers.SagaTrigger, out var result);
 
-            if (result == null)
-                throw new InvalidOperationException($"Header: {Headers.SagaTrigger} cannot be found.");
-
-            return result;
+            return result ?? string.Empty;
         }
 
         public static bool IsSagaReply(this Message message)

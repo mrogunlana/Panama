@@ -37,7 +37,6 @@ namespace Panama.TestApi.Commands
                     .Topic("bar.event")
                     .Group("bar")
                     .Target<DefaultTarget>()
-                    .Invoker<PollingPublisherInvoker>()
                     .Data(models)
                     .Reply("bar.event.success")
                     .Post();

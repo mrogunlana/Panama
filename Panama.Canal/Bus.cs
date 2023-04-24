@@ -8,7 +8,6 @@ using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
 using Panama.Interfaces;
 using Panama.Models;
-using Quartz.Impl.AdoJobStore.Common;
 
 namespace Panama.Canal
 {

@@ -5,7 +5,6 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
-using Panama.Canal.Registrars;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
@@ -26,7 +25,7 @@ namespace Panama.Canal.Invokers
               IStore store
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
-            , ReceivedInvokerFactory invokers
+            , PublishedInvokerFactory invokers
             , ILogger<SubscriptionInvoker> log
             , ConsumerSubscriptions subscriptions)
         {

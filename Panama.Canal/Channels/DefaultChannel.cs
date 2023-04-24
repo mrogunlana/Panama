@@ -27,6 +27,7 @@ namespace Panama.Canal.Channels
             _provider = provider;
             _log = _provider.GetRequiredService<ILogger<DefaultChannel>>();
 
+            Current = new object();
             Queue = new ConcurrentQueue<InternalMessage>();
             Invoker = _provider.GetRequiredService<OutboxInvoker>();
         }
