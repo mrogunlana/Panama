@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
@@ -42,10 +41,6 @@ namespace Panama.Canal.Invokers
             var message = context.Data.DataGetSingle<InternalMessage>();
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
-
-            var dispatcher = _provider.GetRequiredService<IDispatcher>();
-            if (!dispatcher.Online)
-                throw new InvalidOperationException("Panama Canal Dispatcher has not been started.");
 
             var metadata = message.GetData<Message>(_provider);
             var data = metadata.GetData<IList<IModel>>();

@@ -43,7 +43,7 @@ namespace Panama.Canal.Jobs
 
             foreach (var publish in retry)
                 await _factory
-                    .GetProcessor(publish)
+                    .GetProducerProcessor(publish)
                     .Execute(new Context()
                         .Add(retry)
                         .Token(context.CancellationToken));

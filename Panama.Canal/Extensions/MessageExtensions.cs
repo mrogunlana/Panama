@@ -339,7 +339,7 @@ namespace Panama.Canal.Extensions
             return result ?? string.Empty;
         }
 
-        public static bool IsSagaReply(this Message message)
+        public static bool IsSagaParticipant(this Message message)
         {
             var type = message.GetSagaType();
             var name = message.GetName();

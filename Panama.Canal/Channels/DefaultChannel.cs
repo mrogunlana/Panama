@@ -55,7 +55,7 @@ namespace Panama.Canal.Channels
                     token.ThrowIfCancellationRequested();
 
                     await _factory
-                        .GetProcessor(message)
+                        .GetProducerProcessor(message)
                         .Execute(new Panama.Models.Context()
                             .Add(message)
                             .Token(token));

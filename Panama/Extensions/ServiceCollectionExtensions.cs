@@ -14,6 +14,8 @@ namespace Panama.Extensions
             {
                 if (value.IsInterface)
                     continue;
+                if (value.IsAbstract)
+                    continue;
                 if (singleton)
                     services.AddSingleton(value);
                 else
@@ -32,6 +34,8 @@ namespace Panama.Extensions
             foreach (var value in types)
             {
                 if (value.IsInterface)
+                    continue;
+                if (value.IsAbstract)
                     continue;
                 if (singleton)
                 {

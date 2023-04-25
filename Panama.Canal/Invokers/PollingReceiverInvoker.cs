@@ -12,12 +12,15 @@ namespace Panama.Canal.Invokers
     {
         private readonly IStore _store;
         private readonly IServiceProvider _provider;
+        private readonly IProcessorFactory _factory;
 
         public PollingReceiverInvoker(
               IStore store
+            , IProcessorFactory factory
             , IServiceProvider provider)
         {
             _store = store;
+            _factory = factory;
             _provider = provider;
         }
         public async Task<IResult> Invoke(IContext? context = null)
@@ -29,17 +32,16 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            var dispatcher = _provider.GetRequiredService<IDispatcher>();
-            if (!dispatcher.Online)
-                throw new InvalidOperationException("Panama Canal Dispatch service has not been started.");
-
-            message.SetStatus(MessageStatus.Scheduled);
-
             var received = await _store.StoreReceivedMessage(
-                message: message)
+                message: message.SetStatus(MessageStatus.Scheduled))
                 .ConfigureAwait(false);
 
-            await dispatcher.Execute(received);
+            await _factory
+                .GetConsumerProcessor(received)
+                .Execute(new Context()
+                    .Add(received)
+                    .Token(context.Token))
+                .ConfigureAwait(false);
 
             var result = new Result()
                 .Success();

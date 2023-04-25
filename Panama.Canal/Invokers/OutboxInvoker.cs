@@ -29,14 +29,8 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
-            var dispatcher = _provider.GetRequiredService<IDispatcher>();
-            if (!dispatcher.Online)
-                throw new InvalidOperationException("Panama Canal Dispatch service has not been started.");
-
-            message.SetStatus(MessageStatus.Scheduled);
-
             await _store.StoreOutboxMessage(
-                message: message, 
+                message: message.SetStatus(MessageStatus.Scheduled), 
                 transaction: context.Transaction)
                 .ConfigureAwait(false);
 

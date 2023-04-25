@@ -3,6 +3,8 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
+using Panama.Extensions;
+using Panama.Models;
 using Quartz;
 
 namespace Panama.Canal.Jobs
@@ -12,18 +14,18 @@ namespace Panama.Canal.Jobs
     {
         private readonly Job _job;
         private readonly IStore _store;
-        private readonly IDispatcher _dispatcher;
+        private readonly IProcessorFactory _factory;
         private readonly IOptions<CanalOptions> _options;
 
         public ReceivedRetry(
               IStore store
             , IEnumerable<Job> jobs
-            , IDispatcher dispatcher
+            , IProcessorFactory factory
             , IOptions<CanalOptions> options)
         {
             _store = store;
             _options = options;
-            _dispatcher = dispatcher;
+            _factory = factory;
 
             _job = jobs.Where(x => x.Type == typeof(ReceivedRetry)).First();
         }
@@ -40,7 +42,12 @@ namespace Panama.Canal.Jobs
             var retry = await _store.GetReceivedMessagesToRetry().ConfigureAwait(false);
 
             foreach (var received in retry)
-                await _dispatcher.Execute(received, context.CancellationToken).ConfigureAwait(false);
+                await _factory
+                    .GetConsumerProcessor(received)
+                    .Execute(new Context()
+                        .Add(received)
+                        .Token(context.CancellationToken))
+                    .ConfigureAwait(false);
 
             if (_options.Value.UseLock)
                 await _store.ReleaseReceivedLock(token: context.CancellationToken);

@@ -11,16 +11,13 @@ namespace Panama.Canal.Jobs
     {
         private readonly IStore _store;
         private readonly IProcessorFactory _factory;
-        private readonly IDispatcher _dispatcher;
 
         public DelayedPublished(
               IStore store
-            , IDispatcher dispatcher
             , IProcessorFactory factory)
         {
             _store = store;
             _factory = factory;
-            _dispatcher = dispatcher;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -29,7 +26,7 @@ namespace Panama.Canal.Jobs
             {
                 foreach (var message in messages)
                     await _factory
-                        .GetProcessor(message)
+                        .GetProducerProcessor(message)
                         .Execute(new Context()
                             .Add(message)
                             .Add(new Kvp<string, DateTime?>("Delay", message.Expires))

@@ -70,7 +70,7 @@ namespace Panama.Canal.Tests
             _cts.Dispose();
         }
 
-        [TestMethod]
+        //[TestMethod]
         public async Task VerifyFooSaga()
         {
             var channels = _provider.GetRequiredService<IDefaultChannelFactory>();

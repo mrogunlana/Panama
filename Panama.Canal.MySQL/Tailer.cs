@@ -22,17 +22,15 @@ namespace Panama.Canal
 
         private readonly BinlogClient _client;
         private readonly MySqlSettings _settings;
-        private readonly IDispatcher _dispatcher;
         private readonly ILogger<Tailer> _log;
         private readonly IProcessorFactory _factory;
         private readonly IOptions<MySqlOptions> _options;
         private readonly IServiceProvider _provider;
-
+        
         public bool Online => !_cts?.IsCancellationRequested ?? false;
 
         public Tailer(
               ILogger<Tailer> log
-            , IDispatcher dispatcher
             , IProcessorFactory factory
             , IOptions<MySqlOptions> options
             , IOptions<MySqlSettings> settings
@@ -45,7 +43,6 @@ namespace Panama.Canal
             _log = log;
             _factory = factory;
             _options = options;
-            _dispatcher = dispatcher;
             _settings = settings.Value;
             _provider = serviceProvider;
 
@@ -118,9 +115,11 @@ namespace Panama.Canal
 
             //received to subscribers
             foreach (var received in inbox)
-                await _dispatcher.Execute(
-                    message: received,
-                    token: _cts.Token);
+                await _factory
+                    .GetConsumerProcessor(received)
+                    .Execute(new Context()
+                        .Add(received)
+                        .Token(_cts.Token));
 
             //publish to message brokers
             foreach (var publish in outbox)
@@ -130,7 +129,7 @@ namespace Panama.Canal
                     throw new InvalidOperationException("Message headers cannot be found.");
 
                 await _factory
-                    .GetProcessor(publish)
+                    .GetProducerProcessor(publish)
                     .Execute(new Context()
                         .Add(message)
                         .Token(_cts.Token));

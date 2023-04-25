@@ -6,6 +6,7 @@ using Panama.Canal.Models;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
 using Panama.Canal.Processors;
+using Panama.Canal.Sagas.Interfaces;
 using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
@@ -34,10 +35,12 @@ namespace Panama.Canal.Registrars
             
             services.AddSingleton<IBootstrapper, Bootstrapper>();
 
-            services.AddTransient<DefaultProcessor>();
-            services.AddTransient<SagaProcessor>();
-            services.AddTransient<IProcessor, DefaultProcessor>(p => p.GetRequiredService<DefaultProcessor>());
-            services.AddTransient<IProcessor, SagaProcessor>(p => p.GetRequiredService<SagaProcessor>());
+            services.AddTransient<DefaultConsumerProcessor>();
+            services.AddTransient<DefaultProducerProcessor>();
+            services.AddTransient<SagaConsumerProcessor>();
+            services.AddTransient<IProcessor, DefaultConsumerProcessor>(p => p.GetRequiredService<DefaultConsumerProcessor>());
+            services.AddTransient<IProcessor, DefaultProducerProcessor>(p => p.GetRequiredService<DefaultProducerProcessor>());
+            services.AddTransient<IProcessor, SagaConsumerProcessor>(p => p.GetRequiredService<SagaConsumerProcessor>());
             services.AddSingleton<IProcessorFactory, ProcessorFactory>();
 
             services.AddTransient<IMarina, Marina>();
@@ -59,6 +62,7 @@ namespace Panama.Canal.Registrars
 
             services.AddAssemblyTypes<IInvoke>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypes<IChannel>(_builder.Assemblies.Distinct(), false);
+            services.AddAssemblyTypes<ISaga>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypes<ISagaState>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaTrigger>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaEvent>(_builder.Assemblies.Distinct(), false);

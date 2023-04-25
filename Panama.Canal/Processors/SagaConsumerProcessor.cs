@@ -11,16 +11,16 @@ using Panama.Models;
 
 namespace Panama.Canal.Processors
 {
-    public class SagaProcessor : IProcessor
+    public class SagaConsumerProcessor : IProcessor
     {
-        private readonly ILogger<SagaProcessor> _log;
+        private readonly ILogger<SagaConsumerProcessor> _log;
         private readonly ISagaFactory _factory;
         private readonly IServiceProvider _provider;
 
-        public SagaProcessor(
+        public SagaConsumerProcessor(
               ISagaFactory factory
             , IServiceProvider provider
-            , ILogger<SagaProcessor> log)
+            , ILogger<SagaConsumerProcessor> log)
         {
             _log = log;
             _factory = factory;

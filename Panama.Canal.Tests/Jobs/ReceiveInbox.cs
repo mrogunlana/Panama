@@ -1,4 +1,6 @@
 ﻿using Panama.Canal.Interfaces;
+using Panama.Extensions;
+using Panama.Models;
 using Quartz;
 
 namespace Panama.Canal.Tests.Jobs
@@ -7,14 +9,13 @@ namespace Panama.Canal.Tests.Jobs
     public class ReceiveInbox : IJob
     {
         private readonly Store _store;
-        private readonly IDispatcher _dispatcher;
-
+        private readonly IProcessorFactory _factory;
         public ReceiveInbox(
               Store store
-            , IDispatcher dispatcher)
+            , IProcessorFactory factory)
         {
             _store = store;
-            _dispatcher = dispatcher;
+            _factory = factory;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -25,7 +26,12 @@ namespace Panama.Canal.Tests.Jobs
 
             foreach (var received in inbox)
             {
-                await _dispatcher.Execute(received.Value, context.CancellationToken).ConfigureAwait(false);
+                await _factory
+                    .GetConsumerProcessor(received.Value)
+                    .Execute(new Context()
+                        .Add(received.Value)
+                        .Token(context.CancellationToken))
+                    .ConfigureAwait(false);
 
                 _store.Inbox.TryRemove(received.Key, out _);
             }

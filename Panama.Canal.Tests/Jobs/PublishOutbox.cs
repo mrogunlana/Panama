@@ -33,7 +33,7 @@ namespace Panama.Canal.Tests.Jobs
             foreach (var publish in outbox)
             {
                 await _factory
-                    .GetProcessor(publish.Value)
+                    .GetProducerProcessor(publish.Value)
                     .Execute(new Context()
                         .Add(publish.Value)
                         .Token(context.CancellationToken));

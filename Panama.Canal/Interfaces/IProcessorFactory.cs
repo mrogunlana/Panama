@@ -4,6 +4,7 @@ namespace Panama.Canal.Interfaces
 {
     public interface IProcessorFactory
     {
-        IProcessor GetProcessor(InternalMessage message);
+        IProcessor GetProducerProcessor(InternalMessage message);
+        IProcessor GetConsumerProcessor(InternalMessage message);
     }
 }

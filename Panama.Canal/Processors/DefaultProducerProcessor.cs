@@ -1,4 +1,5 @@
-﻿using Panama.Canal.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Panama.Extensions;
@@ -7,12 +8,12 @@ using Panama.Models;
 
 namespace Panama.Canal.Processors
 {
-    public class DefaultProcessor : IProcessor
+    public class DefaultProducerProcessor : IProcessor
     {
         private readonly IDispatcher _dispatcher;
         private readonly IServiceProvider _provider;
 
-        public DefaultProcessor(
+        public DefaultProducerProcessor(
               IDispatcher dispatcher
             , IServiceProvider provider)
         {
@@ -21,6 +22,10 @@ namespace Panama.Canal.Processors
         }
         public async Task<IResult> Execute(IContext context)
         {
+            var _dispatcher = _provider.GetRequiredService<IDispatcher>();
+            if (!_dispatcher.Online)
+                throw new InvalidOperationException("Panama Canal Dispatch service has not been started.");
+
             var message = context.DataGetSingle<InternalMessage>();
             if (message == null)
                 throw new InvalidOperationException("Message headers cannot be found.");

@@ -15,13 +15,19 @@ namespace Panama.Canal.Processors
             _provider = provider;
         }
 
-        public IProcessor GetProcessor(InternalMessage message)
+        public IProcessor GetProducerProcessor(InternalMessage message)
+        {
+            return _provider.GetRequiredService<DefaultProducerProcessor>();
+        }
+
+        public IProcessor GetConsumerProcessor(InternalMessage message)
         {
             var data = message.GetData<Message>(_provider);
-            if (data.IsSagaReply())
-                return _provider.GetRequiredService<SagaProcessor>();
+            if (data.IsSagaParticipant())
+                return _provider.GetRequiredService<SagaConsumerProcessor>();
 
-            return _provider.GetRequiredService<DefaultProcessor>();
+            return _provider.GetRequiredService<DefaultConsumerProcessor>();
         }
+
     }
 }
