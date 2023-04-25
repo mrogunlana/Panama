@@ -2,7 +2,7 @@
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
 using Panama.Canal.Processors;
@@ -50,7 +50,7 @@ namespace Panama.Canal.Registrars
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
 
-            services.AddSingleton<ConsumerSubscriptions>();
+            services.AddSingleton<SubscriberDescriptions>();
             services.AddSingleton<PublishedInvokerFactory>();
             services.AddSingleton<ReceivedInvokerFactory>();
         }

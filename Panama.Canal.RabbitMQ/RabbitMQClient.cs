@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Extensions;
 using Panama.Canal.RabbitMQ.Models;
@@ -36,7 +36,7 @@ namespace Panama.Canal.RabbitMQ
         {
             var headers = e.GetHeaders();
 
-            headers.Add(Canal.Models.Headers.Group, _queue);
+            headers.Add(Canal.Models.Messaging.Headers.Group, _queue);
 
             var message = new TransientMessage(headers, e.Body.ToArray());
 

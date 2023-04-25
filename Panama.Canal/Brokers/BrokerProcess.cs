@@ -6,6 +6,8 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -24,7 +26,7 @@ namespace Panama.Canal.Brokers
         private readonly ILogger<BrokerProcess> _log;
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
-        private readonly ConsumerSubscriptions _subscriptions;
+        private readonly SubscriberDescriptions _subscriptions;
         private readonly IServiceProvider _provider;
 
         public BrokerProcess(
@@ -34,7 +36,7 @@ namespace Panama.Canal.Brokers
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers
-            , ConsumerSubscriptions subscriptions)
+            , SubscriberDescriptions subscriptions)
         {
             _log = log;
             _store = store;

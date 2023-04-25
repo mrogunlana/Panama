@@ -2,18 +2,18 @@
 using Panama.Canal.Attributes;
 using Panama.Canal.Comparers;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
 using System.Collections.ObjectModel;
 
 namespace Panama.Canal.Extensions
 {
     public static class SubscriptionExtensions
     {
-        public static Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>> ToDictionary(this IEnumerable<Subscription> subscriptions)
+        public static Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>> ToDictionary(this IEnumerable<SubscriberDescriptor> subscriptions)
         {
             var targets = subscriptions.Select(s => s.Target).Distinct();
             var buckets = subscriptions.GroupBy(s => s.Target);
-            var results = new Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>>();
+            var results = new Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>();
 
             foreach (var bucket in buckets)
             {

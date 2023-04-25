@@ -1,4 +1,4 @@
-﻿using Panama.Canal.Models;
+﻿using Panama.Canal.Models.Messaging;
 using Panama.Interfaces;
 using System.Collections.Concurrent;
 

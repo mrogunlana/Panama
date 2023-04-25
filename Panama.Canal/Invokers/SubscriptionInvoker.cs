@@ -3,7 +3,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Extensions;
 using Panama.Interfaces;
@@ -19,7 +20,7 @@ namespace Panama.Canal.Invokers
         private readonly CanalOptions _canal;
         private readonly ILogger<SubscriptionInvoker> _log;
         private readonly IStore _store;
-        private readonly ConsumerSubscriptions _subscriptions;
+        private readonly SubscriberDescriptions _subscriptions;
 
         public SubscriptionInvoker(
               IStore store
@@ -27,7 +28,7 @@ namespace Panama.Canal.Invokers
             , IOptions<CanalOptions> canal
             , PublishedInvokerFactory invokers
             , ILogger<SubscriptionInvoker> log
-            , ConsumerSubscriptions subscriptions)
+            , SubscriberDescriptions subscriptions)
         {
             _log = log;
             _store = store;

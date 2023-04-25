@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;

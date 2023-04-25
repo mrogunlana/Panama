@@ -7,6 +7,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Subscriptions;

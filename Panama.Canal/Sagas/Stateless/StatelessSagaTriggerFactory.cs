@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
 using Stateless;

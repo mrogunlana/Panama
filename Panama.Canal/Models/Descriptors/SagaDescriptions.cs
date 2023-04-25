@@ -1,29 +1,30 @@
 ﻿using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.Models.Messaging;
 using Panama.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Descriptors
 {
-    public class ConsumerSubscriptions : IModel
+    public class SagaDescriptions : IModel
     {
-        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>>? _subscriptions;
+        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>? _subscriptions;
         public IServiceProvider Provider { get; }
 
-        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>>? Entries => _subscriptions;
+        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>? Entries => _subscriptions;
 
-        public ConsumerSubscriptions(IServiceProvider provider)
+        public SagaDescriptions(IServiceProvider provider)
         {
             Provider = provider;
         }
 
-        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>> subscriptions)
+        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>> subscriptions)
         {
-            _subscriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>>>(subscriptions); ;
+            _subscriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>(subscriptions); ;
         }
 
-        public IReadOnlyDictionary<string, ReadOnlyCollection<Subscription>> GetSubscriptions(Type type)
+        public IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>> GetSubscriptions(Type type)
         {
             if (Entries == null)
                 throw new InvalidOperationException("Subscriptions are not initialized.");
@@ -35,7 +36,7 @@ namespace Panama.Canal.Models
             return results;
         }
 
-        public IReadOnlyCollection<Subscription> GetSubscriptions(string group, Type type)
+        public IReadOnlyCollection<SubscriberDescriptor> GetSubscriptions(string group, Type type)
         {
             if (Entries == null)
                 throw new InvalidOperationException("Subscriptions are not initialized.");
@@ -47,19 +48,19 @@ namespace Panama.Canal.Models
             return results[group];
         }
 
-        public IReadOnlyCollection<Subscription> GetSubscriptions<T>(string group)
+        public IReadOnlyCollection<SubscriberDescriptor> GetSubscriptions<T>(string group)
             where T : ITarget
         {
             return GetSubscriptions(group, typeof(T));
         }
 
-        public IReadOnlyCollection<Subscription>? GetSubscriptions(Type type, string group, string name)
+        public IReadOnlyCollection<SubscriberDescriptor>? GetSubscriptions(Type type, string group, string name)
         {
             var result = GetSubscriptions(group, type);
             if (result == null)
                 return null;
 
-            return new ReadOnlyCollection<Subscription>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
+            return new ReadOnlyCollection<SubscriberDescriptor>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
         }
 
         public bool HasSubscribers(Message message)

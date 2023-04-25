@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 
 namespace Panama.Canal.Brokers
 {

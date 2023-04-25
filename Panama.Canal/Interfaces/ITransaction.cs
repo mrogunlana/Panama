@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Quartz;
 
 namespace Panama.Canal.Interfaces

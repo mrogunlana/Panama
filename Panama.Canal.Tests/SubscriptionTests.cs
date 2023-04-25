@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
 
 namespace Panama.Canal.Tests
 {
@@ -46,7 +46,7 @@ namespace Panama.Canal.Tests
 
             await initializer.Invoke(CancellationToken.None);
 
-            var manager = _provider.GetRequiredService<ConsumerSubscriptions>();
+            var manager = _provider.GetRequiredService<SubscriberDescriptions>();
 
             Assert.IsNotNull(manager.Entries);
             Assert.IsTrue(manager.Entries.Count > 0);

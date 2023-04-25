@@ -1,4 +1,4 @@
-﻿using Panama.Canal.Models;
+﻿using Panama.Canal.Models.Messaging;
 
 namespace Panama.Canal.Brokers.Interfaces
 {

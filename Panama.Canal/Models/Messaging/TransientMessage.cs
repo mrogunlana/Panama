@@ -1,7 +1,7 @@
 ﻿using Panama.Interfaces;
 using System.Runtime.InteropServices;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Messaging
 {
     [StructLayout(LayoutKind.Auto)]
     public readonly struct TransientMessage : IModel

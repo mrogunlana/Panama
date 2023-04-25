@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
 
 namespace Panama.Canal.Comparers
 {
-    public class SubscriptionComparer : IEqualityComparer<Subscription>
+    public class SubscriptionComparer : IEqualityComparer<SubscriberDescriptor>
     {
         private readonly ILogger _log;
 
@@ -12,7 +12,7 @@ namespace Panama.Canal.Comparers
             _log = log;
         }
 
-        public bool Equals(Subscription? _this, Subscription? _that)
+        public bool Equals(SubscriberDescriptor? _this, SubscriberDescriptor? _that)
         {
             if (ReferenceEquals(_this, _that))
             {
@@ -35,7 +35,7 @@ namespace Panama.Canal.Comparers
             return result;
         }
 
-        public int GetHashCode(Subscription? obj)
+        public int GetHashCode(SubscriberDescriptor? obj)
         {
             if (obj is null) return 0;
 

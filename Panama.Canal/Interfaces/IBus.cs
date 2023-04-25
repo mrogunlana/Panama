@@ -1,4 +1,5 @@
 ﻿using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Interfaces;
 
 namespace Panama.Canal.Interfaces

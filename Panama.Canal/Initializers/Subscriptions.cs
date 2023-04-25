@@ -6,7 +6,7 @@ using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Comparers;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Options;
 
 namespace Panama.Canal.Initializers
@@ -16,7 +16,7 @@ namespace Panama.Canal.Initializers
         private readonly IServiceProvider _provider;
         private readonly ILogger<Subscriptions> _log;
         private readonly ITargetFactory _factory;
-        private readonly Models.ConsumerSubscriptions _subscriptions;
+        private readonly SubscriberDescriptions _subscriptions;
         private readonly IOptions<CanalOptions> _options;
 
         public Subscriptions(
@@ -25,7 +25,7 @@ namespace Panama.Canal.Initializers
            , ILogger<Subscriptions> log
            , IOptions<CanalOptions> options
            
-           , Models.ConsumerSubscriptions subscriptions)
+           , SubscriberDescriptions subscriptions)
         {
             _log = log;
             _factory = factory;
@@ -34,9 +34,9 @@ namespace Panama.Canal.Initializers
             _subscriptions = subscriptions;
         }
 
-        private IEnumerable<Subscription> SetupSubscriptions(IEnumerable<ISubscribe> subscribers)
+        private IEnumerable<SubscriberDescriptor> SetupSubscriptions(IEnumerable<ISubscribe> subscribers)
         {
-            var subscriptions = new List<Subscription>();
+            var subscriptions = new List<SubscriberDescriptor>();
 
             if (subscribers == null)
                 return subscriptions;
@@ -57,7 +57,7 @@ namespace Panama.Canal.Initializers
                 if (topic == null)
                     throw new InvalidOperationException($"Subscription: {subscriber.GetType().Name} needs a Topic attribute.");
 
-                var subscription = new Subscription(
+                var subscription = new SubscriberDescriptor(
                     topic: topic.Name,
                     group: topic.Group ?? _options.Value.DefaultGroup,
                     subscriber: subscriber.GetType(),

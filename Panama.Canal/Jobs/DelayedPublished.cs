@@ -1,5 +1,5 @@
 ﻿using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Extensions;
 using Panama.Models;
 using Quartz;

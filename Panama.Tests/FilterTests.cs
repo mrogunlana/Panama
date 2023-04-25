@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Extensions;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Extensions;
 using Panama.Interfaces;
 using System;

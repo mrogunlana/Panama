@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
+using Panama.Canal.Models.Messaging;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
@@ -128,7 +129,7 @@ namespace Panama.Canal.Extensions
                 
                 external.RemoveException();
 
-                var subscriptions = provider.GetRequiredService<ConsumerSubscriptions>().HasSubscribers(external);
+                var subscriptions = provider.GetRequiredService<SubscriberDescriptions>().HasSubscribers(external);
                 if (subscriptions == false)
                     throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
 

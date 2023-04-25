@@ -6,7 +6,7 @@ using MySqlCdc.Constants;
 using MySqlCdc.Events;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.MySQL.Extensions;
 using Panama.Canal.MySQL.Models;
 using Panama.Extensions;

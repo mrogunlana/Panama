@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Extensions;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 
 namespace Panama.Canal.Brokers
 {

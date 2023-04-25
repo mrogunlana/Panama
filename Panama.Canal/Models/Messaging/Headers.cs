@@ -1,6 +1,6 @@
-﻿namespace Panama.Canal.Models
+﻿namespace Panama.Canal.Models.Messaging
 {
-    public static class Headers 
+    public static class Headers
     {
         public const string CorrelationId = "panama-correlation-id";
         public const string Id = "panama-message-id";

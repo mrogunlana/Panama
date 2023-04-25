@@ -6,7 +6,8 @@ using Panama.Canal.Exceptions;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Descriptors;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Extensions;
@@ -26,7 +27,7 @@ namespace Panama.Canal.RabbitMQ
         private readonly ILogger<RabbitMQProcess> _log;
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
-        private readonly ConsumerSubscriptions _subscriptions;
+        private readonly SubscriberDescriptions _subscriptions;
         private readonly IServiceProvider _provider;
 
         public RabbitMQProcess(
@@ -36,7 +37,7 @@ namespace Panama.Canal.RabbitMQ
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers
-            , ConsumerSubscriptions subscriptions)
+            , SubscriberDescriptions subscriptions)
         {
             _log = log;
             _store = store;

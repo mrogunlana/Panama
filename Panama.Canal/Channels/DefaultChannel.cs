@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
-using Panama.Canal.Models;
+using Panama.Canal.Models.Messaging;
 using Panama.Extensions;
 using Panama.Interfaces;
 using System.Collections.Concurrent;

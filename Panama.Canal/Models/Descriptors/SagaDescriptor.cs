@@ -1,15 +1,15 @@
 ﻿using Panama.Interfaces;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Descriptors
 {
-    public class Subscription : IModel
+    public class SagaDescriptor : IModel
     {
         public string Topic { get; set; }
         public string Group { get; set; }
         public Type Subscriber { get; set; }
         public Type Target { get; set; }
 
-        public Subscription(
+        public SagaDescriptor(
               string topic
             , string group
             , Type subscriber

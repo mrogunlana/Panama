@@ -1,6 +1,6 @@
 ﻿using Panama.Models;
 
-namespace Panama.Canal.Models
+namespace Panama.Canal.Models.Messaging
 {
     public class MessageContext : Context
     {

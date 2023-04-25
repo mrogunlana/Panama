@@ -1,6 +1,6 @@
-﻿namespace Panama.Canal.Models
+﻿namespace Panama.Canal.Models.Messaging
 {
-    public enum MessageStatus 
+    public enum MessageStatus
     {
         None = 0,
         Queued = 10,
