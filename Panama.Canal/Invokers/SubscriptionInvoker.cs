@@ -64,7 +64,7 @@ namespace Panama.Canal.Invokers
 
             try
             {
-                var subscriptions = _subscriptions.GetSubscriptions(target, group, metadata.GetName());
+                var subscriptions = _subscriptions.GetDescriptions(target, group, metadata.GetName());
                 if (subscriptions == null)
                     return new Result().Success();
 

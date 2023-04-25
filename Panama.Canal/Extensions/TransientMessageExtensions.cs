@@ -129,7 +129,7 @@ namespace Panama.Canal.Extensions
                 
                 external.RemoveException();
 
-                var subscriptions = provider.GetRequiredService<SubscriberDescriptions>().HasSubscribers(external);
+                var subscriptions = provider.GetRequiredService<SubscriberDescriptions>().HasDescriptions(external);
                 if (subscriptions == false)
                     throw new InvalidCastException($"No subscribers can be found for message ID: {message.Headers[Headers.Id]}.");
 

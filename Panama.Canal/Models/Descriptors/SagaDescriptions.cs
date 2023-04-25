@@ -9,61 +9,61 @@ namespace Panama.Canal.Models.Descriptors
 {
     public class SagaDescriptions : IModel
     {
-        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>? _subscriptions;
+        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>? _descriptions;
         public IServiceProvider Provider { get; }
 
-        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>? Entries => _subscriptions;
+        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>? Entries => _descriptions;
 
         public SagaDescriptions(IServiceProvider provider)
         {
             Provider = provider;
         }
 
-        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>> subscriptions)
+        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>> descriptions)
         {
-            _subscriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>(subscriptions); ;
+            _descriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>(descriptions); ;
         }
 
-        public IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>> GetSubscriptions(Type type)
+        public IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>> GetDescriptions(Type type)
         {
             if (Entries == null)
-                throw new InvalidOperationException("Subscriptions are not initialized.");
+                throw new InvalidOperationException("Saga descriptions are not initialized.");
 
             var results = Entries[type];
             if (results == null)
-                throw new InvalidOperationException($"Subscriptions for target {type?.FullName} cannot be located.");
+                throw new InvalidOperationException($"descriptions for target {type?.FullName} cannot be located.");
 
             return results;
         }
 
-        public IReadOnlyCollection<SubscriberDescriptor> GetSubscriptions(string group, Type type)
+        public IReadOnlyCollection<SagaDescriptor> GetDescriptions(string group, Type type)
         {
             if (Entries == null)
-                throw new InvalidOperationException("Subscriptions are not initialized.");
+                throw new InvalidOperationException("Saga descriptions are not initialized.");
 
             var results = Entries[type];
             if (results == null)
-                throw new InvalidOperationException($"Subscriptions for target {type?.FullName} cannot be located.");
+                throw new InvalidOperationException($"Saga descriptions for target {type?.FullName} cannot be located.");
 
             return results[group];
         }
 
-        public IReadOnlyCollection<SubscriberDescriptor> GetSubscriptions<T>(string group)
+        public IReadOnlyCollection<SagaDescriptor> GetDescriptions<T>(string group)
             where T : ITarget
         {
-            return GetSubscriptions(group, typeof(T));
+            return GetDescriptions(group, typeof(T));
         }
 
-        public IReadOnlyCollection<SubscriberDescriptor>? GetSubscriptions(Type type, string group, string name)
+        public IReadOnlyCollection<SagaDescriptor>? GetDescriptions(Type type, string group, string name)
         {
-            var result = GetSubscriptions(group, type);
+            var result = GetDescriptions(group, type);
             if (result == null)
                 return null;
 
-            return new ReadOnlyCollection<SubscriberDescriptor>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
+            return new ReadOnlyCollection<SagaDescriptor>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
         }
 
-        public bool HasSubscribers(Message message)
+        public bool HasDescriptions(Message message)
         {
             try
             {
@@ -71,9 +71,9 @@ namespace Panama.Canal.Models.Descriptors
                 var group = message.GetGroup();
                 var type = message.GetBrokerType();
 
-                var subscribers = GetSubscriptions(type, group, name);
-                if (subscribers == null || subscribers.Count == 0)
-                    throw new InvalidOperationException($"Subscriber cannot be found for Target: {type}, Group: {group}, and Topic: {name}.");
+                var descriptions = GetDescriptions(type, group, name);
+                if (descriptions == null || descriptions.Count == 0)
+                    throw new InvalidOperationException($"Saga description cannot be found for Target: {type}, Group: {group}, and Topic: {name}.");
 
                 return true;
             }

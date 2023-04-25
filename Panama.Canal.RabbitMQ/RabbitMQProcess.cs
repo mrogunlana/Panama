@@ -94,7 +94,7 @@ namespace Panama.Canal.RabbitMQ
 
         private Task Execute()
         {
-            var subscriptions = _subscriptions.GetSubscriptions(typeof(RabbitMQTarget));
+            var subscriptions = _subscriptions.GetDescriptions(typeof(RabbitMQTarget));
 
             foreach (var subscription in subscriptions)
             {

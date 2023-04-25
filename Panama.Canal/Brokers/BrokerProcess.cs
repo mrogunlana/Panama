@@ -97,7 +97,7 @@ namespace Panama.Canal.Brokers
 
         private Task Execute()
         {
-            var subscriptions = _subscriptions.GetSubscriptions(typeof(DefaultTarget));
+            var subscriptions = _subscriptions.GetDescriptions(typeof(DefaultTarget));
 
             foreach (var subscription in subscriptions)
             {
