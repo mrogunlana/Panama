@@ -83,9 +83,9 @@ namespace Panama.Canal.Invokers
 
                         foreach (var subscription in subscriptions)
                         {
-                            var subscriber = (ISubscribe)_provider.GetRequiredService(subscription.Subscriber);
+                            var subscriber = (ISubscribe)_provider.GetRequiredService(subscription.Implementation);
                             if (subscriber == null)
-                                throw new InvalidOperationException($"Subscriber: {subscription.Subscriber.Name} could not be located.");
+                                throw new InvalidOperationException($"Subscriber: {subscription.Implementation.Name} could not be located.");
 
                             var local = new Panama.Models.Context(data.AsEnumerable(),
                                 id: message.Id,

@@ -9,11 +9,11 @@ namespace Panama.Canal.Extensions
 {
     public static class SubscriptionExtensions
     {
-        public static Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>> ToDictionary(this IEnumerable<SubscriberDescriptor> subscriptions)
+        public static Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>> ToDictionary(this IEnumerable<IDescriptor> subscriptions)
         {
             var targets = subscriptions.Select(s => s.Target).Distinct();
             var buckets = subscriptions.GroupBy(s => s.Target);
-            var results = new Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SubscriberDescriptor>>>();
+            var results = new Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>();
 
             foreach (var bucket in buckets)
             {

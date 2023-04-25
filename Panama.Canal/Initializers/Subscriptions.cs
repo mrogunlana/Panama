@@ -24,7 +24,6 @@ namespace Panama.Canal.Initializers
            , IServiceProvider provider
            , ILogger<Subscriptions> log
            , IOptions<CanalOptions> options
-           
            , SubscriberDescriptions subscriptions)
         {
             _log = log;
@@ -67,7 +66,7 @@ namespace Panama.Canal.Initializers
             }
 
             subscriptions = subscriptions
-                .Distinct(new SubscriptionComparer(_log))
+                .Distinct(new SubscriberComparer(_log))
                 .ToList();
 
             return subscriptions;

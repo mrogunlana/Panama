@@ -9,22 +9,22 @@ namespace Panama.Canal.Models.Descriptors
 {
     public class SagaDescriptions : IModel
     {
-        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>? _descriptions;
+        private ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>? _descriptions;
         public IServiceProvider Provider { get; }
 
-        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>? Entries => _descriptions;
+        public ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>? Entries => _descriptions;
 
         public SagaDescriptions(IServiceProvider provider)
         {
             Provider = provider;
         }
 
-        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>> descriptions)
+        public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>> descriptions)
         {
-            _descriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>>>(descriptions); ;
+            _descriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>(descriptions); ;
         }
 
-        public IReadOnlyDictionary<string, ReadOnlyCollection<SagaDescriptor>> GetDescriptions(Type type)
+        public IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>> GetDescriptions(Type type)
         {
             if (Entries == null)
                 throw new InvalidOperationException("Saga descriptions are not initialized.");
@@ -36,7 +36,7 @@ namespace Panama.Canal.Models.Descriptors
             return results;
         }
 
-        public IReadOnlyCollection<SagaDescriptor> GetDescriptions(string group, Type type)
+        public IReadOnlyCollection<IDescriptor> GetDescriptions(string group, Type type)
         {
             if (Entries == null)
                 throw new InvalidOperationException("Saga descriptions are not initialized.");
@@ -48,19 +48,19 @@ namespace Panama.Canal.Models.Descriptors
             return results[group];
         }
 
-        public IReadOnlyCollection<SagaDescriptor> GetDescriptions<T>(string group)
+        public IReadOnlyCollection<IDescriptor> GetDescriptions<T>(string group)
             where T : ITarget
         {
             return GetDescriptions(group, typeof(T));
         }
 
-        public IReadOnlyCollection<SagaDescriptor>? GetDescriptions(Type type, string group, string name)
+        public IReadOnlyCollection<IDescriptor>? GetDescriptions(Type type, string group, string name)
         {
             var result = GetDescriptions(group, type);
             if (result == null)
                 return null;
 
-            return new ReadOnlyCollection<SagaDescriptor>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
+            return new ReadOnlyCollection<IDescriptor>(result.Where(s => string.Equals(s.Topic, name, StringComparison.OrdinalIgnoreCase)).ToList());
         }
 
         public bool HasDescriptions(Message message)

@@ -1,12 +1,12 @@
-﻿using Panama.Interfaces;
+﻿using Panama.Canal.Interfaces;
 
 namespace Panama.Canal.Models.Descriptors
 {
-    public class SubscriberDescriptor : IModel
+    public class SubscriberDescriptor : IDescriptor
     {
         public string Topic { get; set; }
         public string Group { get; set; }
-        public Type Subscriber { get; set; }
+        public Type Implementation { get; set; }
         public Type Target { get; set; }
 
         public SubscriberDescriptor(
@@ -17,7 +17,7 @@ namespace Panama.Canal.Models.Descriptors
         {
             Topic = topic;
             Group = group;
-            Subscriber = subscriber;
+            Implementation = subscriber;
             Target = target;
         }
     }

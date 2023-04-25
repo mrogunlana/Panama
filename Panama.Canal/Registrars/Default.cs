@@ -50,6 +50,7 @@ namespace Panama.Canal.Registrars
             services.AddSingleton<ISagaTriggerFactory, StatelessSagaTriggerFactory>();
             services.AddSingleton<ISagaStateFactory, StatelessSagaStateFactory>();
 
+            services.AddSingleton<SagaDescriptions>();
             services.AddSingleton<SubscriberDescriptions>();
             services.AddSingleton<PublishedInvokerFactory>();
             services.AddSingleton<ReceivedInvokerFactory>();

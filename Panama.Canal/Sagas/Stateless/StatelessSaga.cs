@@ -5,7 +5,6 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
-using Panama.Canal.Sagas.Interfaces;
 using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
@@ -31,6 +30,8 @@ namespace Panama.Canal.Sagas.Stateless
         public List<ISagaState> States { get; set; }
         public List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
         public string ReplyTopic { get; }
+        public string ReplyGroup { get; set; }
+        public virtual Type? Target { get; }
 
         public StatelessSaga(IServiceProvider provider)
         {
@@ -44,6 +45,7 @@ namespace Panama.Canal.Sagas.Stateless
             States = new List<ISagaState>();
             Triggers = new List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>();
             ReplyTopic = string.Join(".", new List<string>() { _canalOptions.Value.TopicPrefix ?? string.Empty, GetType().Name, "reply" }.Where(x => !string.IsNullOrEmpty(x)));
+            ReplyGroup = _canalOptions.Value.DefaultGroup;
             States.Add(new NotStarted());
 
             StateMachine = new StateMachine<ISagaState, ISagaTrigger>(States.First());

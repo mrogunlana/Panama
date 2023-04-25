@@ -3,21 +3,21 @@ using Panama.Canal.Models.Descriptors;
 
 namespace Panama.Canal.Comparers
 {
-    public class SubscriptionComparer : IEqualityComparer<SubscriberDescriptor>
+    public class SagaComparer : IEqualityComparer<SagaDescriptor>
     {
         private readonly ILogger _log;
 
-        public SubscriptionComparer(ILogger log)
+        public SagaComparer(ILogger log)
         {
             _log = log;
         }
 
-        public bool Equals(SubscriberDescriptor? _this, SubscriberDescriptor? _that)
+        public bool Equals(SagaDescriptor? _this, SagaDescriptor? _that)
         {
             if (ReferenceEquals(_this, _that))
             {
                 _log.LogWarning(
-                    $"There are duplicate subscribers ({_this!.Topic}) in same group ({_this.Group}) and broker ({_this?.Target?.GetType()?.Name}), this may cause unintended results.");
+                    $"There are duplicate sagas ({_this!.Topic}) in same group ({_this.Group}) and broker ({_this?.Target?.GetType()?.Name}), this may cause unintended results.");
 
                 return true;
             }
@@ -35,7 +35,7 @@ namespace Panama.Canal.Comparers
             return result;
         }
 
-        public int GetHashCode(SubscriberDescriptor? obj)
+        public int GetHashCode(SagaDescriptor? obj)
         {
             if (obj is null) return 0;
 
