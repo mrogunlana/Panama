@@ -21,7 +21,7 @@ namespace Panama.Canal.Models.Descriptors
 
         public void Set(Dictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>> descriptions)
         {
-            _descriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>(descriptions); ;
+            _descriptions = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>>(descriptions);
         }
 
         public IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>> GetDescriptions(Type type)

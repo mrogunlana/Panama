@@ -33,9 +33,9 @@ namespace Panama.Canal.Initializers
             _descriptions = descriptions;
         }
 
-        private IEnumerable<SagaDescriptor> SetupDescriptions(IEnumerable<ISaga> sagas)
+        private IEnumerable<IDescriptor> SetupDescriptions(IEnumerable<ISaga> sagas)
         {
-            var descriptions = new List<SagaDescriptor>();
+            var descriptions = new List<IDescriptor>();
 
             if (sagas == null)
                 return descriptions;
@@ -54,7 +54,7 @@ namespace Panama.Canal.Initializers
             }
 
             descriptions = descriptions
-                .Distinct(new SagaComparer(_log))
+                .Distinct(new DescriptorComparer(_log))
                 .ToList();
 
             return descriptions;

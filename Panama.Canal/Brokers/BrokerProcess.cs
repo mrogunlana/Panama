@@ -27,18 +27,21 @@ namespace Panama.Canal.Brokers
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
         private readonly SubscriberDescriptions _subscriptions;
+        private readonly SagaDescriptions _sagas;
         private readonly IServiceProvider _provider;
 
         public BrokerProcess(
               IStore store
             , ILogger<BrokerProcess> log
             , BrokerFactory factory
+            , SagaDescriptions sagas
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers
             , SubscriberDescriptions subscriptions)
         {
             _log = log;
+            _sagas = sagas;
             _store = store;
             _factory = factory;
             _provider = provider;
@@ -98,14 +101,16 @@ namespace Panama.Canal.Brokers
         private Task Execute()
         {
             var subscriptions = _subscriptions.GetDescriptions(typeof(DefaultTarget));
+            var sagas = _sagas.GetDescriptions(typeof(DefaultTarget));
+            var descriptions = subscriptions.Concat(sagas).ToDictionary<DefaultTarget>();
 
-            foreach (var subscription in subscriptions)
+            foreach (var description in descriptions)
             {
-                ICollection<string> topics;
+                var topics = new List<string>();
                 try
                 {
-                    using (var client = _factory.Create(subscription.Key))
-                        topics = client.GetOrAddTopics(subscription.Value.Select(x => x.Topic));
+                    using (var client = _factory.Create(description.Key))
+                        topics.AddRange(client.GetOrAddTopics(description.Value.Select(x => x.Topic)));
                 }
                 catch (BrokerException e)
                 {
@@ -121,7 +126,7 @@ namespace Panama.Canal.Brokers
                     {
                         try
                         {
-                            using (var client = _factory.Create(subscription.Key))
+                            using (var client = _factory.Create(description.Key))
                             {
                                 Register(client);
 

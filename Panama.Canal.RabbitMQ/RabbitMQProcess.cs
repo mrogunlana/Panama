@@ -6,6 +6,7 @@ using Panama.Canal.Exceptions;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
+using Panama.Canal.Models;
 using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
@@ -28,18 +29,21 @@ namespace Panama.Canal.RabbitMQ
         private readonly IBrokerFactory _factory;
         private readonly IInvokeFactory _invokers;
         private readonly SubscriberDescriptions _subscriptions;
+        private readonly SagaDescriptions _sagas;
         private readonly IServiceProvider _provider;
 
         public RabbitMQProcess(
               IStore store
             , ILogger<RabbitMQProcess> log
             , RabbitMQFactory factory
+            , SagaDescriptions sagas
             , IServiceProvider provider
             , IOptions<CanalOptions> canal
             , ReceivedInvokerFactory invokers
             , SubscriberDescriptions subscriptions)
         {
             _log = log;
+            _sagas = sagas;
             _store = store;
             _factory = factory;
             _provider = provider;
@@ -95,14 +99,16 @@ namespace Panama.Canal.RabbitMQ
         private Task Execute()
         {
             var subscriptions = _subscriptions.GetDescriptions(typeof(RabbitMQTarget));
+            var sagas = _sagas.GetDescriptions(typeof(RabbitMQTarget));
+            var descriptions = subscriptions.Concat(sagas).ToDictionary<DefaultTarget>();
 
-            foreach (var subscription in subscriptions)
+            foreach (var description in descriptions)
             {
                 ICollection<string> topics;
                 try
                 {
-                    using (var client = _factory.Create(subscription.Key))
-                        topics = client.GetOrAddTopics(subscription.Value.Select(x => x.Topic));
+                    using (var client = _factory.Create(description.Key))
+                        topics = client.GetOrAddTopics(description.Value.Select(x => x.Topic));
                 }
                 catch (BrokerException e)
                 {
@@ -118,7 +124,7 @@ namespace Panama.Canal.RabbitMQ
                     {
                         try
                         {
-                            using (var client = _factory.Create(subscription.Key))
+                            using (var client = _factory.Create(description.Key))
                             {
                                 Register(client);
 
