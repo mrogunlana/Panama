@@ -233,5 +233,14 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
+        public static IBus Trigger(this IBus bus, string? value = null)
+        {
+            if (value == null)
+                return bus;
+
+            bus.Context.Headers.Add(Headers.SagaTrigger, value);
+
+            return bus;
+        }
     }
 }

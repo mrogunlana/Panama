@@ -40,12 +40,14 @@ namespace Panama.Canal
                 .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
                 .AddMessageBroker(Context.Target?.FullName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
                 .AddMessageInstance(Context.Instance)
-                .AddMessageType(nameof(Context.Data))
+                .AddMessageType(Context.Data.GetType().AssemblyQualifiedName)
                 .AddCreatedTime()
                 .AddDelayTime(Context.Delay)
                 .AddHeaders(Context.Headers)
                 .AddData(Context.Data)
                 .AddReply(Context.Reply)
+                .AddSagaId(Context.SagaId)
+                .AddSagaType(Context.SagaType)
                 .ToInternal(Context.Provider);
 
             return await Post(message, token);

@@ -81,10 +81,10 @@ namespace Panama.Canal.Brokers
                             .SetStatus(MessageStatus.Failed)
                             .SetFailedExpiration(_provider, DateTime.UtcNow);
 
-                    await new Context(_provider).Bus()
+                    await new Context(_provider, _cts.Token).Bus()
                         .CorrelationId(external.GetCorrelationId())
                         .Invoker(_invokers.GetInvoker())
-                        .Post(value)
+                        .Post(value, _cts.Token)
                         .ConfigureAwait(false);
 
                     client.Commit(sender);

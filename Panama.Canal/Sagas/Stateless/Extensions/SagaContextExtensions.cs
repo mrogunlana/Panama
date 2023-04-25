@@ -30,6 +30,8 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
                 provider: context.Provider)
                 .Add(context.Data)
                 .Add(saga.States)
+                .Add(new Kvp<string, string>("SagaId", Guid.NewGuid().ToString()))
+                .Add(new Kvp<string, string>("SagaType", saga.GetType().AssemblyQualifiedName!))
                 .Add(new Kvp<string, string>("ReplyTopic", saga.ReplyTopic))
                 .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", saga.Triggers));
 

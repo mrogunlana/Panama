@@ -109,7 +109,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageType(this Message message, string value)
+        public static Message AddMessageType(this Message message, string? value = null)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
@@ -190,6 +190,34 @@ namespace Panama.Canal.Extensions
                 message.Headers.Remove(Headers.Delay);
             
             message.Headers.Add(Headers.Delay, value?.ToUniversalTime().ToString());
+
+            return message;
+        }
+        public static Message AddSagaId(this Message message, string? value)
+        {
+            if (value == null)
+                return message;
+            if (value == string.Empty)
+                return message;
+
+            if (message.Headers.ContainsKey(Headers.SagaId))
+                message.Headers.Remove(Headers.SagaId);
+
+            message.Headers.Add(Headers.SagaId, value);
+
+            return message;
+        }
+        public static Message AddSagaType(this Message message, string? value)
+        {
+            if (value == null)
+                return message;
+            if (value == string.Empty)
+                return message;
+
+            if (message.Headers.ContainsKey(Headers.SagaType))
+                message.Headers.Remove(Headers.SagaType);
+
+            message.Headers.Add(Headers.SagaType, value);
 
             return message;
         }
@@ -343,13 +371,20 @@ namespace Panama.Canal.Extensions
         public static bool IsSagaParticipant(this Message message)
         {
             var type = message.GetSagaType();
+            if (type == null)
+                return false;
+
+            var impl = Type.GetType(type);
+            if (impl == null)
+                return false;
+
             var name = message.GetName();
 
-            if (string.IsNullOrEmpty(type))
+            if (string.IsNullOrEmpty(impl.Name))
                 return false;
             if (string.IsNullOrEmpty(name))
                 return false;
-            if (!name.Contains(type, StringComparison.OrdinalIgnoreCase))
+            if (!name.Contains(impl.Name, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             return true;

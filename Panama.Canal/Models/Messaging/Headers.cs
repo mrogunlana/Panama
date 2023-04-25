@@ -16,7 +16,7 @@
         public const string Delay = "panama-delay-time";
         public const string StoreStrategy = "panama-store-strategy";
         public const string SagaType = "panama-saga-type";
-        public const string SagaId = "panama-saga-type";
+        public const string SagaId = "panama-saga-id";
         public const string SagaTrigger = "panama-saga-trigger";
     }
 }

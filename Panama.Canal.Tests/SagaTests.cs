@@ -36,6 +36,7 @@ namespace Panama.Canal.Tests
 
             services.AddSingleton(configuration);
             services.AddSingleton<IConfiguration>(configuration);
+            services.AddSingleton<State>();
 
             services.AddPanama(
                 configuration: configuration,
@@ -55,6 +56,7 @@ namespace Panama.Canal.Tests
         [TestInitialize]
         public async Task Init()
         {
+            _provider.GetRequiredService<State>().Data.Clear();
             _cts = new CancellationTokenSource();
 
             await _bootstrapper.On(_cts.Token);
@@ -63,6 +65,7 @@ namespace Panama.Canal.Tests
         [TestCleanup]
         public async Task Cleanup()
         {
+            _provider.GetRequiredService<State>().Data.Clear();
             _cts.Cancel();
 
             await _bootstrapper.Off(_cts.Token);
@@ -70,7 +73,7 @@ namespace Panama.Canal.Tests
             _cts.Dispose();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public async Task VerifyFooSaga()
         {
             var channels = _provider.GetRequiredService<IDefaultChannelFactory>();
@@ -85,7 +88,7 @@ namespace Panama.Canal.Tests
 
                 await channel.Commit();
 
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromMinutes(60));
 
                 var state = _provider.GetRequiredService<State>();
                 var response = state.Data.ToList();

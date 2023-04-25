@@ -37,6 +37,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
             Triggers.Add(_triggers.Create<CreateNewFoo>(StateMachine));
             Triggers.Add(_triggers.Create<ReviewCreateFooAnswer>(StateMachine));
             Triggers.Add(_triggers.Create<RollbackCreateFoo>(StateMachine));
+            Triggers.Add(_triggers.Create<CompleteNewFoo>(StateMachine));
 
             StateMachine.Configure(States.Get<NotStarted>())
                 .PermitDynamic(Triggers.Get<CreateNewFoo>(), (context) => {

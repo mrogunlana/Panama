@@ -13,7 +13,9 @@ namespace Panama.Canal.Extensions
         {
             return context.Provider.GetRequiredService<IMarina>()
                 .GetBus(context.Token)
-                .Reply(context.KvpGetSingle<string, string>("ReplyTopic"));
+                .Reply(context.KvpGetSingle<string, string>("ReplyTopic"))
+                .SagaId(context.KvpGetSingle<string, string>("SagaId"))
+                .SagaType(context.KvpGetSingle<string, string>("SagaType"));
         }
 
         public static SagaContext Saga<T>(this IContext context)

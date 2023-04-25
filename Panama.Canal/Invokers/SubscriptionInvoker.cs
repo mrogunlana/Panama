@@ -107,7 +107,7 @@ namespace Panama.Canal.Invokers
                     }, local, context.Token);
 
                 if (metadata.HasReply())
-                    await new Panama.Models.Context(_provider).Bus()
+                    await new Panama.Models.Context(_provider, context.Token).Bus()
                             .Instance(metadata.GetInstance())
                             .Token(context.Token)
                             .Id(Guid.NewGuid().ToString())
@@ -117,6 +117,7 @@ namespace Panama.Canal.Invokers
                             .Data(data)
                             .Invoker(_invokers.GetInvoker())
                             .Target(target)
+                            .Trigger(metadata.GetSagaTrigger())
                             .SagaId(metadata.GetSagaId())
                             .SagaType(metadata.GetSagaType())
                             .Post()
@@ -138,7 +139,7 @@ namespace Panama.Canal.Invokers
                     .ConfigureAwait(false);
 
                 if (metadata.HasReply())
-                    await new Panama.Models.Context(_provider).Bus()
+                    await new Panama.Models.Context(_provider, context.Token).Bus()
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
@@ -149,6 +150,7 @@ namespace Panama.Canal.Invokers
                         .Data(data)
                         .Invoker(_invokers.GetInvoker())
                         .Target(target)
+                        .Trigger(metadata.GetSagaTrigger())
                         .SagaId(metadata.GetSagaId())
                         .SagaType(metadata.GetSagaType())
                         .Post()
