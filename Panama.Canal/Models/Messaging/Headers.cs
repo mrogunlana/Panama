@@ -18,5 +18,6 @@
         public const string SagaType = "panama-saga-type";
         public const string SagaId = "panama-saga-id";
         public const string SagaTrigger = "panama-saga-trigger";
+        public const string SagaState = "panama-saga-state";
     }
 }

@@ -1,5 +1,4 @@
-﻿using Panama.Canal.Models;
-using Panama.Canal.Sagas.Stateless;
+﻿using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
@@ -24,7 +23,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
             _triggers = triggers;
         }
 
-        public override void Configure(IContext context)
+        public override void Init(IContext context)
         {
             States.Add(_states.Create<CreateFooRequested>());
             States.Add(_states.Create<CreateFooRequestAnswered>());
@@ -38,6 +37,11 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
             Triggers.Add(_triggers.Create<ReviewCreateFooAnswer>(StateMachine));
             Triggers.Add(_triggers.Create<RollbackCreateFoo>(StateMachine));
             Triggers.Add(_triggers.Create<CompleteNewFoo>(StateMachine));
+        }
+
+        public override void Configure(IContext context)
+        {
+            base.Configure(context);
 
             StateMachine.Configure(States.Get<NotStarted>())
                 .PermitDynamic(Triggers.Get<CreateNewFoo>(), (context) => {
@@ -60,6 +64,17 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
                 });
         }
 
-        public override async Task Start(IContext context) => await StateMachine.FireAsync(Triggers.Get<CreateNewFoo>(), context);
+        public override async Task Start(IContext context)
+        {
+            try
+            {
+                await StateMachine.FireAsync(Triggers.Get<CreateNewFoo>(), context);
+            }
+            catch (Exception ex)
+            {
+                var e = ex;
+                throw;
+            }
+        }
     }
 }

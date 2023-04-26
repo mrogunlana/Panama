@@ -26,7 +26,18 @@ namespace Panama.Canal.Sagas.Stateless
             if (result == null)
                 throw new InvalidOperationException($"Header: {Headers.SagaTrigger} type cannot be found.");
 
-            return machine.SetTriggerParameters<IContext>((ISagaTrigger)_provider.GetRequiredService(result));
+            try
+            {
+                var trigger = (ISagaTrigger)_provider.GetRequiredService(result);
+                var parameter = machine.SetTriggerParameters<IContext>(trigger);
+                
+                return parameter;
+            }
+            catch (Exception ex)
+            {
+                var e = ex;
+                throw;
+            }
         }
     }
 }

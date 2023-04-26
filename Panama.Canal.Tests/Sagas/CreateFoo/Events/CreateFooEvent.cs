@@ -30,6 +30,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
                     .Token(context.Token)
                     .Topic("foo.created")
                     .Trigger<ReviewCreateFooAnswer>()
+                    .State<CreateFooRequestAnswered>()
                 .Post();
                 await channel.Commit();
             }

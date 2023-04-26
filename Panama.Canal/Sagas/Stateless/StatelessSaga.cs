@@ -6,6 +6,7 @@ using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.Sagas.Models;
+using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
 using Panama.Extensions;
@@ -24,8 +25,8 @@ namespace Panama.Canal.Sagas.Stateless
         private readonly ISagaTriggerFactory _triggers;
         private readonly IOptions<CanalOptions> _canalOptions;
         private readonly StringEncryptorResolver _resolver;
-
-        public StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
+        private StateMachine<ISagaState, ISagaTrigger> _machine;
+        public StateMachine<ISagaState, ISagaTrigger> StateMachine => _machine;
 
         public List<ISagaState> States { get; set; }
         public List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
@@ -48,21 +49,74 @@ namespace Panama.Canal.Sagas.Stateless
             ReplyGroup = _canalOptions.Value.DefaultGroup;
             States.Add(new NotStarted());
 
-            StateMachine = new StateMachine<ISagaState, ISagaTrigger>(States.First());
+            _machine = new StateMachine<ISagaState, ISagaTrigger>(States.First());
         }
+
+        public abstract void Init(IContext context);
 
         public virtual Task<IResult> Continue(SagaContext context)
         {
+            var message = context.DataGetSingle<InternalMessage>()
+                    .GetData<Message>(_provider);
+
+            if (string.IsNullOrEmpty(message.GetSagaTrigger()))
+                return Task.FromResult(new Result().Success());
+            
+            Init(context);
+
+            _machine = new StateMachine<ISagaState, ISagaTrigger>(States.Get(message.GetSagaStateType()) ?? States.First());
+
+            var local = new Context(
+                token: context.Token,
+                id: Guid.NewGuid().ToString(),
+                correlationId: message.GetCorrelationId(),
+                provider: _provider)
+                .Add(message)
+                .Add(context.DataGetSingle<InternalMessage>())
+                .Add(message.GetData<IList<IModel>>())
+                .Add(new Kvp<string, string>("CorrelationId", message.GetCorrelationId()))
+                .Add(new Kvp<string, string>("SagaId", message.GetSagaId()))
+                .Add(new Kvp<string, string>("SagaType", GetType().AssemblyQualifiedName!))
+                .Add(new Kvp<string, string>("ReplyTopic", ReplyTopic))
+                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", Triggers))
+                .Add(new Kvp<string, List<ISagaState>>("States", States));
+
+            Configure(local);
+            
+            try
+            {
+                var trigger = Triggers.Get(message.GetSagaTriggerType());
+                if (trigger == null)
+                    return Task.FromResult(new Result().Success());
+                
+                StateMachine.Fire(trigger, local);
+            }
+            catch (Exception ex)
+            {
+                var e = ex;
+                throw;
+            }
+            
+
+            return Task.FromResult(new Result().Success());
+        }
+
+        public virtual void Configure(IContext context)
+        {
             StateMachine.OnTransitionCompleted((transition) => {
-                var i = context.DataGetSingle<InternalMessage>();
-                var m = i.GetData<Message>(_provider);
+                var id = context.KvpGetSingle<string, string>("SagaId");
+                var correlationId = context.KvpGetSingle<string, string>("CorrelationId");
                 var e = new SagaEvent();
-                e.Id = m.GetSagaId();
-                e.Content = i.Content;
-                e.CorrelationId = m.GetCorrelationId();
-                e.Source = transition?.Source?.ToString() ?? string.Empty;
-                e.Destination = transition?.Destination?.ToString() ?? string.Empty;
+
+                var i = context?.DataGetSingle<InternalMessage>();
+
+                e.Id = id;
+                e.Content = i?.Content;
+                e.CorrelationId = correlationId;
+                e.Source = transition?.Source?.GetType().AssemblyQualifiedName ?? string.Empty;
+                e.Destination = transition?.Destination?.GetType().AssemblyQualifiedName ?? string.Empty;
                 e.Expires = DateTime.UtcNow.ToUniversalTime().AddSeconds(_canalOptions.Value.SucceedMessageExpiredAfter);
+                e.Trigger = transition?.Trigger.GetType().AssemblyQualifiedName ?? string.Empty;
 
                 _store.StoreSagaEvent(e).GetAwaiter().GetResult();
             });
@@ -73,37 +127,7 @@ namespace Panama.Canal.Sagas.Stateless
                     .GetSagaId();
                 _log.LogWarning($"Could not locate trigger: {trigger} for state: {state}. Saga Id: {id}");
             });
-
-            var message = context.DataGetSingle<InternalMessage>()
-                    .GetData<Message>(_provider);
-
-            var data = message.GetData<IList<IModel>>();
-
-            if (string.IsNullOrEmpty(message.GetSagaTrigger()))
-                return Task.FromResult(new Result().Success());
-
-            Configure(new Context(
-                token: context.Token,
-                provider: _provider,
-                correlationId: message.GetCorrelationId()));
-
-            var local = new Context(
-                token: context.Token,
-                id: Guid.NewGuid().ToString(),
-                correlationId: context.CorrelationId,
-                provider: _provider)
-                .Add(message)
-                .Add(data)
-                .Add(States)
-                .Add(new Kvp<string, string>("ReplyTopic", ReplyTopic))
-                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", Triggers));
-
-            StateMachine.Fire(_triggers.Create(message.GetSagaTrigger(), StateMachine), local);
-
-            return Task.FromResult(new Result().Success());
         }
-
-        public abstract void Configure(IContext context);
 
         public abstract Task Start(IContext context);
     }

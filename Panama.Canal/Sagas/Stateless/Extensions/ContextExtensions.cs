@@ -16,7 +16,11 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
         public static S GetState<S>(this IContext context)
             where S : ISagaState
         {
-            return context.DataGetSingle<S>();
+            var states = context.KvpGetSingle<string, List<ISagaState>>("States")?.Select(x => x as IModel)?.ToList();
+            if (states == null)
+                throw new InvalidOperationException($"States cannot be located");
+
+            return states.DataGetSingle<S>();
         }
 
         public static StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> GetTrigger<T>(this IContext context)

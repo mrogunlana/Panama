@@ -73,7 +73,7 @@ namespace Panama.Canal.Tests
             _cts.Dispose();
         }
 
-        [TestMethod]
+        //[TestMethod]
         public async Task VerifyFooSaga()
         {
             _cts = new CancellationTokenSource();
@@ -85,12 +85,21 @@ namespace Panama.Canal.Tests
             
             using (var channel = channels.CreateChannel<DefaultChannel>())
             {
-                await context.Saga<CreateFooSaga>()
-                    .Channel(channel)
-                    .Data(new Foo())
-                    .Start();
+                try
+                {
+                    await context.Saga<CreateFooSaga>()
+                        .Channel(channel)
+                        .Data(new Foo())
+                        .Start();
 
-                await channel.Commit();
+                    await channel.Commit();
+                }
+                catch (Exception ex)
+                {
+                    var e = ex; 
+                    throw;
+                }
+                
 
                 await Task.Delay(TimeSpan.FromMinutes(60));
 

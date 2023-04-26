@@ -368,6 +368,34 @@ namespace Panama.Canal.Extensions
             return result ?? string.Empty;
         }
 
+        public static string GetSagaState(this Message message)
+        {
+            if (message.Headers == null)
+                throw new InvalidOperationException("Message headers cannot be found.");
+
+            message.Headers.TryGetValue(Headers.SagaState, out var result);
+
+            return result ?? string.Empty;
+        }
+
+        public static Type? GetSagaStateType(this Message message)
+        {
+            var state = GetSagaState(message);
+            if (state == null)
+                return null;
+
+            return Type.GetType(state);
+        }
+
+        public static Type? GetSagaTriggerType(this Message message)
+        {
+            var trigger = GetSagaTrigger(message);
+            if (trigger == null)
+                return null;
+
+            return Type.GetType(trigger);
+        }
+
         public static bool IsSagaParticipant(this Message message)
         {
             var type = message.GetSagaType();

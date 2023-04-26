@@ -11,14 +11,23 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
         public static StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext> Get<T>(this List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> triggers)
             where T : ISagaTrigger
         {
+            var result = triggers.Get(typeof(T));
+            if (result == null)
+                throw new InvalidOperationException($"Trigger of type: {typeof(T)} cannot be located.");
+
+            return result;
+        }
+
+        public static StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>? Get(this List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> triggers, Type? type)
+        {
+            if (type == null)
+                return null;
             if (triggers == null)
                 throw new ArgumentNullException(nameof(triggers));
 
-            var result = triggers.Where(x => x.Trigger is T).FirstOrDefault();
-            if (result == null)
-                throw new InvalidOperationException($"Trigger of type: {typeof(T).Name} could not be located.");
+            var trigger = triggers.Where(x => x.Trigger.GetType() == type).FirstOrDefault();
 
-            return result;
+            return trigger;
         }
     }
 }

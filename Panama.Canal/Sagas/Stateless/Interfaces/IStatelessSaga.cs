@@ -10,5 +10,6 @@ namespace Panama.Canal.Sagas.Stateless.Interfaces
         List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>> Triggers { get; set; }
         StateMachine<ISagaState, ISagaTrigger> StateMachine { get; }
         void Configure(IContext context);
+        void Init(IContext context);
     }
 }

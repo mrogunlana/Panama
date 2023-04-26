@@ -195,7 +195,7 @@ namespace Panama.Canal
                     .Take(batch);
 
             foreach (var id in ids)
-                if (Outbox.TryRemove(id, out _))
+                if (Saga.TryRemove(id, out _))
                     removed++;
 
             return Task.FromResult(removed);
@@ -366,7 +366,7 @@ namespace Panama.Canal
 
         public Task<SagaEvent> StoreSagaEvent(SagaEvent saga)
         {
-            Saga[saga.Id] = saga;
+            Saga[Guid.NewGuid().ToString()] = saga;
 
             return Task.FromResult(saga);
         }

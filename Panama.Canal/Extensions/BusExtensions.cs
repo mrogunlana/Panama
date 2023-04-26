@@ -229,7 +229,21 @@ namespace Panama.Canal.Extensions
         public static IBus Trigger<T>(this IBus bus)
             where T : ISagaTrigger
         {
-            bus.Context.Headers.Add(Headers.SagaTrigger, typeof(T).GetType().AssemblyQualifiedName);
+            bus.Context.Headers.Add(Headers.SagaTrigger, typeof(T).AssemblyQualifiedName);
+
+            return bus;
+        }
+
+        public static IBus State<T>(this IBus bus)
+            where T : ISagaState
+        {
+            bus.Context.Headers.Add(Headers.SagaState, typeof(T).AssemblyQualifiedName);
+
+            return bus;
+        }
+        public static IBus State(this IBus bus, string? value = null)
+        {
+            bus.Context.Headers.Add(Headers.SagaState, value);
 
             return bus;
         }

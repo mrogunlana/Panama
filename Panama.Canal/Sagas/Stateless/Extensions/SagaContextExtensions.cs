@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Models.Messaging;
 using Panama.Canal.Sagas.Models;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
@@ -28,13 +29,15 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
                 id: Guid.NewGuid().ToString(),
                 correlationId: context.CorrelationId,
                 provider: context.Provider)
-                .Add(context.Data)
-                .Add(saga.States)
+            .Add(context.Data)
+                .Add(new Kvp<string, string>("CorrelationId", context.CorrelationId))
                 .Add(new Kvp<string, string>("SagaId", Guid.NewGuid().ToString()))
                 .Add(new Kvp<string, string>("SagaType", saga.GetType().AssemblyQualifiedName!))
                 .Add(new Kvp<string, string>("ReplyTopic", saga.ReplyTopic))
-                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", saga.Triggers));
+                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", saga.Triggers))
+                .Add(new Kvp<string, List<ISagaState>>("States", saga.States));
 
+            saga.Init(local);
             saga.Configure(local);
 
             await saga.Start(local);

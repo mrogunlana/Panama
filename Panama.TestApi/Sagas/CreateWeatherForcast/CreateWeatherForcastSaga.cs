@@ -24,7 +24,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             _triggers = triggers;
         }
 
-        public override void Configure(IContext context)
+        public override void Init(IContext context)
         {
             States.Add(_states.Create<CreateWeatherForcastRequested>());
             States.Add(_states.Create<CreateWeatherForcastRequestAnswered>());
@@ -43,6 +43,11 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             Triggers.Add(_triggers.Create<RollbackCreateWeatherForcast>(StateMachine));
             Triggers.Add(_triggers.Create<ReviewCreateWeatherForcastRollbackAnswer>(StateMachine));
             Triggers.Add(_triggers.Create<PublishCreateWeatherForcastResults>(StateMachine));
+        }
+
+        public override void Configure(IContext context)
+        {
+            base.Configure(context);
 
             StateMachine.Configure(States.Get<NotStarted>())
                 .PermitDynamic(Triggers.Get<CreateNewWeatherForcast>(), (context) => {
