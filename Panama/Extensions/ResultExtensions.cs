@@ -1,4 +1,5 @@
 ﻿using Panama.Interfaces;
+using Panama.Models;
 using System.Transactions;
 
 namespace Panama.Extensions
@@ -79,6 +80,12 @@ namespace Panama.Extensions
         public static IResult Add(this IResult result, IModel model)
         {
             result.Data.Add(model);
+
+            return result;
+        }
+        public static IResult AddKvp<K, V>(this IResult result, K key, V value)
+        {
+            result.Data.Add(new Kvp<K, V>(key, value));
 
             return result;
         }

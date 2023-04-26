@@ -73,7 +73,7 @@ namespace Panama.Canal.Tests
             _cts.Dispose();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public async Task VerifyFooSaga()
         {
             _cts = new CancellationTokenSource();
