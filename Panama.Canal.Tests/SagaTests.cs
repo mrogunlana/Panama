@@ -53,7 +53,7 @@ namespace Panama.Canal.Tests
             _bootstrapper = _provider.GetRequiredService<IBootstrapper>();
         }
 
-        [TestInitialize]
+        //[TestInitialize]
         public async Task Init()
         {
             _provider.GetRequiredService<State>().Data.Clear();
@@ -62,7 +62,7 @@ namespace Panama.Canal.Tests
             await _bootstrapper.On(_cts.Token);
         }
 
-        [TestCleanup]
+        //[TestCleanup]
         public async Task Cleanup()
         {
             _provider.GetRequiredService<State>().Data.Clear();
@@ -76,6 +76,10 @@ namespace Panama.Canal.Tests
         [TestMethod]
         public async Task VerifyFooSaga()
         {
+            _cts = new CancellationTokenSource();
+
+            await _bootstrapper.On(_cts.Token);
+
             var channels = _provider.GetRequiredService<IDefaultChannelFactory>();
             var context = new Context(_provider);
             
@@ -95,6 +99,12 @@ namespace Panama.Canal.Tests
 
                 Assert.IsTrue(response.KvpGet<string, string>("saga.event.name").Count == 3);
                 Assert.IsTrue(response.KvpGet<string, string>("subscription.name").Count == 2);
+
+                _cts.Cancel();
+
+                await _bootstrapper.Off(_cts.Token);
+
+                _cts.Dispose();
             }
         }
     }

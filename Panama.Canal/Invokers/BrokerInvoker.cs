@@ -92,7 +92,8 @@ namespace Panama.Canal.Invokers
                             .ConfigureAwait(false);
 
                         return result;
-                    }, local, context.Token);
+                    }, local, context.Token)
+                    .ConfigureAwait(false);
 
                 return polly.Result;
             }

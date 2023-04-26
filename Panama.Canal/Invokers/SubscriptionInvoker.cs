@@ -104,7 +104,8 @@ namespace Panama.Canal.Invokers
 
                         return new Result().Success();
 
-                    }, local, context.Token);
+                    }, local, context.Token)
+                    .ConfigureAwait(false);
 
                 if (metadata.HasReply())
                     await new Panama.Models.Context(_provider, context.Token).Bus()
