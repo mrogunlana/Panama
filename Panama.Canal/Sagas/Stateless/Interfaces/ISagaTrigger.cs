@@ -2,5 +2,5 @@
 
 namespace Panama.Canal.Sagas.Stateless.Interfaces
 {
-    public interface ISagaTrigger { }
+    public interface ISagaTrigger : IModel { }
 }
