@@ -12,7 +12,7 @@ using Panama.Models;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
 {
-    public class RollbackFooEvent : ISagaEvent
+    public class RollbackFooEvent : ISagaStepEvent
     {
         public async Task<ISagaState> Execute(IContext context)
         {

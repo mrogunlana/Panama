@@ -10,7 +10,7 @@ using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
 {
-    public class CreateWeatherForcastEvent : ISagaEvent
+    public class CreateWeatherForcastEvent : ISagaStepEvent
     {
         public async Task<ISagaState> Execute(IContext context)
         {

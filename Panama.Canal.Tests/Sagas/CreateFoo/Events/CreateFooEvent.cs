@@ -15,7 +15,7 @@ using Quartz.Impl.AdoJobStore.Common;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
 {
-    public class CreateFooEvent : ISagaEvent
+    public class CreateFooEvent : ISagaStepEvent
     {
         public async Task<ISagaState> Execute(IContext context)
         {

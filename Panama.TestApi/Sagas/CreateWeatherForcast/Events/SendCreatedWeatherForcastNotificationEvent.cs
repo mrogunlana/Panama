@@ -5,7 +5,7 @@ using Panama.TestApi.Sagas.CreateWeatherForcast.States;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
 {
-    public class SendCreatedWeatherForcastNotificationEvent : ISagaEvent
+    public class SendCreatedWeatherForcastNotificationEvent : ISagaStepEvent
     {
         public Task<ISagaState> Execute(IContext context)
         {

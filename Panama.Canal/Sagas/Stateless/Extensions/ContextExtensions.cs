@@ -44,7 +44,7 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
         }
 
         public static ISagaState ExecuteEvent<E>(this IContext context)
-            where E : ISagaEvent
+            where E : ISagaStepEvent
         {
             var @event = context.Provider.GetRequiredService<E>();
 
@@ -52,11 +52,29 @@ namespace Panama.Canal.Sagas.Stateless.Extensions
         }
 
         public static IResult ExecuteEntry<E>(this IContext context)
-            where E : ISagaEntry
+            where E : ISagaStepEntry
         {
             var @event = context.Provider.GetRequiredService<E>();
 
             return @event.Execute(context).GetAwaiter().GetResult();
+        }
+
+        public static IResult ExecuteExit<E>(this IContext context)
+            where E : ISagaStepExit
+        {
+            var @event = context.Provider.GetRequiredService<E>();
+
+            return @event.Execute(context).GetAwaiter().GetResult();
+        }
+
+        public static StateMachine<ISagaState, ISagaTrigger> GetStateMachine(this IContext context)
+        {
+            return context.KvpGetSingle<string, StateMachine<ISagaState, ISagaTrigger>>("StateMachine");
+        }
+
+        public static ISagaState GetDestination(this IContext context)
+        {
+            return context.KvpGetSingle<string, ISagaState>("Destination");
         }
     }
 }

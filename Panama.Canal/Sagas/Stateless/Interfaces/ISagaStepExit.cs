@@ -2,8 +2,8 @@
 
 namespace Panama.Canal.Sagas.Stateless.Interfaces
 {
-    public interface ISagaEvent
+    public interface ISagaStepExit
     {
-        Task<ISagaState> Execute(IContext context);
+        Task<IResult> Execute(IContext context);
     }
 }

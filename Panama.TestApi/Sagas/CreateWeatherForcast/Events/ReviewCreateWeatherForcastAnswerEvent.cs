@@ -8,7 +8,7 @@ using Panama.TestApi.Sagas.CreateWeatherForcast.States;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
 {
-    public class ReviewCreateWeatherForcastAnswerEvent : ISagaEvent
+    public class ReviewCreateWeatherForcastAnswerEvent : ISagaStepEvent
     {
         public Task<ISagaState> Execute(IContext context)
         {

@@ -66,8 +66,9 @@ namespace Panama.Canal.Registrars
             services.AddAssemblyTypesWithInterface<ISaga>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypes<ISagaState>(_builder.Assemblies.Distinct(), true);
             services.AddAssemblyTypes<ISagaTrigger>(_builder.Assemblies.Distinct(), true);
-            services.AddAssemblyTypes<ISagaEvent>(_builder.Assemblies.Distinct(), false);
-            services.AddAssemblyTypes<ISagaEntry>(_builder.Assemblies.Distinct(), false);
+            services.AddAssemblyTypes<ISagaStepEvent>(_builder.Assemblies.Distinct(), false);
+            services.AddAssemblyTypes<ISagaStepEntry>(_builder.Assemblies.Distinct(), false);
+            services.AddAssemblyTypes<ISagaStepExit>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypes<ISubscribe>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypesWithInterface<ISubscribe>(_builder.Assemblies.Distinct(), false);
             services.AddAssemblyTypesByInterface<IInvokeFactory>(_builder.Assemblies.Distinct(), true);

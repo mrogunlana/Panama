@@ -12,7 +12,7 @@ using Panama.Models;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
 {
-    public class ReviewCreateFooAnswerEntry : ISagaEntry
+    public class ReviewCreateFooAnswerEntry : ISagaStepEntry
     {
         public Task<IResult> Execute(IContext context)
         {

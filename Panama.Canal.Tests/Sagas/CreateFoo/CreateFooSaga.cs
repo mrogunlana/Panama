@@ -2,12 +2,16 @@
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
+using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.Events;
+using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
 using Panama.Extensions;
 using Panama.Interfaces;
+using Quartz;
 using Stateless;
+using System.Reflection.PortableExecutable;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo
 {
@@ -51,36 +55,22 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
                 });
 
             StateMachine.Configure(States.Get<CreateFooRequestAnswered>())
-                .Permit(Triggers.GetUnderlyingTrigger<ReviewCreateFooAnswer>(), States.Get<CreateFooRollbackAnswered>())
-                .OnEntryFrom(Triggers.Get<ReviewCreateFooAnswer>(), (context) => {
-                    var result = context.ExecuteEntry<ReviewCreateFooAnswerEntry>();
-                    var trigger = result.TriggerGetSingle("Trigger");
-                    
-                    StateMachine.Fire(trigger, context);
+                .PermitDynamic(Triggers.Get<ReviewCreateFooAnswer>(), (context) => {
+                    return context.ExecuteEvent<ReviewCreateFooAnswerEvent>();
                 })
+                .OnExit((e) => {
+                    e.Context(StateMachine).ExecuteExit<ReviewCreateFooAnswerExit>();
+                });
+
+            StateMachine.Configure(States.Get<CreateFooCreated>())
                 .PermitDynamic(Triggers.Get<CompleteNewFoo>(), (context) => {
                     return States.Get<CreateFooComplete>();
-                })
+                });
+
+            StateMachine.Configure(States.Get<CreateFooFailed>())
                 .PermitDynamic(Triggers.Get<RollbackCreateFoo>(), (context) => {
                     return context.ExecuteEvent<RollbackFooEvent>();
                 });
-                //.OnEntryFrom(Triggers.Get<ReviewCreateFooAnswer>(), email => OnAssigned(email));
-                //.PermitIf(Trigger.CallDialled, State.Ringing, () => IsValidNumber)
-                //.PermitIf(Trigger.CallDialled, State.Beeping, () => !IsValidNumber)
-                //.PermitDynamic(Triggers.Get<ReviewCreateFooAnswer>(), (context) => {
-                //    return context.ExecuteEvent<ReviewCreateFooAnswerEvent>();
-                //})
-                //.OnExit(() => {  });
-
-            //StateMachine.Configure(States.Get<CreateFooCreated>())
-            //    .PermitDynamic(Triggers.Get<CompleteNewFoo>(), (context) => {
-            //        return States.Get<CreateFooComplete>();
-            //    });
-
-            //StateMachine.Configure(States.Get<CreateFooFailed>())
-            //    .PermitDynamic(Triggers.Get<RollbackCreateFoo>(), (context) => {
-            //        return context.ExecuteEvent<RollbackFooEvent>();
-            //    });
         }
 
         public override async Task Start(IContext context)

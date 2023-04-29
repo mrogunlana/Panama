@@ -11,7 +11,7 @@ using Panama.Models;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
 {
-    public class ReviewCreateFooAnswerEvent : ISagaEvent
+    public class ReviewCreateFooAnswerEvent : ISagaStepEvent
     {
         public Task<ISagaState> Execute(IContext context)
         {

@@ -1,4 +1,5 @@
 ﻿using Panama.Interfaces;
+using Panama.Models;
 
 namespace Panama.Extensions
 {
@@ -64,6 +65,13 @@ namespace Panama.Extensions
         public static IContext Token(this IContext context, CancellationToken token)
         {
             context.Token = token;
+
+            return context;
+        }
+
+        public static IContext AddKvp<K, V>(this IContext context, K key, V value)
+        {
+            context.Data.Add(new Kvp<K, V>(key, value));
 
             return context;
         }
