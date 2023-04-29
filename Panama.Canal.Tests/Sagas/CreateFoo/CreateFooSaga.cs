@@ -64,7 +64,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
 
             StateMachine.Configure(States.Get<CreateFooCreated>())
                 .PermitDynamic(Triggers.Get<CompleteNewFoo>(), (context) => {
-                    return States.Get<CreateFooComplete>();
+                    return context.ExecuteEvent<FooCompletedEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateFooFailed>())
@@ -73,17 +73,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo
                 });
         }
 
-        public override async Task Start(IContext context)
-        {
-            try
-            {
-                await StateMachine.FireAsync(Triggers.Get<CreateNewFoo>(), context);
-            }
-            catch (Exception ex)
-            {
-                var e = ex;
-                throw;
-            }
-        }
+        public override async Task Start(IContext context) => 
+            await StateMachine.FireAsync(Triggers.Get<CreateNewFoo>(), context);
     }
 }

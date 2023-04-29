@@ -8,6 +8,8 @@ using Panama.Canal.Sagas.Extensions;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo;
+using Panama.Canal.Tests.Sagas.CreateFoo.Events;
+using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
@@ -53,7 +55,7 @@ namespace Panama.Canal.Tests
             _bootstrapper = _provider.GetRequiredService<IBootstrapper>();
         }
 
-        //[TestInitialize]
+        [TestInitialize]
         public async Task Init()
         {
             _provider.GetRequiredService<State>().Data.Clear();
@@ -62,7 +64,7 @@ namespace Panama.Canal.Tests
             await _bootstrapper.On(_cts.Token);
         }
 
-        //[TestCleanup]
+        [TestCleanup]
         public async Task Cleanup()
         {
             _provider.GetRequiredService<State>().Data.Clear();
@@ -76,44 +78,39 @@ namespace Panama.Canal.Tests
         [TestMethod]
         public async Task VerifyFooSaga()
         {
-            _cts = new CancellationTokenSource();
-
-            await _bootstrapper.On(_cts.Token);
-
             var channels = _provider.GetRequiredService<IDefaultChannelFactory>();
             var context = new Context(_provider);
             
             using (var channel = channels.CreateChannel<DefaultChannel>())
             {
-                try
-                {
-                    await context.Saga<CreateFooSaga>()
-                        .Channel(channel)
-                        .Data(new Foo())
-                        .Start();
+                await context.Saga<CreateFooSaga>()
+                    .Channel(channel)
+                    .Data(new Foo())
+                    .Start();
 
-                    await channel.Commit();
-                }
-                catch (Exception ex)
-                {
-                    var e = ex; 
-                    throw;
-                }
-                
+                await channel.Commit();
 
-                await Task.Delay(TimeSpan.FromMinutes(60));
+                await Task.Delay(TimeSpan.FromSeconds(2));
 
                 var state = _provider.GetRequiredService<State>();
+                var store = _provider.GetRequiredService<Store>();
                 var response = state.Data.ToList();
 
                 Assert.IsTrue(response.KvpGet<string, string>("saga.event.name").Count == 3);
-                Assert.IsTrue(response.KvpGet<string, string>("subscription.name").Count == 2);
+                Assert.IsTrue(response.KvpGet<string, string>("saga.exit.name").Count == 1);
+                Assert.IsTrue(response.KvpGet<string, string>("subscription.name").Count == 1);
 
-                _cts.Cancel();
+                var steps = new List<string>();
 
-                await _bootstrapper.Off(_cts.Token);
+                steps.AddRange(response.KvpGet<string, string>("saga.event.name"));
+                steps.AddRange(response.KvpGet<string, string>("saga.exit.name"));
+                steps.AddRange(response.KvpGet<string, string>("subscription.name"));
 
-                _cts.Dispose();
+                Assert.IsNotNull(steps.Contains(nameof(CreateFooEvent)));
+                Assert.IsNotNull(steps.Contains(nameof(FooCreated)));
+                Assert.IsNotNull(steps.Contains(nameof(ReviewCreateFooAnswerEvent)));
+                Assert.IsNotNull(steps.Contains(nameof(ReviewCreateFooAnswerExit)));
+                Assert.IsNotNull(steps.Contains(nameof(FooCompletedEvent)));
             }
         }
     }

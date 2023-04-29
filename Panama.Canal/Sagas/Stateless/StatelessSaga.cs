@@ -82,21 +82,12 @@ namespace Panama.Canal.Sagas.Stateless
                 .Add(new Kvp<string, List<ISagaState>>("States", States));
 
             Configure(local);
-            
-            try
-            {
-                var trigger = Triggers.Get(message.GetSagaTriggerType());
-                if (trigger == null)
-                    return Task.FromResult(new Result().Success());
-                
-                StateMachine.Fire(trigger, local);
-            }
-            catch (Exception ex)
-            {
-                var e = ex;
-                throw;
-            }
-            
+
+            var trigger = Triggers.Get(message.GetSagaTriggerType());
+            if (trigger == null)
+                return Task.FromResult(new Result().Success());
+
+            StateMachine.Fire(trigger, local);
 
             return Task.FromResult(new Result().Success());
         }
