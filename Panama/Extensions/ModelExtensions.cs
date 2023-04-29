@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Panama.Interfaces;
 using Panama.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Panama.Extensions
 {

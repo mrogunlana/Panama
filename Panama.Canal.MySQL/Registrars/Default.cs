@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic.FileIO;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.MySQL.Channels;

@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
-using Panama.Interfaces;
+﻿using Panama.Interfaces;
 
 namespace Panama.Canal.Extensions
 {

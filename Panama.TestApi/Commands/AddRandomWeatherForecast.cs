@@ -1,7 +1,5 @@
 ﻿using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Models;
-using Panama.TestApi;
 
 namespace Panama.TestApi.Commands
 {

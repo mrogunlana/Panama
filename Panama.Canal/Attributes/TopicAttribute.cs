@@ -1,6 +1,4 @@
-﻿using Panama.Canal.Interfaces;
-
-namespace Panama.Canal.Attributes
+﻿namespace Panama.Canal.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class TopicAttribute : Attribute

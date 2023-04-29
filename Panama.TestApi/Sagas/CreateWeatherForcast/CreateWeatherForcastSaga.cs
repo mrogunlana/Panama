@@ -1,5 +1,4 @@
-﻿using Panama.Canal.Models;
-using Panama.Canal.Sagas.Stateless;
+﻿using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;

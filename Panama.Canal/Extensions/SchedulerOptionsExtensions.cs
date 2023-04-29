@@ -1,7 +1,6 @@
 ﻿using Panama.Canal.Models;
 using Panama.Canal.Models.Options;
 using Quartz;
-using System.Collections.Generic;
 
 namespace Panama.Canal.Extensions
 {

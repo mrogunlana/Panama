@@ -2,16 +2,11 @@
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
-using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.Events;
 using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
-using Panama.Extensions;
 using Panama.Interfaces;
-using Quartz;
-using Stateless;
-using System.Reflection.PortableExecutable;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo
 {

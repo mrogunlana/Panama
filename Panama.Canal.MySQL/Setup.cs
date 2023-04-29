@@ -1,5 +1,4 @@
 ﻿using Panama.Canal.MySQL.Models;
-using Panama.Extensions;
 
 namespace Panama.Canal.MySQL
 {

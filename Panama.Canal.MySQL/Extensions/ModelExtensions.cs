@@ -1,6 +1,4 @@
-﻿using Panama.Canal.Models;
-using Panama.Interfaces;
-using Panama.Security.Interfaces;
+﻿using Panama.Interfaces;
 using System.Reflection;
 
 namespace Panama.Canal.MySQL.Extensions

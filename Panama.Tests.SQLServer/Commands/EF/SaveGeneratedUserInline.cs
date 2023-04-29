@@ -6,7 +6,6 @@ using Panama.Interfaces;
 using Panama.Tests.SQLServer.Models;
 using System.Data;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Panama.Tests.SQLServer.Commands.EF
 {

@@ -1,5 +1,4 @@
-﻿using Panama.Extensions;
-using Panama.Interfaces;
+﻿using Panama.Interfaces;
 using Panama.Tests.MySQL.Contexts;
 using Panama.Tests.MySQL.Models;
 using System.Threading.Tasks;

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-
-namespace Panama.Canal.Interfaces
+﻿namespace Panama.Canal.Interfaces
 {
     public interface IScheduler : ICanalService
     {

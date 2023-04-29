@@ -1,5 +1,4 @@
-﻿using Panama.Extensions;
-using Panama.Interfaces;
+﻿using Panama.Interfaces;
 using Panama.Tests.SQLServer.Contexts;
 using Panama.Tests.SQLServer.Models;
 using System.Threading.Tasks;

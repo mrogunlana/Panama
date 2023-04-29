@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using MySqlConnector;
-using System.Data;
-using System.Data.Common;
+﻿using System.Data.Common;
 
 namespace Panama.Canal.MySQL.Extensions
 {

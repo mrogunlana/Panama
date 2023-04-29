@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Panama.Canal.Models.Options;
-using Panama.Security.Resolvers;
+﻿using Panama.Canal.Models.Options;
 using System.Net;
 using System.Text;
 

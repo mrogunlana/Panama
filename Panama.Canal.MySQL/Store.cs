@@ -9,7 +9,6 @@ using Panama.Canal.MySQL.Extensions;
 using Panama.Canal.MySQL.Models;
 using Panama.Canal.Sagas.Models;
 using Panama.Extensions;
-using Panama.Interfaces;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;

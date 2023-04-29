@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
-namespace Panama.Interfaces
+﻿namespace Panama.Interfaces
 {
     public interface IContext
     {

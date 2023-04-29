@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Panama.Interfaces
+﻿namespace Panama.Interfaces
 {
     public interface IResult
     {

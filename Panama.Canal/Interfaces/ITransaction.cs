@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Panama.Canal.Models.Messaging;
-using Quartz;
+﻿using Panama.Canal.Models.Messaging;
 
 namespace Panama.Canal.Interfaces
 {

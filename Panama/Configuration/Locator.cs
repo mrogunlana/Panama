@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Interfaces;
-using System;
-using System.Collections.Generic;
 
 namespace Panama.Configuration
 {

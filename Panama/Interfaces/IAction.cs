@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Panama.Interfaces
+﻿namespace Panama.Interfaces
 {
     public interface IAction : IModel
     {

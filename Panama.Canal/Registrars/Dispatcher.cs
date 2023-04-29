@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Initializers;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Markers;
 using Panama.Canal.Models.Options;
-using Panama.Extensions;
 using Panama.Interfaces;
 
 

@@ -1,5 +1,4 @@
 ﻿using Panama.Canal.RabbitMQ.Models;
-using Panama.Extensions;
 
 namespace Panama.Canal.RabbitMQ
 {

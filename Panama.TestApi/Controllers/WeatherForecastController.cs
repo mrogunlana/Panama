@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Panama.Canal.Extensions;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Invokers;
 using Panama.TestApi.Commands;
 
 

@@ -1,6 +1,5 @@
 ﻿using Panama.Canal.Brokers;
 using Panama.Canal.Models.Options;
-using Panama.Extensions;
 
 namespace Panama.Canal
 {

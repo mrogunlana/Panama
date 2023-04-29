@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Interfaces;
 using Panama.Models;
-using Panama.Models.Options;
 using Panama.Security;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;

@@ -4,7 +4,6 @@ using Panama.Canal.Models.Messaging;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Tests.Models;
-using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
 using Panama.Extensions;
 using Panama.Interfaces;

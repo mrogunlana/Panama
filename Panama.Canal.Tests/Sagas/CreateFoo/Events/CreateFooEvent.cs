@@ -7,11 +7,9 @@ using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
-using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
-using Quartz.Impl.AdoJobStore.Common;
 
 namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
 {

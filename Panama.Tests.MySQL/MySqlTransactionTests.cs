@@ -7,7 +7,6 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Models;
-using Panama.Security;
 using Panama.Tests.MySQL.Commands;
 using Panama.Tests.MySQL.Commands.EF;
 using Panama.Tests.MySQL.Contexts;

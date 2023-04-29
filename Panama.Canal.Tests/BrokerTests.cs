@@ -2,15 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Brokers.Interfaces;
-using Panama.Canal.Channels;
-using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Jobs;
 using Panama.Canal.Models;
-using Panama.Canal.Tests.Jobs;
-using Panama.Models;
-using Panama.Security;
-using System.Reflection;
 
 namespace Panama.Canal.Tests
 {

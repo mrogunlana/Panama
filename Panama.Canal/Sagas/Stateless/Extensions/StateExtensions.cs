@@ -1,6 +1,4 @@
 ﻿using Panama.Canal.Sagas.Stateless.Interfaces;
-using Panama.Interfaces;
-using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless.Extensions
 {

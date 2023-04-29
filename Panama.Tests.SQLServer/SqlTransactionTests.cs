@@ -7,7 +7,6 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Models;
-using Panama.Security;
 using Panama.Tests.SQLServer.Commands;
 using Panama.Tests.SQLServer.Commands.EF;
 using Panama.Tests.SQLServer.Contexts;

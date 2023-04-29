@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.ObjectPool;
-using Panama.Interfaces;
+﻿using Panama.Interfaces;
 
 namespace Panama.Canal.Brokers.Interfaces
 {

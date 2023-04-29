@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Panama.Canal.Extensions;
-using Panama.Canal.Interfaces;
 using Panama.Canal.Models;
 using Quartz;
 using Quartz.Spi;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Panama.Interfaces
+﻿namespace Panama.Interfaces
 {
     public interface ILogFactory
     {

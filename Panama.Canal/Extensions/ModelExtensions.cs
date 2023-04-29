@@ -1,10 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Interfaces;
-using Panama.Canal.Models;
-using Panama.Canal.Models.Filters;
-using Panama.Extensions;
-using Panama.Interfaces;
-using System.Linq;
+﻿using Panama.Interfaces;
 
 namespace Panama.Canal.Extensions
 {

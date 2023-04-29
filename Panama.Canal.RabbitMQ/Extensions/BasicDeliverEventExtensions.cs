@@ -1,5 +1,4 @@
-﻿using Panama.Canal.Models;
-using RabbitMQ.Client.Events;
+﻿using RabbitMQ.Client.Events;
 using System.Text;
 
 namespace Panama.Canal.RabbitMQ.Extensions

@@ -2,7 +2,6 @@
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Models;
 using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless.Extensions

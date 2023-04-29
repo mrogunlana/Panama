@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.ObjectPool;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Messaging;

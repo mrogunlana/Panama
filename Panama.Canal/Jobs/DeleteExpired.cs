@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Panama.Canal.Interfaces;
+﻿using Panama.Canal.Interfaces;
 using Quartz;
 
 namespace Panama.Canal.Jobs

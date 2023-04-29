@@ -7,8 +7,6 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Panama.Tests
 {
