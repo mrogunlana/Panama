@@ -35,6 +35,7 @@ namespace Panama.Canal.Tests.Subscriptions
                 return Task.CompletedTask;
 
             state.Data.Add(kvp);
+            state.Data.Add(new Kvp<string, DateTime>("FooCreated.DateTime", DateTime.UtcNow));
 
             return Task.CompletedTask;
         }

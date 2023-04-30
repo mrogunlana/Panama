@@ -19,7 +19,7 @@ namespace Panama.Tests.SQLServer.Commands.EF
                 ID = System.Guid.NewGuid(),
                 Key = $"test.{new System.Random().Next()}",
                 Value = $"value.{new System.Random().Next()}",
-                Created = System.DateTime.Now
+                Created = System.DateTime.UtcNow
             });
 
             await _context.SaveChangesAsync();

@@ -312,7 +312,7 @@ namespace Panama.Canal
         {
             message.Expires = delay;
 
-            var timeSpan = delay - DateTime.Now;
+            var timeSpan = delay - DateTime.UtcNow;
 
             if (timeSpan <= TimeSpan.FromMinutes(1))
             {

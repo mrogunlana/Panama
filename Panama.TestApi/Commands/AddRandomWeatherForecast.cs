@@ -15,7 +15,7 @@ namespace Panama.TestApi.Commands
                 .Range(1, 5)
                 .Select(index => new WeatherForecast
                 {
-                    Date = DateTime.Now.AddDays(index),
+                    Date = DateTime.UtcNow.AddDays(index),
                     TemperatureC = Random.Shared.Next(-20, 55),
                     Summary = list[Random.Shared.Next(list.Count)].Value
                 }));

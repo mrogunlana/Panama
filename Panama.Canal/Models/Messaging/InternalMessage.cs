@@ -8,7 +8,7 @@ namespace Panama.Canal.Models.Messaging
         public InternalMessage()
         {
             if (Created == DateTime.MinValue)
-                Created = DateTime.Now.ToUniversalTime();
+                Created = DateTime.UtcNow;
         }
         public override int GetHashCode()
         {

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models.Messaging;
@@ -92,12 +94,25 @@ namespace Panama.Canal.Extensions
 
             return bus;
         }
-        public static IBus Delay(this IBus bus, DateTime? delay = null)
+        public static IBus Delay(this IBus bus, DateTime? value = null)
+        {
+            if (value == null)
+                return bus;
+
+            var result = value ?? DateTime.UtcNow;
+
+            bus.Context.Delay = result.Kind == DateTimeKind.Utc
+                ? result
+                : result.ToUniversalTime();
+
+            return bus;
+        }
+        public static IBus Delay(this IBus bus, TimeSpan? delay = null)
         {
             if (delay == null)
                 return bus;
 
-            bus.Context.Delay = delay.Value.ToUniversalTime();
+            bus.Context.Delay = DateTime.UtcNow.Add(delay.Value);
 
             return bus;
         }

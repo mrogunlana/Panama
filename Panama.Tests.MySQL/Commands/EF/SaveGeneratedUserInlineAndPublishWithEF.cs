@@ -31,7 +31,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                     Email = $"test.{new System.Random().Next()}",
                     FirstName = $"first.{new System.Random().Next()}",
                     LastName = $"last.{new System.Random().Next()}",
-                    Created = System.DateTime.Now
+                    Created = System.DateTime.UtcNow
                 };
 
                 _context.Add(user);

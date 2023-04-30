@@ -29,7 +29,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                 Email = $"test.{new System.Random().Next()}",
                 FirstName = $"first.{new System.Random().Next()}",
                 LastName = $"last.{new System.Random().Next()}",
-                Created = System.DateTime.Now
+                Created = System.DateTime.UtcNow
             };
 
             using (var connection = new MySqlConnection(_config.GetConnectionString("MYSQL")))
@@ -77,7 +77,7 @@ namespace Panama.Tests.MySQL.Commands.EF
                 command.Parameters.Add(new MySqlParameter {
                     ParameterName = "@Created",
                     DbType = DbType.DateTime,
-                    Value = System.DateTime.Now,
+                    Value = System.DateTime.UtcNow,
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);

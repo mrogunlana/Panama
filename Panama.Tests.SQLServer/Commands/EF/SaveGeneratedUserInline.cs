@@ -24,7 +24,7 @@ namespace Panama.Tests.SQLServer.Commands.EF
                 Email = $"test.{new System.Random().Next()}",
                 FirstName = $"first.{new System.Random().Next()}",
                 LastName = $"last.{new System.Random().Next()}",
-                Created = System.DateTime.Now
+                Created = System.DateTime.UtcNow
             };
 
             using (var connection = new SqlConnection(_config.GetConnectionString("MSSQL")))
@@ -75,7 +75,7 @@ namespace Panama.Tests.SQLServer.Commands.EF
                 command.Parameters.Add(new SqlParameter {
                     ParameterName = "@Created",
                     DbType = DbType.DateTime,
-                    Value = System.DateTime.Now,
+                    Value = System.DateTime.UtcNow,
                 });
 
                 var result = await command.ExecuteScalarAsync().ConfigureAwait(false);

@@ -143,7 +143,9 @@ namespace Panama.Canal.Extensions
             if (string.IsNullOrEmpty(result))
                 return message;
 
-            message.Created = DateTimeOffset.Parse(result).UtcDateTime;
+            var date = DateTimeOffset.Parse(result);
+
+            message.Created = DateTime.SpecifyKind(date.DateTime, DateTimeKind.Utc);
 
             return message;
         }
@@ -251,7 +253,12 @@ namespace Panama.Canal.Extensions
         {
             var options = provider.GetRequiredService<IOptions<CanalOptions>>();
 
-            message.Expires = ((value ?? DateTime.UtcNow).ToUniversalTime()).AddSeconds(options.Value.FailedMessageExpiredAfter);
+            var result = value ?? DateTime.UtcNow;
+
+            message.Expires = (result.Kind == DateTimeKind.Utc
+                ? result
+                : result.ToUniversalTime())
+                .AddSeconds(options.Value.FailedMessageExpiredAfter);
 
             return message;
         }
@@ -260,7 +267,12 @@ namespace Panama.Canal.Extensions
         {
             var options = provider.GetRequiredService<IOptions<CanalOptions>>();
 
-            message.Expires = ((value ?? DateTime.UtcNow).ToUniversalTime()).AddSeconds(options.Value.SucceedMessageExpiredAfter);
+            var result = value ?? DateTime.UtcNow;
+
+            message.Expires = (result.Kind == DateTimeKind.Utc
+                ? result
+                : result.ToUniversalTime())
+                .AddSeconds(options.Value.SucceedMessageExpiredAfter);
 
             return message;
         }

@@ -326,7 +326,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@LastLockTime",
                     DbType = DbType.DateTime,
-                    Value = DateTime.Now,
+                    Value = DateTime.UtcNow,
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
@@ -338,7 +338,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Window",
                     DbType = DbType.DateTime,
-                    Value = DateTime.Now.Subtract(ttl),
+                    Value = DateTime.UtcNow.Subtract(ttl),
                 });
 
                 var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -1084,7 +1084,7 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@Added",
                     DbType = DbType.String,
-                    Value = DateTime.Now.AddMinutes(-4)
+                    Value = DateTime.UtcNow.AddMinutes(-4)
                 });
 
                 var messages = new List<InternalMessage>();
@@ -1164,13 +1164,13 @@ namespace Panama.Canal.MySQL
                 {
                     ParameterName = "@TwoMinutesLater",
                     DbType = DbType.String,
-                    Value = DateTime.Now.AddMinutes(2)
+                    Value = DateTime.UtcNow.AddMinutes(2)
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
                     ParameterName = "@OneMinutesAgo",
                     DbType = DbType.String,
-                    Value = DateTime.Now.AddMinutes(-1)
+                    Value = DateTime.UtcNow.AddMinutes(-1)
                 });
 
                 var messages = new List<InternalMessage>();

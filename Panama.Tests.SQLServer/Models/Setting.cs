@@ -8,7 +8,7 @@ namespace Panama.Tests.SQLServer.Models
         public Setting()
         {
             if (Created == DateTime.MinValue)
-                Created = DateTime.Now;
+                Created = DateTime.UtcNow;
         }
         public int _ID { get; set; }
         public Guid ID { get; set; }

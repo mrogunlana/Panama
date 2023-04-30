@@ -204,8 +204,8 @@ namespace Panama.Canal
         public Task GetDelayedMessagesForScheduling(string table, Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
             var result = Published.Values.Where(x =>
-                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
-                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
+                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(2)) ||
+                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(-1)))
                 .Select(x => x);
 
             return task(null!, result);
@@ -214,8 +214,8 @@ namespace Panama.Canal
         public Task GetDelayedPublishedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
             var result = Published.Values.Where(x =>
-                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
-                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
+                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(2)) ||
+                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(-1)))
                 .Select(x => x);
 
             return task(null!, result);
@@ -224,8 +224,8 @@ namespace Panama.Canal
         public Task GetDelayedReceivedMessagesForScheduling(Func<object, IEnumerable<InternalMessage>, Task> task, CancellationToken token = default)
         {
             var result = Received.Values.Where(x =>
-                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.Now.AddMinutes(2)) ||
-                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.Now.AddMinutes(-1)))
+                    (x.Status == MessageStatus.Delayed.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(2)) ||
+                    (x.Status == MessageStatus.Queued.ToString() && x.Expires < DateTime.UtcNow.AddMinutes(-1)))
                 .Select(x => x);
 
             return task(null!, result);
@@ -237,7 +237,7 @@ namespace Panama.Canal
             {
                 return Task.FromResult(Published.Values
                     .Where(x => x.Retries < _canalOptions.FailedRetryCount
-                                && x.Created < DateTime.Now.AddSeconds(-10)
+                                && x.Created < DateTime.UtcNow.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
                                     x.Status == MessageStatus.Failed.ToString()))
                     .Take(200)
@@ -247,7 +247,7 @@ namespace Panama.Canal
             {
                 return Task.FromResult(Received.Values
                     .Where(x => x.Retries < _canalOptions.FailedRetryCount
-                                && x.Created < DateTime.Now.AddSeconds(-10)
+                                && x.Created < DateTime.UtcNow.AddSeconds(-10)
                                 && (x.Status == MessageStatus.Scheduled.ToString() ||
                                     x.Status == MessageStatus.Failed.ToString()))
                     .Take(200)
@@ -259,7 +259,7 @@ namespace Panama.Canal
         {
             var result = Published.Values
                 .Where(x => x.Retries < _canalOptions.FailedRetryCount
-                            && x.Created < DateTime.Now.AddSeconds(-10)
+                            && x.Created < DateTime.UtcNow.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
                                 x.Status == MessageStatus.Failed.ToString()))
                 .Take(200)
@@ -272,7 +272,7 @@ namespace Panama.Canal
         {
             var result = Received.Values
                 .Where(x => x.Retries < _canalOptions.FailedRetryCount
-                            && x.Created < DateTime.Now.AddSeconds(-10)
+                            && x.Created < DateTime.UtcNow.AddSeconds(-10)
                             && (x.Status == MessageStatus.Scheduled.ToString() ||
                                 x.Status == MessageStatus.Failed.ToString()))
                 .Take(200)

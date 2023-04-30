@@ -171,10 +171,14 @@ namespace Panama.Canal.Extensions
         }
         public static Message AddCreatedTime(this Message message, DateTime? value = null)
         {
+            var result = value ?? DateTime.UtcNow;
+
             if (message.Headers.ContainsKey(Headers.Created))
                 message.Headers.Remove(Headers.Created);
 
-            message.Headers.Add(Headers.Created, value?.ToUniversalTime().ToString() ?? DateTime.UtcNow.ToString());
+            message.Headers.Add(Headers.Created, (result.Kind == DateTimeKind.Utc
+                ? result
+                : result.ToUniversalTime()).ToString("MM/dd/yyyy hh:mm:ss.fff tt zzz"));
 
             return message;
         }
@@ -187,8 +191,10 @@ namespace Panama.Canal.Extensions
 
             if (message.Headers.ContainsKey(Headers.Delay))
                 message.Headers.Remove(Headers.Delay);
-            
-            message.Headers.Add(Headers.Delay, value?.ToUniversalTime().ToString());
+
+            message.Headers.Add(Headers.Delay, (value.Value.Kind == DateTimeKind.Utc
+                ? value.Value
+                : value.Value.ToUniversalTime()).ToString());
 
             return message;
         }
@@ -225,7 +231,9 @@ namespace Panama.Canal.Extensions
             if (message.Headers.ContainsKey(Headers.Sent))
                 message.Headers.Remove(Headers.Sent);
 
-            message.Headers.Add(Headers.Sent, value.ToUniversalTime().ToString());
+            message.Headers.Add(Headers.Sent, (value.Kind == DateTimeKind.Utc
+                ? value
+                : value.ToUniversalTime()).ToString());
 
             return message;
         }
