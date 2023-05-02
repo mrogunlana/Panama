@@ -23,7 +23,6 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
                 await context.Bus()
                     .Data(model)
                     .Channel(channel)
-                    .Reply(context.GetReplyTopic())
                     .Token(context.Token)
                     .Topic("weatherforcast.create")
                     .Trigger<ReviewCreateWeatherForcastAnswer>()

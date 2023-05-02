@@ -4,6 +4,7 @@ using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
 using Panama.Interfaces;
 using Panama.TestApi.Sagas.CreateWeatherForcast.Events;
+using Panama.TestApi.Sagas.CreateWeatherForcast.Exits;
 using Panama.TestApi.Sagas.CreateWeatherForcast.States;
 using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
 
@@ -39,6 +40,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             Triggers.Add(_triggers.Create<CreateNewWeatherForcast>(StateMachine));
             Triggers.Add(_triggers.Create<ReviewCreateWeatherForcastAnswer>(StateMachine));
             Triggers.Add(_triggers.Create<SendCreatedWeatherForcastNotification>(StateMachine));
+            Triggers.Add(_triggers.Create<SendFailedWeatherForcastNotification>(StateMachine));
             Triggers.Add(_triggers.Create<RollbackCreateWeatherForcast>(StateMachine));
             Triggers.Add(_triggers.Create<ReviewCreateWeatherForcastRollbackAnswer>(StateMachine));
             Triggers.Add(_triggers.Create<PublishCreateWeatherForcastResults>(StateMachine));
@@ -56,6 +58,9 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
             StateMachine.Configure(States.Get<CreateWeatherForcastRequestAnswered>())
                 .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastAnswer>(), (context) => {
                     return context.ExecuteEvent<ReviewCreateWeatherForcastAnswerEvent>();
+                })
+                .OnExit((e) => {
+                    e.Context(StateMachine).ExecuteExit<ReviewCreateWeatherForcastAnswerExit>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastCreated>())
@@ -65,22 +70,28 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast
 
             StateMachine.Configure(States.Get<CreateWeatherForcastComplete>())
                 .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) => {
-                    return context.ExecuteEvent<SendCreatedWeatherForcastNotificationEvent>();
+                    return context.ExecuteEvent<PublishCreateWeatherForcastResultsEvent>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailed>())
                 .PermitDynamic(Triggers.Get<RollbackCreateWeatherForcast>(), (context) => {
-                    return context.ExecuteEvent<SendCreatedWeatherForcastNotificationEvent>();
+                    return context.ExecuteEvent<RollbackCreateWeatherForcastEvent>();
+                })
+                .OnExit((e) => {
+                    e.Context(StateMachine).ExecuteExit<RollbackCreateWeatherForcastEventExit>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastRollbackAnswered>())
                 .PermitDynamic(Triggers.Get<ReviewCreateWeatherForcastRollbackAnswer>(), (context) => {
                     return context.ExecuteEvent<ReviewCreateWeatherForcastRollbackAnswerEvent>();
+                })
+                .OnExit((e) => {
+                    e.Context(StateMachine).ExecuteExit<ReviewCreateWeatherForcastRollbackAnswerExit>();
                 });
 
             StateMachine.Configure(States.Get<CreateWeatherForcastFailedNotificationSent>())
-                .PermitDynamic(Triggers.Get<PublishCreateWeatherForcastResults>(), (context) => {
-                    return context.ExecuteEvent<PublishCreateWeatherForcastResultsEvent>();
+                .PermitDynamic(Triggers.Get<SendFailedWeatherForcastNotification>(), (context) => {
+                    return context.ExecuteEvent<SendFailedWeatherForcastNotificationEvent>();
                 });
         }
 

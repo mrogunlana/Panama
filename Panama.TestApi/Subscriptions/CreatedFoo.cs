@@ -7,25 +7,25 @@ using Panama.Models;
 namespace Panama.TestApi.Subscriptions
 {
     [DefaultTopic("foo.created")]
-    public class FooCreated : ISubscribe
+    public class CreatedFoo : ISubscribe
     {
-        private readonly ILogger<FooCreated> _log;
+        private readonly ILogger<CreatedFoo> _log;
         private readonly IServiceProvider _provider;
 
-        public FooCreated(
+        public CreatedFoo(
               IServiceProvider provider
-            , ILogger<FooCreated> log)
+            , ILogger<CreatedFoo> log)
         {
             _log = log;
             _provider = provider;
         }
         public Task Event(IContext context)
         {
-            var kvp = new Kvp<string, string>("subscription.name", nameof(FooCreated));
+            var kvp = new Kvp<string, string>("subscription.name", nameof(CreatedFoo));
 
             context.Add(kvp);
 
-            _log.LogInformation($"{typeof(FooCreated)} subscriber executed.");
+            _log.LogInformation($"{typeof(CreatedFoo)} subscriber executed.");
 
             return Task.CompletedTask;
         }

@@ -1,7 +1,11 @@
-﻿using Panama.Canal.Sagas.Stateless.Extensions;
+﻿using Panama.Canal.Extensions;
+using Panama.Canal.Models.Messaging;
+using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
+using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.TestApi.Sagas.CreateWeatherForcast.States;
+using Panama.TestApi.Sagas.CreateWeatherForcast.Triggers;
 
 namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
 {
@@ -9,9 +13,7 @@ namespace Panama.TestApi.Sagas.CreateWeatherForcast.Events
     {
         public Task<ISagaState> Execute(IContext context)
         {
-            //TODO: send review rollback response here..
-            //but this is a repeatable trasaction so the response doesn't matter in this case
-            //so we just send the failed notification instead
+            var message = context.DataGetSingle<Message>();
 
             ISagaState result = context.GetState<CreateWeatherForcastFailedNotificationSent>();
 
