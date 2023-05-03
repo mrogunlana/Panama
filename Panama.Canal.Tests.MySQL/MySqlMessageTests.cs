@@ -212,5 +212,36 @@ namespace Panama.Canal.Tests.MySQL
 
             await bootstrapper.Off(_cts.Token);
         }
+
+        [TestMethod]
+        public async Task VerifyDelayedPublishJob()
+        {
+            _services.AddSingleton<State>();
+            _services.AddPanama(
+                configuration: _configuration,
+                setup: options => {
+                    options.UseCanal(canal => {
+                        canal.UseMySqlStore();
+                        canal.UseDefaultBroker();
+                        canal.UseDefaultScheduler((scheduler) => {
+                            scheduler.RemoveJob<DelayedPublished>();
+                            scheduler.AddJob<DelayedPublished>("* * * * * ?");
+                        });
+                    });
+                });
+
+            _cts = new CancellationTokenSource();
+
+            var provider = _services.BuildServiceProvider();
+            var bootstrapper = provider.GetRequiredService<IBootstrapper>();
+
+            await bootstrapper.On(_cts.Token);
+
+            var options = provider.GetRequiredService<IOptions<MySqlOptions>>().Value;
+
+            await Task.Delay(TimeSpan.FromHours(90));
+
+            await bootstrapper.Off(_cts.Token);
+        }
     }
 }

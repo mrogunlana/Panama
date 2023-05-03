@@ -85,15 +85,25 @@ namespace Panama.Canal
             {
                 if (_cts.Token.IsCancellationRequested)
                     _cts.Token.ThrowIfCancellationRequested();
-
-                //TODO: Handle Other Events ? e.g: 
-                //if UpdateRowsEvent 
-                //if DeleteRowsEvent 
-                //if PrintEventAsync 
-                if (binlogEvent is TableMapEvent tableMap)
-                    TableMapEvent(tableMap);
-                else if (binlogEvent is WriteRowsEvent writeRows)
-                    await WriteEvent(writeRows);
+                try
+                {
+                    //TODO: Handle Other Events ? e.g: 
+                    //if UpdateRowsEvent 
+                    //if DeleteRowsEvent 
+                    //if PrintEventAsync 
+                    if (binlogEvent is TableMapEvent tableMap)
+                        TableMapEvent(tableMap);
+                    else if (binlogEvent is WriteRowsEvent writeRows)
+                        await WriteEvent(writeRows);
+                }
+                catch (NotSupportedException ex)
+                {
+                    _log.LogWarning(ex, $"Local table parsing unavailable.");
+                }
+                catch (Exception ex)
+                {
+                    _log.LogError(ex, $"Exception occurred while processing data stream.");
+                }
             }
         }
 

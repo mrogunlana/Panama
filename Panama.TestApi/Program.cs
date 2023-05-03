@@ -18,7 +18,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddPanama(
     configuration: builder.Configuration,
     setup: options => {
-        options.UseMysql();
         options.UseCanal(canal => {
             canal.UseDefaultStore();
             canal.UseDefaultBroker();

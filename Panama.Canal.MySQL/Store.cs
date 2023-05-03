@@ -13,7 +13,6 @@ using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;
 using System.Data.Common;
-using System.Text;
 
 namespace Panama.Canal.MySQL
 {
@@ -424,7 +423,8 @@ namespace Panama.Canal.MySQL
                     `Retries`       = @Retries,
                     `Expires`       = @Expires,
                     `Status`        = @Status 
-                WHERE `__Id`        = unhex(md5(@Id));";
+                WHERE   `_Id`       = @_Id
+                    OR  `__Id`      = unhex(md5(@Id));";
 
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Id",
@@ -432,9 +432,16 @@ namespace Panama.Canal.MySQL
                 Value = message.Id,
             });
             command.Parameters.Add(new MySqlParameter {
+                ParameterName = "@_Id",
+                DbType = DbType.Int64,
+                Value = message._Id,
+            });
+            command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Content",
                 DbType = DbType.String,
-                Value = _encryptor.ToString(message.Content),
+                Value = message.IsContentBase64()
+                    ? message.Content
+                    : _encryptor.ToString(message.Content)
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Retries",
@@ -453,7 +460,7 @@ namespace Panama.Canal.MySQL
             });
 
             command.Transaction = transaction?.To<DbTransaction>();
-
+            
             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
@@ -1098,8 +1105,8 @@ namespace Panama.Canal.MySQL
                 using var command = new MySqlCommand($@"
                     
                     SELECT 
-                         `_Id`
-                        ,`Id` 
+                         `_Id` 
+                        ,`Id`    
                         ,`CorrelationId`
                         ,`Version`
                         ,`Name` 
@@ -1110,11 +1117,11 @@ namespace Panama.Canal.MySQL
                         ,`Expires` 
                         ,`Status` 
                     FROM `{table}` 
-                    WHERE `Retries` < @Retries
+                    WHERE `Retries` < @Retries 
                     AND `Version` = @Version 
                     AND ((`Expires`< @TwoMinutesLater AND `Status` = '{MessageStatus.Delayed}') 
-                        OR (`Expires`< @OneMinutesAgo AND `Status` = '{MessageStatus.Queued}'))
-                    LIMIT 200 {append};"
+                        OR (`Expires`< @OneMinutesAgo AND `Status` = '{MessageStatus.Queued}')) 
+                    {append};"
 
                 , connection);
 
@@ -1145,20 +1152,19 @@ namespace Panama.Canal.MySQL
                 command.Transaction = transaction;
 
                 var messages = new List<InternalMessage>();
-                var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-
+                
+                using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var model = _settings.GetModel(table);
-                    
+
                     for (int i = 0; i < reader.FieldCount; i++)
-                        if (reader.GetName(i).Equals("content", StringComparison.OrdinalIgnoreCase))
-                            model.SetValue<InternalMessage>(reader.GetName(i), _encryptor.FromString(reader.GetValue(i)?.ToString() ?? string.Empty));
-                        else
-                            model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
+                        model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
 
                     messages.Add(model);
                 }
+                if (!reader.IsClosed)
+                    await reader.CloseAsync();
 
                 await task(transaction, messages);
 

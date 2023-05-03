@@ -27,8 +27,7 @@ namespace Panama.Canal.Jobs
                 foreach (var message in messages)
                     await _factory
                         .GetProducerProcessor(message)
-                        .Execute(new Context()
-                            .Add(message)
+                        .Execute(new Context(message, transaction: transaction)
                             .Add(new Kvp<string, DateTime?>("Delay", message.Expires))
                             .Token(context.CancellationToken));
             }
