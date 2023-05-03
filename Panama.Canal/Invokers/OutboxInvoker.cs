@@ -28,6 +28,12 @@ namespace Panama.Canal.Invokers
             if (message == null)
                 throw new InvalidOperationException("Message cannot be located.");
 
+            //for redundancy
+            await _store.StorePublishedMessage(
+                message: message.SetStatus(MessageStatus.Scheduled),
+                transaction: context.Transaction)
+                .ConfigureAwait(false);
+
             await _store.StoreOutboxMessage(
                 message: message.SetStatus(MessageStatus.Scheduled), 
                 transaction: context.Transaction)

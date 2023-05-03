@@ -29,7 +29,7 @@ namespace Panama.Canal.Tests.Subscriptions
             
             context.Add(kvp);
 
-            _log.LogInformation($"{typeof(FooCreated)} subscriber executed.");
+            _log.LogInformation($"{typeof(FooAcknowledged)} subscriber executed.");
 
             var state = _provider.GetService<State>();
             if (state == null)

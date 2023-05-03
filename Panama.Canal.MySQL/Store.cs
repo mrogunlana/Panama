@@ -13,6 +13,7 @@ using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 
 namespace Panama.Canal.MySQL
 {
@@ -35,7 +36,7 @@ namespace Panama.Canal.MySQL
             _settings = settings;
             _mysqlOptions = mysqlOptions;
             _canalOptions = canalOptions;
-            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64); ;
+            _encryptor = stringEncryptorResolver(StringEncryptorResolverKey.Base64);
         }
 
         public async Task Init()
@@ -940,8 +941,8 @@ namespace Panama.Canal.MySQL
                 using var command = new MySqlCommand($@"
                     DELETE FROM `{table}` 
                     WHERE Expires < @Timeout 
-                    AND (StatusName = @Succeeded 
-                    OR StatusName = @Failed) 
+                    AND (Status = @Succeeded 
+                    OR Status = @Failed) 
                     limit @Batch;"
 
                 , connection);
@@ -1053,13 +1054,12 @@ namespace Panama.Canal.MySQL
 
                 var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                var map = _settings.GetMap(table);
 
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var model = _settings.GetModel(table);
                     for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
+                        model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
 
                     messages.Add(model);
                 }
@@ -1077,7 +1077,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<IEnumerable<InternalMessage>> GetReceivedMessagesToRetry()
         {
-            return await GetMessagesToRetry(_settings.PublishedTable).ConfigureAwait(false);
+            return await GetMessagesToRetry(_settings.ReceivedTable).ConfigureAwait(false);
         }
 
         public async Task GetDelayedMessagesForScheduling(
@@ -1112,8 +1112,8 @@ namespace Panama.Canal.MySQL
                     FROM `{table}` 
                     WHERE `Retries` < @Retries
                     AND `Version` = @Version 
-                    AND ((`Expires`< @TwoMinutesLater AND `StatusName` = '{MessageStatus.Delayed}') 
-                        OR (`Expires`< @OneMinutesAgo AND `StatusName` = '{MessageStatus.Queued}'))
+                    AND ((`Expires`< @TwoMinutesLater AND `Status` = '{MessageStatus.Delayed}') 
+                        OR (`Expires`< @OneMinutesAgo AND `Status` = '{MessageStatus.Queued}'))
                     LIMIT 200 {append};"
 
                 , connection);
@@ -1142,16 +1142,20 @@ namespace Panama.Canal.MySQL
                     DbType = DbType.String,
                     Value = DateTime.UtcNow.AddMinutes(-1)
                 });
+                command.Transaction = transaction;
 
                 var messages = new List<InternalMessage>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                var map = _settings.GetMap(table);
 
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var model = _settings.GetModel(table);
+                    
                     for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<InternalMessage>(map[i], reader.GetValue(i));
+                        if (reader.GetName(i).Equals("content", StringComparison.OrdinalIgnoreCase))
+                            model.SetValue<InternalMessage>(reader.GetName(i), _encryptor.FromString(reader.GetValue(i)?.ToString() ?? string.Empty));
+                        else
+                            model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
 
                     messages.Add(model);
                 }
@@ -1302,13 +1306,12 @@ namespace Panama.Canal.MySQL
 
                 var results = new List<SagaEvent>();
                 var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                var map = _settings.GetMap(_settings.SagaTable);
 
                 while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var model = new SagaEvent();
                     for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<SagaEvent>(map[i], reader.GetValue(i));
+                        model.SetValue<SagaEvent>(reader.GetName(i), reader.GetValue(i));
 
                     results.Add(model);
                 }

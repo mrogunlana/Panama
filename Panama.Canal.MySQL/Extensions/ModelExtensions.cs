@@ -14,7 +14,14 @@ namespace Panama.Canal.MySQL.Extensions
             if (!property.CanWrite)
                 return;
 
-            var result = Convert.ChangeType(value, property.PropertyType);
+            var type = property.PropertyType;
+            
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (value == null)
+                return;
+
+            var result = Convert.ChangeType(value, type);
 
             property.SetValue(model, result, null);
         }
