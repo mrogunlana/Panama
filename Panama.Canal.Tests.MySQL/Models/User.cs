@@ -7,12 +7,12 @@ namespace Panama.Canal.Tests.MySQL.Models
     {
         public User()
         {
-            ID = Guid.NewGuid().ToString();
+            ID = Guid.NewGuid();
             if (Created == DateTime.MinValue)
                 Created = DateTime.UtcNow;
         }
         public int _ID { get; set; }
-        public string ID { get; set; }
+        public Guid ID { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Email { get; set; }

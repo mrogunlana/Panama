@@ -60,7 +60,7 @@ namespace Panama.Canal.Tests.MySQL
 
             services.AddDbContext<AppDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("MYSQL");
+                var connectionString = configuration.GetConnectionString("MySql");
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
                     .LogTo(Console.WriteLine, LogLevel.Information)
                     .EnableDetailedErrors();
@@ -84,13 +84,17 @@ namespace Panama.Canal.Tests.MySQL
             Assert.IsTrue(save.Success);
 
             var query = await _provider.GetRequiredService<IHandler>()
-                .Add(save.DataGet<User>().Select(x => new Kvp<string, string>("ID", x.ID.ToString())))
+                .Add(save.DataGet<User>().Select(x => new Kvp<string, Guid>("ID", x.ID)))
                 .Query<GetUsers>()
                 .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(query.Success);
             Assert.AreEqual(query.DataGet<User>().Count, 4);
+
+            await _provider.GetRequiredService<IHandler>()
+                .Command<DeleteAllUsers>()
+                .Invoke();
         }
 
         [TestMethod]
@@ -107,13 +111,18 @@ namespace Panama.Canal.Tests.MySQL
             Assert.IsTrue(save.Success);
 
             var query = await _provider.GetRequiredService<IHandler>()
-                .Add(save.DataGet<User>().Select(x => new Kvp<string, string>("ID", x.ID.ToString())))
+                .Add(save.DataGet<User>().Select(x => new Kvp<string, Guid>("ID", x.ID)))
                 .Query<GetUsers>()
                 .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(query.Success);
             Assert.AreEqual(query.DataGet<User>().Count, 0);
+
+            await _provider.GetRequiredService<IHandler>()
+                .Command<DeleteAllUsers>()
+                .Invoke();
+
         }
     }
 }

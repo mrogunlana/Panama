@@ -3,6 +3,7 @@ using Panama.Interfaces;
 using Panama.Canal.Tests.MySQL.Contexts;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace Panama.Canal.Tests.MySQL.Commands.EF
 {
@@ -16,11 +17,20 @@ namespace Panama.Canal.Tests.MySQL.Commands.EF
         }
         public Task Execute(IContext context)
         {
-            var list = context.KvpGet<string, string>("ID");
+            var list = context.KvpGet<string, Guid>("ID");
 
-            var users = _context.Users.Where(x => list.Contains(x.ID)).ToList();
+            try
+            {
+                var users = _context.Users.Where(x => list.Contains(x.ID)).ToList();
 
-            context.Data.AddRange(users);
+                context.Data.AddRange(users);
+            }
+            catch (System.Exception ex)
+            {
+                var e = ex;
+                throw;
+            }
+            
 
             return Task.CompletedTask;
         }

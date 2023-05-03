@@ -15,6 +15,9 @@ namespace Panama.Canal.Tests.MySQL.Contexts
             modelBuilder.Entity<User>(builder => {
                 builder.ToTable("User");
                 builder.HasKey(u => u._ID);
+                builder.Property(u => u.ID)
+                    .HasColumnType("char(36)")
+                    .HasMaxLength(36);
             });
             modelBuilder.Entity<Setting>(builder => {
                 builder.ToTable("Setting");

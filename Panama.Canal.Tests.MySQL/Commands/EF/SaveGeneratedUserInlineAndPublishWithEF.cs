@@ -27,7 +27,7 @@ namespace Panama.Canal.Tests.MySQL.Commands.EF
             using (var channel = _factory.CreateChannel<DatabaseFacade, IDbContextTransaction>(_context.Database, context.Token))
             {
                 var user = new User {
-                    ID = System.Guid.NewGuid().ToString(),
+                    ID = System.Guid.NewGuid(),
                     Email = $"test.{new System.Random().Next()}",
                     FirstName = $"first.{new System.Random().Next()}",
                     LastName = $"last.{new System.Random().Next()}",
