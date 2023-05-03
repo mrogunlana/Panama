@@ -15,8 +15,8 @@ namespace Panama.Canal.Interfaces
         Task ReleasePublishedLock(string? instance = null, CancellationToken token = default);
         Task ReleaseReceivedLock(string? instance = null, CancellationToken token = default);
         Task RenewLockAsync(string key, TimeSpan ttl, string instance, CancellationToken token = default);
-        Task ChangePublishedStateToDelayed(int[] ids);
-        Task ChangeReceivedStateToDelayed(int[] ids);
+        Task ChangePublishedStateToDelayed(string[] ids);
+        Task ChangeReceivedStateToDelayed(string[] ids);
         Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null);
         Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null);
         Task ChangeReceivedState(InternalMessage message, MessageStatus state, object? transaction = null);

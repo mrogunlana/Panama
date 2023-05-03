@@ -33,9 +33,8 @@ namespace Panama.Canal
               ILogger<Tailer> log
             , IProcessorFactory factory
             , IOptions<MySqlOptions> options
-            , IOptions<MySqlSettings> settings
-            , IServiceProvider serviceProvider
-            , StringEncryptorResolver stringEncryptorResolver)
+            , MySqlSettings settings
+            , IServiceProvider serviceProvider)
         {
             //TODO: check the existance of MySqlCdCOptions in the 
             //registrar and if it's null, throw an exception as 
@@ -43,7 +42,7 @@ namespace Panama.Canal
             _log = log;
             _factory = factory;
             _options = options;
-            _settings = settings.Value;
+            _settings = settings;
             _provider = serviceProvider;
 
             /*  NOTES: 
@@ -72,9 +71,10 @@ namespace Panama.Canal
                 options.SslMode = SslMode.Disabled;
                 options.HeartbeatInterval = TimeSpan.FromSeconds(_options.Value.Heartbeat);
                 options.Blocking = _options.Value.StreamBinlog;
+                options.Database = _options.Value.Database;
 
                 // Start replication from MySQL GTID
-                //var gtidSet = "4805a37c-b600-11ed-91dc-0242ac1a0002:1-19";
+                //var gtidSet = "b3721bbf-e947-11ed-a0d3-0242ac170002:1-40";
                 //options.Binlog = BinlogOptions.FromGtid(GtidSet.Parse(gtidSet));
             });
         }
@@ -87,18 +87,41 @@ namespace Panama.Canal
                     _cts.Token.ThrowIfCancellationRequested();
 
                 //TODO: Handle Other Events ? e.g: 
-                //if tableMap
-                //if WriteRowsEvent 
                 //if UpdateRowsEvent 
                 //if DeleteRowsEvent 
                 //if PrintEventAsync 
-
-                if (binlogEvent is WriteRowsEvent writeRows)
-                    await Handle(writeRows);
+                if (binlogEvent is TableMapEvent tableMap)
+                    TableMapEvent(tableMap);
+                else if (binlogEvent is WriteRowsEvent writeRows)
+                    await WriteEvent(writeRows);
             }
         }
 
-        private async Task Handle(WriteRowsEvent writeRows)
+        private void TableMapEvent(TableMapEvent @event) 
+        {
+            switch (@event.TableName.Split(".").LastOrDefault()?.ToLower())
+            {
+                case "saga":
+                    _settings.SagaLocalTableId = @event.TableId;
+                    break;
+                case "inbox":
+                    _settings.InboxLocalTableId = @event.TableId;
+                    break;
+                case "outbox":
+                    _settings.OutboxLocalTableId = @event.TableId;
+                    break;
+                case "published":
+                    _settings.PublishedLocalTableId = @event.TableId;
+                    break;
+                case "received":
+                    _settings.ReceivedLocalTableId = @event.TableId;
+                    break;
+                default:
+                    throw new NotSupportedException($"Internal table: {@event.TableName} not supported.");
+            }
+        }
+
+        private async Task WriteEvent(WriteRowsEvent writeRows)
         {
             if (_cts!.Token.IsCancellationRequested)
                 _cts!.Token.ThrowIfCancellationRequested();
@@ -111,27 +134,33 @@ namespace Panama.Canal
             var inbox = writeRows
                 .GetInboxMessages(_settings);
 
-            var data = outbox.GetData<Message>(_provider);
-
             //received to subscribers
             foreach (var received in inbox)
+            {
+                var data = received.GetData<Message>(_provider);
+                if (data == null)
+                    throw new InvalidOperationException("Message headers cannot be found.");
+
                 await _factory
                     .GetConsumerProcessor(received)
                     .Execute(new Context()
                         .Add(received)
+                        .Add(data)
                         .Token(_cts.Token));
+            }
 
             //publish to message brokers
             foreach (var publish in outbox)
             {
-                var message = data.Where(x => x.Headers[Headers.Id] == publish.Id).FirstOrDefault();
-                if (message == null)
+                var data = publish.GetData<Message>(_provider); 
+                if (data == null)
                     throw new InvalidOperationException("Message headers cannot be found.");
 
                 await _factory
                     .GetProducerProcessor(publish)
                     .Execute(new Context()
-                        .Add(message)
+                        .Add(data)
+                        .Add(publish)
                         .Token(_cts.Token));
             }
         }

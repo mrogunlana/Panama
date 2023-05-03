@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Panama.Tests.MySQL.Commands
+namespace Panama.Canal.Tests.MySQL.Commands
 {
     public class ThrowException : ICommand
     {

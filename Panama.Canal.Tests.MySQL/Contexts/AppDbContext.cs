@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Panama.Tests.MySQL.Models;
+using Panama.Canal.Tests.MySQL.Models;
 
-namespace Panama.Tests.MySQL.Contexts
+namespace Panama.Canal.Tests.MySQL.Contexts
 {
     public class AppDbContext : DbContext
     {

@@ -1,7 +1,7 @@
 ﻿using Panama.Interfaces;
 using System;
 
-namespace Panama.Tests.MySQL.Models
+namespace Panama.Canal.Tests.MySQL.Models
 {
     public class Setting : IModel
     {

@@ -12,6 +12,7 @@ using Panama.Extensions;
 using Panama.Security.Interfaces;
 using Panama.Security.Resolvers;
 using System.Data;
+using System.Data.Common;
 
 namespace Panama.Canal.MySQL
 {
@@ -51,6 +52,7 @@ namespace Panama.Canal.MySQL
                     
                     CREATE TABLE IF NOT EXISTS `{_settings.PublishedTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `__Id` BINARY(16) NOT NULL,
                       `Id` varchar(150) NOT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
@@ -63,11 +65,13 @@ namespace Panama.Canal.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_Expires`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`),
+                      INDEX `IX__Id`(`__Id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_settings.ReceivedTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `__Id` BINARY(16) NOT NULL,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
@@ -80,11 +84,13 @@ namespace Panama.Canal.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_Expires`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`),
+                      INDEX `IX__Id`(`__Id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_settings.OutboxTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `__Id` BINARY(16) NOT NULL,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
@@ -97,11 +103,13 @@ namespace Panama.Canal.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_Expires`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`),
+                      INDEX `IX__Id`(`__Id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_settings.InboxTable}` (
                       `_Id` bigint NOT NULL AUTO_INCREMENT,
+                      `__Id` BINARY(16) NOT NULL,
                       `Id` varchar(150) DEFAULT NULL,
                       `CorrelationId` varchar(150) DEFAULT NULL,
                       `Version` varchar(20) DEFAULT NULL,
@@ -114,7 +122,8 @@ namespace Panama.Canal.MySQL
                       `Expires` datetime DEFAULT NULL,
                       `Status` varchar(40) NOT NULL,
                       PRIMARY KEY (`_Id`),
-                      INDEX `IX_Expires`(`Expires`)
+                      INDEX `IX_Expires`(`Expires`),
+                      INDEX `IX__Id`(`__Id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                     CREATE TABLE IF NOT EXISTS `{_settings.SagaTable}` (
@@ -185,7 +194,7 @@ namespace Panama.Canal.MySQL
                     
                     SET @TABLE_ID = (SELECT TABLE_ID  
                     FROM INFORMATION_SCHEMA.INNODB_TABLES 
-                    WHERE `NAME` = @Name limit 1);
+                    WHERE replace(`Name`, '@002e', '.') = @Name limit 1);
 
                     SELECT TABLE_ID, `NAME`, POS, MTYPE
                     FROM INFORMATION_SCHEMA.INNODB_COLUMNS 
@@ -204,7 +213,7 @@ namespace Panama.Canal.MySQL
                 var result = new Dictionary<int, string>();
                 using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
                 while (reader.Read())
-                    result.Add(reader.GetInt32(0), reader.GetString(1));
+                    result.Add(reader.GetInt32(2), reader.GetString(1));
 
                 connection.Close();
 
@@ -214,31 +223,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> GetPublishedTableId()
         {
-            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed)
-                    await connection.OpenAsync().ConfigureAwait(false);
-
-                using var command = new MySqlCommand(@"
-                    
-                    SELECT TABLE_ID  
-                    FROM INFORMATION_SCHEMA.INNODB_TABLES 
-                    WHERE `NAME` = @Name limit 1;"
-
-                , connection);
-
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = $@"{_mysqlOptions.Value.Database}/{_settings.PublishedTable}",
-                });
-
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
-                connection.Close();
-
-                return result.ToInt();
-            }
+            return await GetTableId($@"{_mysqlOptions.Value.Database}/{_settings.PublishedTable}");
         }
 
         public async Task<int> GetTableId(string table)
@@ -252,7 +237,7 @@ namespace Panama.Canal.MySQL
                     
                     SELECT TABLE_ID  
                     FROM INFORMATION_SCHEMA.INNODB_TABLES 
-                    WHERE `NAME` = @Name limit 1;"
+                    WHERE replace(`Name`, '@002e', '.') = @Name limit 1;"
 
                 , connection);
 
@@ -272,31 +257,7 @@ namespace Panama.Canal.MySQL
 
         public async Task<int> GetReceivedTableId()
         {
-            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
-            {
-                if (connection.State == ConnectionState.Closed)
-                    await connection.OpenAsync().ConfigureAwait(false);
-
-                using var command = new MySqlCommand(@"
-                    
-                    SELECT TABLE_ID  
-                    FROM INFORMATION_SCHEMA.INNODB_TABLES 
-                    WHERE `NAME` = @Name limit 1;"
-
-                , connection);
-
-                command.Parameters.Add(new MySqlParameter {
-                    ParameterName = "@Name",
-                    DbType = DbType.String,
-                    Value = $@"{_mysqlOptions.Value.Database}/{_settings.ReceivedTable}",
-                });
-
-                var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
-
-                connection.Close();
-
-                return result.ToInt();
-            }
+            return await GetTableId($@"{_mysqlOptions.Value.Database}/{_settings.ReceivedTable}");
         }
 
         public async Task<bool> AcquireLock(string key, TimeSpan ttl, string? instance = null, CancellationToken token = default)
@@ -462,12 +423,12 @@ namespace Panama.Canal.MySQL
                     `Retries`       = @Retries,
                     `Expires`       = @Expires,
                     `Status`        = @Status 
-                WHERE `_Id`         = @_Id;";
+                WHERE `__Id`        = unhex(md5(@Id));";
 
             command.Parameters.Add(new MySqlParameter {
-                ParameterName = "@_Id",
-                DbType = DbType.Int32,
-                Value = message._Id,
+                ParameterName = "@Id",
+                DbType = DbType.String,
+                Value = message.Id,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Content",
@@ -487,13 +448,12 @@ namespace Panama.Canal.MySQL
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Status",
                 DbType = DbType.String,
-                Value = message.Status,
+                Value = status,
             });
 
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            command.Transaction = transaction?.To<DbTransaction>();
 
-            if (transaction is IDbTransaction)
-                connection.Close();
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
         public async Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
@@ -506,7 +466,7 @@ namespace Panama.Canal.MySQL
             await ChangeMessageState(_settings.ReceivedTable, message, status, transaction).ConfigureAwait(false);
         }
 
-        public async Task ChangePublishedStateToDelayed(int[] ids)
+        public async Task ChangePublishedStateToDelayed(string[] ids)
         {
             using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
@@ -517,7 +477,7 @@ namespace Panama.Canal.MySQL
 
                     UPDATE `{_settings.PublishedTable}` 
                     SET `Status`='{MessageStatus.Delayed}' 
-                    WHERE `_Id` IN ({string.Join(',', ids)});"
+                    WHERE `Id` IN ({string.Join(',', ids)});"
 
                 , connection);
 
@@ -527,7 +487,7 @@ namespace Panama.Canal.MySQL
             }
         }
 
-        public async Task ChangeReceivedStateToDelayed(int[] ids)
+        public async Task ChangeReceivedStateToDelayed(string[] ids)
         {
             using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
             {
@@ -538,7 +498,7 @@ namespace Panama.Canal.MySQL
 
                     UPDATE `{_settings.ReceivedTable}` 
                     SET `Status`='{MessageStatus.Delayed}' 
-                    WHERE `_Id` IN ({string.Join(',', ids)});"
+                    WHERE `Id` IN ({string.Join(',', ids)});"
 
                 , connection);
 
@@ -558,7 +518,8 @@ namespace Panama.Canal.MySQL
             command.CommandText = $@"
 
                 INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.PublishedTable}`
-                (`Id`,
+                (`__Id`,
+                `Id`,
                 `CorrelationId`,
                 `Version`,
                 `Name`,
@@ -570,7 +531,8 @@ namespace Panama.Canal.MySQL
                 `Expires`,
                 `Status`)
                 VALUES
-                (@Id,
+                (unhex(md5(@Id)),
+                @Id,
                  @CorrelationId,
                  @Version,
                  @Name,
@@ -597,7 +559,7 @@ namespace Panama.Canal.MySQL
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Version",
                 DbType = DbType.String,
-                Value = message.Version,
+                Value = message.Version ?? _canalOptions.Value.Version,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Name",
@@ -642,10 +604,9 @@ namespace Panama.Canal.MySQL
                 Value = message.Status,
             });
 
-            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+            command.Transaction = transaction?.To<DbTransaction>();
 
-            if (transaction is IDbTransaction)
-                connection.Close();
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
             message._Id = result.ToInt();
 
@@ -662,7 +623,8 @@ namespace Panama.Canal.MySQL
             command.CommandText = $@"
 
                 INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.ReceivedTable}`
-                (`Id`,
+                (`__Id`,
+                `Id`,
                 `CorrelationId`,
                 `Version`,
                 `Name`,
@@ -674,7 +636,8 @@ namespace Panama.Canal.MySQL
                 `Expires`,
                 `Status`)
                 VALUES
-                (@Id,
+                (unhex(md5(@Id)),
+                @Id,
                 @CorrelationId,
                 @Version,
                 @Name,
@@ -701,7 +664,7 @@ namespace Panama.Canal.MySQL
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Version",
                 DbType = DbType.String,
-                Value = message.Version,
+                Value = message.Version ?? _canalOptions.Value.Version,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Name",
@@ -746,10 +709,9 @@ namespace Panama.Canal.MySQL
                 Value = message.Status,
             });
 
-            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+            command.Transaction = transaction?.To<DbTransaction>();
 
-            if (transaction is IDbTransaction)
-                connection.Close();
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
             message._Id = result.ToInt();
 
@@ -766,7 +728,8 @@ namespace Panama.Canal.MySQL
             command.CommandText = $@"
 
                 INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.InboxTable}`
-                (`Id`,
+                (`__Id`,
+                `Id`,
                 `CorrelationId`,
                 `Version`,
                 `Name`,
@@ -778,7 +741,8 @@ namespace Panama.Canal.MySQL
                 `Expires`,
                 `Status`)
                 VALUES
-                (@Id,
+                (unhex(md5(@Id)),
+                @Id,
                 @CorrelationId,
                 @Version,
                 @Name,
@@ -805,7 +769,7 @@ namespace Panama.Canal.MySQL
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Version",
                 DbType = DbType.String,
-                Value = message.Version,
+                Value = message.Version ?? _canalOptions.Value.Version,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Name",
@@ -850,10 +814,9 @@ namespace Panama.Canal.MySQL
                 Value = message.Status,
             });
 
-            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+            command.Transaction = transaction?.To<DbTransaction>();
 
-            if (transaction is IDbTransaction)
-                connection.Close();
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
             message._Id = result.ToInt();
 
@@ -870,7 +833,8 @@ namespace Panama.Canal.MySQL
             command.CommandText = $@"
 
                 INSERT INTO `{_mysqlOptions.Value.Database}`.`{_settings.OutboxTable}`
-                (`Id`,
+                (`__Id`,
+                `Id`,
                 `CorrelationId`,
                 `Version`,
                 `Name`,
@@ -882,7 +846,8 @@ namespace Panama.Canal.MySQL
                 `Expires`,
                 `Status`)
                 VALUES
-                (@Id,
+                (unhex(md5(@Id)),
+                @Id,
                 @CorrelationId,
                 @Version,
                 @Name,
@@ -909,7 +874,7 @@ namespace Panama.Canal.MySQL
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Version",
                 DbType = DbType.String,
-                Value = message.Version,
+                Value = message.Version ?? _canalOptions.Value.Version,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Name",
@@ -954,10 +919,9 @@ namespace Panama.Canal.MySQL
                 Value = message.Status,
             });
 
-            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+            command.Transaction = transaction?.To<DbTransaction>();
 
-            if (transaction is IDbTransaction)
-                connection.Close();
+            var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
             message._Id = result.ToInt();
 
@@ -1159,6 +1123,12 @@ namespace Panama.Canal.MySQL
                     ParameterName = "@Version",
                     DbType = DbType.String,
                     Value = _canalOptions.Value.Version
+                });
+                command.Parameters.Add(new MySqlParameter
+                {
+                    ParameterName = "@Retries",
+                    DbType = DbType.Int32,
+                    Value = _canalOptions.Value.FailedRetryCount
                 });
                 command.Parameters.Add(new MySqlParameter
                 {

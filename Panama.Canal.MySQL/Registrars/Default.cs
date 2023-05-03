@@ -43,7 +43,10 @@ namespace Panama.Canal.MySQL.Registrars
 
             services.AddSingleton<Store>();
             services.AddSingleton<IStore, Store>(p => p.GetRequiredService<Store>());
-            services.AddSingleton<IInitialize, Initializers.Default>();
+
+            services.AddSingleton<Initializers.Default>();
+            services.AddSingleton<IInitialize, Initializers.Default>(p => p.GetRequiredService<Initializers.Default>());
+
         }
 
         public void AddAssemblies(IServiceCollection services)
@@ -62,15 +65,16 @@ namespace Panama.Canal.MySQL.Registrars
                 return;
 
             services.Configure<MySqlOptions>(options =>
-                _builder.Configuration.GetSection("Panama:Canal:Stores:Mysql:Options").Bind(options));
+                _builder.Configuration.GetSection("Panama:Canal:Stores:MySql:Options").Bind(options));
 
             services.PostConfigure<MySqlOptions>(options => {
                 services.AddSingleton<IStoreOptions>(options);
             });
             services.AddSingleton<IOptions<IStoreOptions>>(p => p.GetRequiredService<IOptions<MySqlOptions>>());
 
-            services.Configure<MySqlSettings>(options =>
-                _builder.Configuration.GetSection("Panama:Canal:Stores:Mysql:Settings").Bind(options));
+            var settings = new MySqlSettings();
+            _builder.Configuration.GetSection("Panama:Canal:Stores:MySql:Settings").Bind(settings);
+            services.AddSingleton(settings);
         }
     }
 }

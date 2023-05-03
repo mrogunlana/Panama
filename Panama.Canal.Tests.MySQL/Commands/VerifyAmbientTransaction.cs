@@ -3,7 +3,7 @@ using Panama.Models;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Panama.Tests.MySQL.Commands
+namespace Panama.Canal.Tests.MySQL.Commands
 {
     public class VerifyAmbientTransaction : ICommand
     {

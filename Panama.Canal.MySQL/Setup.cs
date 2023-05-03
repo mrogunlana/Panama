@@ -1,10 +1,11 @@
-﻿using Panama.Canal.MySQL.Models;
+﻿using Panama.Canal.Models.Options;
+using Panama.Canal.MySQL.Models;
 
 namespace Panama.Canal.MySQL
 {
     public static class Setup
     {
-        public static Panama.Models.Options.PanamaOptions UseMysql(this Panama.Models.Options.PanamaOptions options, Action<MySqlOptions>? setup = null)
+        public static CanalOptions UseMySqlStore(this CanalOptions options, Action<MySqlOptions>? setup = null)
         {
             options.Register(new Registrars.Default(
                 builder: options.Builder,

@@ -71,9 +71,9 @@ namespace Panama.Canal
             return Task.CompletedTask;
         }
 
-        public Task ChangePublishedStateToDelayed(int[] ids)
+        public Task ChangePublishedStateToDelayed(string[] ids)
         {
-            var messages = Published.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
+            var messages = Published.Where(x => ids.Contains(x.Value.Id)).Select(x => x.Value); 
             foreach (var message in messages)
                 message.Status = MessageStatus.Delayed.ToString();
 
@@ -88,9 +88,9 @@ namespace Panama.Canal
             return Task.CompletedTask;
         }
 
-        public Task ChangeReceivedStateToDelayed(int[] ids)
+        public Task ChangeReceivedStateToDelayed(string[] ids)
         {
-            var messages = Received.Where(x => ids.Contains(x.Value._Id)).Select(x => x.Value); ;
+            var messages = Received.Where(x => ids.Contains(x.Value.Id)).Select(x => x.Value); ;
             foreach (var message in messages)
                 message.Status = MessageStatus.Delayed.ToString();
 

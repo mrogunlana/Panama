@@ -2,11 +2,11 @@
 using MySqlConnector;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Tests.MySQL.Models;
+using Panama.Canal.Tests.MySQL.Models;
 using System.Data;
 using System.Threading.Tasks;
 
-namespace Panama.Tests.MySQL.Commands.EF
+namespace Panama.Canal.Tests.MySQL.Commands.EF
 {
     public class SaveGeneratedUserInline : ICommand
     {

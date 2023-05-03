@@ -19,10 +19,10 @@ namespace Panama.Canal.Models.Messaging
 
             return hash_Id ^ hashId;
         }
-        public int _Id { get; set; }
+        public long _Id { get; set; }
         public string Id { get; set; } = string.Empty;
         public string CorrelationId { get; set; } = string.Empty;
-        public string Version { get; set; } = string.Empty;
+        public string? Version { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Group { get; set; } = string.Empty;
         public string Broker { get; set; } = string.Empty;

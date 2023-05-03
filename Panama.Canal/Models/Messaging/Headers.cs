@@ -3,7 +3,7 @@
     public static class Headers
     {
         public const string CorrelationId = "panama-correlation-id";
-        public const string Id = "panama-message-id";
+        public const string Id = "panama-message-id-guid";
         public const string Name = "panama-message-name";
         public const string Broker = "panama-message-broker";
         public const string Instance = "panama-message-broker-instance";

@@ -15,11 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.TestApi", "Panama.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.RabbitMQ", "Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj", "{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Tests.MySQL", "Panama.Tests.MySQL\Panama.Tests.MySQL.csproj", "{253CC02B-EE67-4070-A176-3A632EDB257E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Tests.SQLServer", "Panama.Tests.SQLServer\Panama.Tests.SQLServer.csproj", "{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests", "Panama.Canal.Tests\Panama.Canal.Tests.csproj", "{A6D0D087-01BC-4420-8AF0-C8B613AC8EB3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests.MySQL", "Panama.Canal.Tests.MySQL\Panama.Canal.Tests.MySQL.csproj", "{330C336F-4057-4D30-97E2-0D4C27690D84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,10 +51,6 @@ Global
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{253CC02B-EE67-4070-A176-3A632EDB257E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{253CC02B-EE67-4070-A176-3A632EDB257E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{253CC02B-EE67-4070-A176-3A632EDB257E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{253CC02B-EE67-4070-A176-3A632EDB257E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D345AB63-7FAE-4DF2-AEF0-2C88C182F2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +59,10 @@ Global
 		{A6D0D087-01BC-4420-8AF0-C8B613AC8EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6D0D087-01BC-4420-8AF0-C8B613AC8EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6D0D087-01BC-4420-8AF0-C8B613AC8EB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{330C336F-4057-4D30-97E2-0D4C27690D84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{330C336F-4057-4D30-97E2-0D4C27690D84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{330C336F-4057-4D30-97E2-0D4C27690D84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{330C336F-4057-4D30-97E2-0D4C27690D84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

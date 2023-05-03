@@ -1,10 +1,10 @@
 ﻿using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Tests.MySQL.Contexts;
+using Panama.Canal.Tests.MySQL.Contexts;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Panama.Tests.MySQL.Commands.EF
+namespace Panama.Canal.Tests.MySQL.Commands.EF
 {
     public class GetUsers : IQuery
     {

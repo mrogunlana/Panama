@@ -90,7 +90,7 @@ namespace Panama.Canal
             {
                 if (_scheduled.Count == 0) return;
 
-                var ids = _scheduled.UnorderedItems.Select(x => x.Element._Id).ToArray();
+                var ids = _scheduled.UnorderedItems.Select(x => x.Element.Id).ToArray();
                 _store.ChangePublishedStateToDelayed(ids).GetAwaiter().GetResult();
                 _log.LogDebug("Scheduled messages stored as delayed successfully.");
             }

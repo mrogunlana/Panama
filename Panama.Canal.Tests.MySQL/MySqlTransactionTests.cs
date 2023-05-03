@@ -7,17 +7,17 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Invokers;
 using Panama.Models;
-using Panama.Tests.MySQL.Commands;
-using Panama.Tests.MySQL.Commands.EF;
-using Panama.Tests.MySQL.Contexts;
-using Panama.Tests.MySQL.Models;
+using Panama.Canal.Tests.MySQL.Commands;
+using Panama.Canal.Tests.MySQL.Commands.EF;
+using Panama.Canal.Tests.MySQL.Contexts;
+using Panama.Canal.Tests.MySQL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Panama.Tests.MySQL
+namespace Panama.Canal.Tests.MySQL
 {
     [TestClass]
     public class MySqlTransactionTests

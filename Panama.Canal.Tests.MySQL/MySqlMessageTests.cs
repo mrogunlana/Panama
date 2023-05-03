@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,21 +9,26 @@ using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
+using Panama.Canal.MySQL;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Panama.Canal.Tests
+namespace Panama.Canal.Tests.MySQL
 {
     [TestClass]
-    public class MessageTests
+    public class MySqlMessageTests
     {
-        private CancellationTokenSource _cts; 
+        private CancellationTokenSource _cts;
         private ServiceCollection _services;
         private IConfigurationRoot _configuration;
 
-        public MessageTests()
+        public MySqlMessageTests()
         {
             _services = new ServiceCollection();
             _cts = new CancellationTokenSource();
@@ -45,27 +50,13 @@ namespace Panama.Canal.Tests
         }
 
         [TestMethod]
-        public void VerifyMessageDeserialization()
-        {
-            _services.AddPanama(_configuration);
-            var provider = _services.BuildServiceProvider();
-
-            var message = new Message();
-            message.AddData(new Foo());
-            var that = message.ToInternal(provider);
-            var @this = that.GetData<Message>(provider);
-
-            Assert.AreEqual(message.Value?.To<Foo>()?.Value, @this.Value?.To<Foo>()?.Value);
-        }
-
-        [TestMethod]
         public async Task VerifyScheduledPollingPublishMessageState()
         {
             _services.AddPanama(
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
-                        canal.UseDefaultStore();
+                        canal.UseMySqlStore();
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler(scheduler => {
                             scheduler.RemoveJob<DelayedPublished>();
@@ -97,7 +88,7 @@ namespace Panama.Canal.Tests
                     .Topic("foo.created")
                     .Channel(channel)
                     .Post();
-                
+
                 var store = provider.GetRequiredService<Store>();
 
                 Assert.IsTrue(store.Published.Count == 1);
@@ -126,7 +117,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
-                        canal.UseDefaultStore();
+                        canal.UseMySqlStore();
                         canal.UseDefaultBroker();
                     });
                 });
@@ -192,7 +183,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
-                        canal.UseDefaultStore();
+                        canal.UseMySqlStore();
                         canal.UseDefaultBroker();
                     });
                 });
@@ -265,7 +256,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
-                        canal.UseDefaultStore();
+                        canal.UseMySqlStore();
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler();
                     });
@@ -299,7 +290,7 @@ namespace Panama.Canal.Tests
             }
 
             var store = provider.GetRequiredService<Store>();
-            
+
             await Task.Delay(TimeSpan.FromSeconds(90));
 
             Assert.IsTrue(store.Published.Count == 2);
