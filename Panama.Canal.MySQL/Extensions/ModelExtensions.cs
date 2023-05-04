@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace Panama.Canal.MySQL.Extensions
 {
-    internal static class ModelExtensions
+    public static class ModelExtensions
     {
-        internal static void SetValue<T>(this IModel model, string name, object? value)
+        public static void SetValue<T>(this IModel model, string name, object? value)
         {
             var property = typeof(T).GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
 
@@ -26,7 +26,7 @@ namespace Panama.Canal.MySQL.Extensions
             property.SetValue(model, result, null);
         }
 
-        internal static T Resolve<T>(this IModel model)
+        public static T Resolve<T>(this IModel model)
             where T : IModel
         {
             if (model == null)

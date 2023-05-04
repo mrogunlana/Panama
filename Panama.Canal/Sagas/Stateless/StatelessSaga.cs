@@ -106,7 +106,7 @@ namespace Panama.Canal.Sagas.Stateless
                 e.CorrelationId = correlationId;
                 e.Source = transition?.Source?.GetType().AssemblyQualifiedName ?? string.Empty;
                 e.Destination = transition?.Destination?.GetType().AssemblyQualifiedName ?? string.Empty;
-                e.Expires = DateTime.UtcNow.AddSeconds(_canalOptions.Value.SucceedMessageExpiredAfter);
+                e.Expires = DateTime.UtcNow.AddSeconds(_canalOptions.Value.SuccessfulMessageExpiredAfter);
                 e.Trigger = transition?.Trigger.GetType().AssemblyQualifiedName ?? string.Empty;
 
                 _store.StoreSagaEvent(e).GetAwaiter().GetResult();

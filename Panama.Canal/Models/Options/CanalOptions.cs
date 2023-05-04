@@ -15,11 +15,10 @@ namespace Panama.Canal.Models.Options
         public string Version { get; set; } = "v1";
         public string DefaultGroup { get; set; } = "panama.queue." + Assembly.GetEntryAssembly()?.GetName().Name!.ToLower();
 
-        public int SucceedMessageExpiredAfter { get; set; }
+        public int SuccessfulMessageExpiredAfter { get; set; }
         public int FailedMessageExpiredAfter { get; set; }
         public int FailedRetryInterval { get; set; }
         public int FailedRetryCount { get; set; }
-        public int SuccessfulMessageExpiredAfter { get; set; }
 
         public CanalOptions()
             : base()

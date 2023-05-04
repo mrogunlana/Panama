@@ -272,7 +272,7 @@ namespace Panama.Canal.Extensions
             message.Expires = (result.Kind == DateTimeKind.Utc
                 ? result
                 : result.ToUniversalTime())
-                .AddSeconds(options.Value.SucceedMessageExpiredAfter);
+                .AddSeconds(options.Value.SuccessfulMessageExpiredAfter);
 
             return message;
         }

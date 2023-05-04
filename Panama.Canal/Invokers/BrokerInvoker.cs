@@ -55,6 +55,8 @@ namespace Panama.Canal.Invokers
             if (broker == null)
                 throw new InvalidOperationException($"Broker could not be located from target: {target.Name}");
 
+            _log.LogDebug($"Publishing message: {message.Id} using {target.Name}.");
+
             try
             {
                 var local = new Polly.Context("broker-invocation") {
@@ -81,7 +83,7 @@ namespace Panama.Canal.Invokers
                             await _store.ChangePublishedState(metadata
                                 .RemoveException()
                                 .ToInternal(_provider)
-                                .SetSucceedExpiration(_provider), MessageStatus.Succeeded)
+                                .SetSucceedExpiration(_provider, DateTime.UtcNow.AddSeconds(_canal.SuccessfulMessageExpiredAfter)), MessageStatus.Succeeded)
                             .ConfigureAwait(false);
                         else
                             await _store.ChangePublishedState(metadata

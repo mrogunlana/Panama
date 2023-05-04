@@ -318,6 +318,8 @@ namespace Panama.Canal
             {
                 await _store.ChangePublishedState(message, MessageStatus.Queued, transaction);
 
+                _log.LogDebug($"Queued scheduled message: {message.Id} for dispatch.");
+
                 _scheduled.Enqueue(message, delay);
 
                 if (delay < _next)
@@ -326,6 +328,8 @@ namespace Panama.Canal
             else
             {
                 await _store.ChangePublishedState(message, MessageStatus.Delayed, transaction);
+
+                _log.LogDebug($"Delayed scheduled message: {message.Id} for dispatch on {DateTime.UtcNow.Add(timeSpan)} (approx).");
             }
         }
     }

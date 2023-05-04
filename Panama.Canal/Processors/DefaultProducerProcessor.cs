@@ -42,7 +42,8 @@ namespace Panama.Canal.Processors
                 await _dispatcher.Schedule(
                     message: message,
                     delay: delay,
-                    token: context.Token)
+                    token: context.Token,
+                    transaction: context.Transaction)
                     .ConfigureAwait(false);
 
             return new Result().Success();

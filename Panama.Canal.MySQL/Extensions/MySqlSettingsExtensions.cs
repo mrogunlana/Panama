@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Panama.Canal.MySQL.Extensions
 {
-    internal static class MySqlSettingsExtensions
+    public static class MySqlSettingsExtensions
     {
-        internal static Dictionary<int, string> GetMap(this MySqlSettings settings, string table)
+        public static Dictionary<int, string> GetMap(this MySqlSettings settings, string table)
         {
             if (string.IsNullOrEmpty(table))
                 throw new ArgumentNullException("Table name must have value to get schema map.");
@@ -25,7 +25,7 @@ namespace Panama.Canal.MySQL.Extensions
             throw new Exception($"Table map {table} not found!");
         }
 
-        internal static InternalMessage GetModel(this MySqlSettings settings, string table)
+        public static InternalMessage GetModel(this MySqlSettings settings, string table)
         {
             if (string.IsNullOrEmpty(table))
                 throw new ArgumentNullException("Table name must have value to get schema map.");

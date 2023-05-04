@@ -458,7 +458,9 @@ namespace Panama.Canal.MySQL
             command.Transaction = transaction?.To<DbTransaction>();
             try
             {
-                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+                _log.LogDebug($"{result} message state changed to: {status}; Id: {message.Id}; _Id: {message._Id}");
             }
             catch (Exception ex)
             {
@@ -984,7 +986,7 @@ namespace Panama.Canal.MySQL
                 var result = await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 connection.Close();
 
-                _log.LogDebug($"Deletion of expired data from table: {table} complete.");
+                _log.LogDebug($"Deleted {result} expired message(s) from table: {table} complete.");
 
                 return result;
             }
@@ -1036,7 +1038,7 @@ namespace Panama.Canal.MySQL
                     FROM `{table}` 
                     WHERE `Retries` < @Retries
                     AND `Version` = @Version 
-                    AND `Added` < @Added 
+                    AND `Created` < @Created 
                     AND (`Status` = '{MessageStatus.Failed}' OR `Status` = '{MessageStatus.Scheduled}') 
                     LIMIT 200;"
 
@@ -1056,7 +1058,7 @@ namespace Panama.Canal.MySQL
                 });
                 command.Parameters.Add(new MySqlParameter
                 {
-                    ParameterName = "@Added",
+                    ParameterName = "@Created",
                     DbType = DbType.String,
                     Value = DateTime.UtcNow.AddMinutes(-4)
                 });
@@ -1096,15 +1098,17 @@ namespace Panama.Canal.MySQL
         {
             using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};Allow User Variables=True;"))
             {
-                if (connection.State == ConnectionState.Closed)
-                    await connection.OpenAsync().ConfigureAwait(false);
+                await connection.OpenAsync().ConfigureAwait(false);
 
-                var append = _settings
-                    .Resolve<MySqlSettings>()
-                    .IsSupportSkipLocked() ? "FOR UPDATE SKIP LOCKED" : "FOR UPDATE";
+                using (var transaction = await connection.BeginTransactionAsync(IsolationLevel.ReadCommitted, token))
+                {
+                    var append = _settings
+                        .Resolve<MySqlSettings>()
+                        .IsSupportSkipLocked() ? "FOR UPDATE SKIP LOCKED" : "FOR UPDATE";
 
-                await using var transaction = await connection.BeginTransactionAsync(IsolationLevel.ReadCommitted, token);
-                using var command = new MySqlCommand($@"
+                    var messages = new List<InternalMessage>();
+
+                    using (var command = new MySqlCommand($@"
                     
                     SELECT 
                          `_Id` 
@@ -1125,52 +1129,54 @@ namespace Panama.Canal.MySQL
                         OR (`Expires`< @OneMinutesAgo AND `Status` = '{MessageStatus.Queued}')) 
                     {append};"
 
-                , connection);
+                    , connection))
+                    {
+                        command.Parameters.Add(new MySqlParameter
+                        {
+                            ParameterName = "@Version",
+                            DbType = DbType.String,
+                            Value = _canalOptions.Value.Version
+                        });
+                        command.Parameters.Add(new MySqlParameter
+                        {
+                            ParameterName = "@Retries",
+                            DbType = DbType.Int32,
+                            Value = _canalOptions.Value.FailedRetryCount
+                        });
+                        command.Parameters.Add(new MySqlParameter
+                        {
+                            ParameterName = "@TwoMinutesLater",
+                            DbType = DbType.String,
+                            Value = DateTime.UtcNow.AddMinutes(2)
+                        });
+                        command.Parameters.Add(new MySqlParameter
+                        {
+                            ParameterName = "@OneMinutesAgo",
+                            DbType = DbType.String,
+                            Value = DateTime.UtcNow.AddMinutes(-1)
+                        });
+                        command.Transaction = transaction;
 
-                command.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@Version",
-                    DbType = DbType.String,
-                    Value = _canalOptions.Value.Version
-                });
-                command.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@Retries",
-                    DbType = DbType.Int32,
-                    Value = _canalOptions.Value.FailedRetryCount
-                });
-                command.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@TwoMinutesLater",
-                    DbType = DbType.String,
-                    Value = DateTime.UtcNow.AddMinutes(2)
-                });
-                command.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@OneMinutesAgo",
-                    DbType = DbType.String,
-                    Value = DateTime.UtcNow.AddMinutes(-1)
-                });
-                command.Transaction = transaction;
+                        using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
+                        {
+                            while (await reader.ReadAsync().ConfigureAwait(false))
+                            {
+                                var model = _settings.GetModel(table);
 
-                var messages = new List<InternalMessage>();
-                
-                using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                while (await reader.ReadAsync().ConfigureAwait(false))
-                {
-                    var model = _settings.GetModel(table);
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                    model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
 
-                    for (int i = 0; i < reader.FieldCount; i++)
-                        model.SetValue<InternalMessage>(reader.GetName(i), reader.GetValue(i));
+                                messages.Add(model);
+                            }
+                        }
+                    }
 
-                    messages.Add(model);
+                    _log.LogDebug($"Retrieved {messages.Count} delayed message(s) for scheduling.");
+
+                    await task(transaction, messages);
+
+                    await transaction.CommitAsync(token);
                 }
-                if (!reader.IsClosed)
-                    await reader.CloseAsync();
-
-                await task(transaction, messages);
-
-                await transaction.CommitAsync(token);
             }
         }
 
@@ -1362,7 +1368,7 @@ namespace Panama.Canal.MySQL
                 var result = await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                 connection.Close();
 
-                _log.LogDebug($"Deletion of expired data from table: {_settings.SagaTable} complete.");
+                _log.LogDebug($"Deleting {result} message(s) from table: {_settings.SagaTable} complete.");
 
                 return result;
             }

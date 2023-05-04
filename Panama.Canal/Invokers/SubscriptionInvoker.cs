@@ -99,7 +99,7 @@ namespace Panama.Canal.Invokers
                         await _store.ChangeReceivedState(metadata
                                 .RemoveException()
                                 .ToInternal(_provider)
-                                .SetSucceedExpiration(_provider), MessageStatus.Succeeded)
+                                .SetSucceedExpiration(_provider, DateTime.UtcNow.AddSeconds(_canal.SuccessfulMessageExpiredAfter)), MessageStatus.Succeeded)
                             .ConfigureAwait(false);
 
                         return new Result().Success();
