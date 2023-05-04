@@ -411,30 +411,26 @@ namespace Panama.Canal.MySQL
 
         public async Task ChangeMessageState(string tableName, InternalMessage message, MessageStatus status, object? transaction = null)
         {
-            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};");
+            var connection = transaction?.GetConnection() ?? new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};Allow User Variables=True;");
             if (connection.State == ConnectionState.Closed)
                 await connection.OpenAsync().ConfigureAwait(false);
 
             using var command = connection.CreateCommand();
             command.CommandText = $@"
 
+                SET @_Id = (SELECT _Id FROM `{tableName}` WHERE `__Id` = unhex(md5(@Id)) LIMIT 1);
+
                 UPDATE `{tableName}` 
                 SET `Content`       = @Content,
                     `Retries`       = @Retries,
                     `Expires`       = @Expires,
                     `Status`        = @Status 
-                WHERE   `_Id`       = @_Id
-                    OR  `__Id`      = unhex(md5(@Id));";
+                WHERE   `_Id`       = @_Id;";
 
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Id",
                 DbType = DbType.String,
                 Value = message.Id,
-            });
-            command.Parameters.Add(new MySqlParameter {
-                ParameterName = "@_Id",
-                DbType = DbType.Int64,
-                Value = message._Id,
             });
             command.Parameters.Add(new MySqlParameter {
                 ParameterName = "@Content",
@@ -460,8 +456,14 @@ namespace Panama.Canal.MySQL
             });
 
             command.Transaction = transaction?.To<DbTransaction>();
-            
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            try
+            {
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, $"Error occurred during message status update. Message ID: {message.Id}. Message Status: {message.Status}. Updated Status: {status}");
+            }
         }
 
         public async Task ChangePublishedState(InternalMessage message, MessageStatus status, object? transaction = null)
@@ -1092,7 +1094,7 @@ namespace Panama.Canal.MySQL
             , Func<object, IEnumerable<InternalMessage>, Task> task
             , CancellationToken token = default)
         {
-            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};"))
+            using (var connection = new MySqlConnection($"Server={_mysqlOptions.Value.Host};Port={_mysqlOptions.Value.Port};Database={_mysqlOptions.Value.Database};Uid={_mysqlOptions.Value.Username};Pwd={_mysqlOptions.Value.Password};Allow User Variables=True;"))
             {
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync().ConfigureAwait(false);

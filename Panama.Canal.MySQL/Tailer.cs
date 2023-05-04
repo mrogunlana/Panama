@@ -96,9 +96,9 @@ namespace Panama.Canal
                     else if (binlogEvent is WriteRowsEvent writeRows)
                         await WriteEvent(writeRows);
                 }
-                catch (NotSupportedException ex)
+                catch (NotSupportedException)
                 {
-                    _log.LogWarning(ex, $"Local table parsing unavailable.");
+                    //ignore
                 }
                 catch (Exception ex)
                 {

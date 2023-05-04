@@ -86,7 +86,6 @@ namespace Panama.Canal.Tests.MySQL
             var query = await _provider.GetRequiredService<IHandler>()
                 .Add(save.DataGet<User>().Select(x => new Kvp<string, Guid>("ID", x.ID)))
                 .Query<GetUsers>()
-                .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(query.Success);
@@ -113,7 +112,6 @@ namespace Panama.Canal.Tests.MySQL
             var query = await _provider.GetRequiredService<IHandler>()
                 .Add(save.DataGet<User>().Select(x => new Kvp<string, Guid>("ID", x.ID)))
                 .Query<GetUsers>()
-                .Set<ScopedInvoker>()
                 .Invoke();
 
             Assert.IsTrue(query.Success);
