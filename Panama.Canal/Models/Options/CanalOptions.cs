@@ -12,6 +12,7 @@ namespace Panama.Canal.Models.Options
         public int ProducerThreads { get; set; } = 1;
         public int ConsumerThreads { get; set; } = 1;
         public string? TopicPrefix { get; set; }
+        public string? Scope { get; set; }
         public string Version { get; set; } = "v1";
         public string DefaultGroup { get; set; } = "panama.queue." + Assembly.GetEntryAssembly()?.GetName().Name!.ToLower();
 

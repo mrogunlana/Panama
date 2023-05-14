@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MySqlConnector.Logging;
+using NLog.Extensions.Logging;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
@@ -14,6 +17,7 @@ using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
+using System.Configuration;
 
 namespace Panama.Canal.Tests.RabbitMQ
 {
@@ -34,12 +38,22 @@ namespace Panama.Canal.Tests.RabbitMQ
 
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.test.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build();
+            .AddEnvironmentVariables()
+            .Build();
+
+            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
+            MySqlConnectorLogManager.Provider = new MySqlConnector.Logging.NLogLoggerProvider();
 
             services.AddSingleton(configuration);
             services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<State>();
+
+            services.AddLogging(loggingBuilder => {
+                // configure Logging with NLog
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog(configuration);
+            });
 
             services.AddPanama(
                 configuration: configuration,

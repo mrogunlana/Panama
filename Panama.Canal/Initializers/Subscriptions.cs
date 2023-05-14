@@ -8,6 +8,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Options;
+using Panama.Canal.Sagas.Interfaces;
 
 namespace Panama.Canal.Initializers
 {
@@ -57,7 +58,7 @@ namespace Panama.Canal.Initializers
                     throw new InvalidOperationException($"Subscription: {subscriber.GetType().Name} needs a Topic attribute.");
 
                 var subscription = new SubscriberDescriptor(
-                    topic: topic.Name,
+                    topic: _options.Value.GetName(topic.Name),
                     group: topic.Group ?? _options.Value.DefaultGroup,
                     subscriber: subscriber.GetType(),
                     target: topic?.Target ?? _factory.GetDefaultTarget().GetType());

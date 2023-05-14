@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MySqlConnector.Logging;
+using NLog.Extensions.Logging;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
-using Panama.Canal.Models;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ;
@@ -30,6 +32,16 @@ namespace Panama.Canal.Tests.RabbitMQ
                 .AddJsonFile("appsettings.test.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
+
+            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = _configuration;
+            MySqlConnectorLogManager.Provider = new MySqlConnector.Logging.NLogLoggerProvider();
+
+            _services.AddLogging(loggingBuilder => {
+                // configure Logging with NLog
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog(_configuration);
+            });
 
             Init();
         }
@@ -97,7 +109,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
 
@@ -162,7 +174,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
 
@@ -229,7 +241,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 
                 var state = provider.GetRequiredService<State>();
@@ -306,7 +318,7 @@ namespace Panama.Canal.Tests.RabbitMQ
             Assert.IsNotNull(message);
             Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
             Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
-            Assert.AreEqual(message.GetName(), "foo.created");
+            Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
             Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 
             var state = provider.GetRequiredService<State>();

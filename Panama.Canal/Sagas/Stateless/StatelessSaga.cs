@@ -45,7 +45,7 @@ namespace Panama.Canal.Sagas.Stateless
 
             States = new List<ISagaState>();
             Triggers = new List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>();
-            ReplyTopic = string.Join(".", new List<string>() { _canalOptions.Value.TopicPrefix ?? string.Empty, GetType().Name, "reply" }.Where(x => !string.IsNullOrEmpty(x)));
+            ReplyTopic = string.Join(".", new List<string>() { GetType().Name, "reply" });
             ReplyGroup = _canalOptions.Value.DefaultGroup;
             States.Add(new NotStarted());
 

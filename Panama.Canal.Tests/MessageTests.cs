@@ -112,7 +112,7 @@ namespace Panama.Canal.Tests
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
 
@@ -177,7 +177,7 @@ namespace Panama.Canal.Tests
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
 
@@ -244,7 +244,7 @@ namespace Panama.Canal.Tests
                 Assert.IsNotNull(message);
                 Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
                 Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
-                Assert.AreEqual(message.GetName(), "foo.created");
+                Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 
                 var state = provider.GetRequiredService<State>();
@@ -321,7 +321,7 @@ namespace Panama.Canal.Tests
             Assert.IsNotNull(message);
             Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
             Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
-            Assert.AreEqual(message.GetName(), "foo.created");
+            Assert.AreEqual(message.GetName(), options.Value.GetName("foo.created"));
             Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 
             var state = provider.GetRequiredService<State>();

@@ -13,6 +13,7 @@ using Panama.Canal.Sagas.Stateless;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Extensions;
 using Panama.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Panama.Canal.Registrars
 {
@@ -83,6 +84,9 @@ namespace Panama.Canal.Registrars
                 return;
 
             var options = new CanalOptions();
+
+            services.Configure<CanalOptions>(options =>
+                _builder.Configuration.GetSection("Panama:Canal:Options").Bind(options));
 
             options.SetBuilder(new Panama.Models.Builder(_builder.Configuration, _builder.Assemblies));
 

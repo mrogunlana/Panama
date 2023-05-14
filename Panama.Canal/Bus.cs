@@ -35,7 +35,7 @@ namespace Panama.Canal
         {
             var message = new Message()
                 .AddMessageId(Context.Id)
-                .AddMessageName(Context.Name)
+                .AddMessageName(_options.Value.GetName(Context.Name))
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
                 .AddMessageBroker(Context.Target?.AssemblyQualifiedName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
@@ -45,7 +45,7 @@ namespace Panama.Canal
                 .AddDelayTime(Context.Delay)
                 .AddHeaders(Context.Headers)
                 .AddData(Context.Data)
-                .AddReply(Context.Reply)
+                .AddReply(_options.Value.GetName(Context.Reply))
                 .AddSagaId(Context.SagaId)
                 .AddSagaType(Context.SagaType)
                 .ToInternal(Context.Provider);

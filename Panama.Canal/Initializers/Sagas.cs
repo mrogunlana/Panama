@@ -45,7 +45,7 @@ namespace Panama.Canal.Initializers
             foreach (var saga in sagas)
             {
                 var subscription = new SagaDescriptor(
-                    topic: saga.ReplyTopic,
+                    topic: _options.Value.GetName(saga.ReplyTopic),
                     group: saga.ReplyGroup ?? _options.Value.DefaultGroup,
                     saga: saga.GetType(),
                     target: saga?.Target ?? _factory.GetDefaultTarget().GetType());

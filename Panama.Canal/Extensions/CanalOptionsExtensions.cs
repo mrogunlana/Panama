@@ -30,5 +30,20 @@ namespace Panama.Canal.Extensions
 
             return builder.ToString();
         }
+
+        public static string GetName(this CanalOptions options, string? name = null)
+        {
+            if (string.IsNullOrEmpty(name))
+                return string.Empty;
+
+            var prefix = string.Join(".", new List<string?>() { options.Scope, options.TopicPrefix }.Where(x => !string.IsNullOrEmpty(x)));
+            var fqn = string.Join(".", new List<string?>() { prefix, name }.Where(x => !string.IsNullOrEmpty(x)));
+            if (string.IsNullOrEmpty(prefix))
+                return name;
+            if (name.Contains(prefix, StringComparison.OrdinalIgnoreCase))
+                return name;
+
+            return fqn;
+        }
     }
 }

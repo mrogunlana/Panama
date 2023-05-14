@@ -60,15 +60,14 @@ namespace Panama.Canal.RabbitMQ
         {
             client.OnCallback = async (message, sender) =>
             {
-
                 try
                 {
-                    _log.LogInformation($"Received message. ID:{message.GetId()}.");
-
                     var result = message.TryGetModels(_provider);
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
                     var local = result.DataGetSingle<InternalMessage>();
+
+                    _log.LogInformation($"Received message ({external.GetName()}). Message ID:{message.GetId()}.");
 
                     //received id = published id
                     var value = external
