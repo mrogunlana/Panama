@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Panama.Canal.Brokers.Interfaces;
+using Panama.Canal.Brokers;
 using Panama.Canal.Channels;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
@@ -35,6 +37,7 @@ namespace Panama.Canal.Registrars
             
             services.AddSingleton<IBootstrapper, Bootstrapper>();
 
+            services.AddSingleton<ITargetFactory, TargetFactory>();
             services.AddTransient<DefaultConsumerProcessor>();
             services.AddTransient<DefaultProducerProcessor>();
             services.AddTransient<SagaConsumerProcessor>();

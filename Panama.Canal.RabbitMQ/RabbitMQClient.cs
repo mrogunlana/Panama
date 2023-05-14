@@ -36,7 +36,7 @@ namespace Panama.Canal.RabbitMQ
         {
             var headers = e.GetHeaders();
 
-            headers.Add(Canal.Models.Messaging.Headers.Group, _queue);
+            headers.TryAdd(Canal.Models.Messaging.Headers.Group, _queue);
 
             var message = new TransientMessage(headers, e.Body.ToArray());
 

@@ -4,10 +4,9 @@ namespace Panama.Canal.RabbitMQ.Models
 {
     public class RabbitMQOptions : IBrokerOptions
     {
-        public static string Section { get; set; } = "Panama:Canal:RabbitMQ";
-        public string UserName { get; set; } = "guest";
+        public string Username { get; set; } = "guest";
         public string Password { get; set; } = "guest";
-        public string HostName { get; set; } = "localhost";
+        public string Host { get; set; } = "localhost";
         public string HostAddress { get; set; } 
         public int Port { get; set; } = 5672;
         public string VHost { get; set; } = "/";
@@ -21,7 +20,7 @@ namespace Panama.Canal.RabbitMQ.Models
 
         public RabbitMQOptions()
         {
-            HostAddress = $"{HostName}:{Port}";
+            HostAddress = $"{Host}:{Port}";
         }
     }
 }

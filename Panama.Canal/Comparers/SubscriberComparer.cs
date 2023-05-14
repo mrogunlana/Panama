@@ -26,7 +26,7 @@ namespace Panama.Canal.Comparers
 
             var result = string.Equals(_this?.Topic, _that?.Topic, StringComparison.OrdinalIgnoreCase) &&
                          string.Equals(_this?.Group, _that?.Group, StringComparison.OrdinalIgnoreCase) &&
-                         _this?.Target == _that?.Target;
+                         string.Equals(_this?.Target?.FullName, _that?.Target?.FullName, StringComparison.OrdinalIgnoreCase);
             
             if (result)
                 _log.LogWarning(
@@ -43,9 +43,9 @@ namespace Panama.Canal.Comparers
 
             var hashGroup = obj.Group == null ? 0 : obj.Group.GetHashCode();
 
-            var hashBroker = obj.Target == null ? 0 : obj.Target.GetHashCode();
+            var hashTarget = obj.Target == null ? 0 : obj.Target.GetHashCode();
 
-            return hashGroup ^ hashTopic ^ hashBroker;
+            return hashGroup ^ hashTopic ^ hashTarget;
         }
     }
 }

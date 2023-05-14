@@ -48,9 +48,9 @@ namespace Panama.Canal.RabbitMQ
 
                 var metadata = context.Data.DataGetSingle<InternalMessage>();
                 var message = metadata.GetData<Message>(_provider);
-                var transport = message.ToTransient(_provider);
+                var transport = metadata.ToTransient(_provider);
                 var properties = channel.CreateBasicProperties();
-
+                
                 properties.DeliveryMode = 2;
                 properties.Headers = message.Headers.ToDictionary(x => x.Key, x => (object?)x.Value);
 

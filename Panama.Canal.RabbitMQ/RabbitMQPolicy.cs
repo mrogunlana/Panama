@@ -33,16 +33,16 @@ namespace Panama.Canal.RabbitMQ
         {
             var factory = new ConnectionFactory() {
                 Port = _options.Port,
-                HostName = _options.HostName.Contains(",") ? null : _options.HostName,
-                UserName = _options.UserName,
+                HostName = _options.Host.Contains(",") ? null : _options.Host,
+                UserName = _options.Username,
                 Password = _options.Password,
                 VirtualHost = _options.VHost,
                 DispatchConsumersAsync = true,
                 ClientProvidedName = Assembly.GetEntryAssembly()?.GetName().Name!.ToLower()
             };
 
-            if (_options.HostName.Contains(","))
-                return factory.CreateConnection(AmqpTcpEndpoint.ParseMultiple(_options.HostName));
+            if (_options.Host.Contains(","))
+                return factory.CreateConnection(AmqpTcpEndpoint.ParseMultiple(_options.Host));
             else
                 return factory.CreateConnection();
         }

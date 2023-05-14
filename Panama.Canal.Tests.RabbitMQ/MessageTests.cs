@@ -1,7 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
@@ -9,12 +6,14 @@ using Panama.Canal.Jobs;
 using Panama.Canal.Models;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
+using Panama.Canal.RabbitMQ;
+using Panama.Canal.RabbitMQ.Models;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
 
-namespace Panama.Canal.Tests
+namespace Panama.Canal.Tests.RabbitMQ
 {
     [TestClass]
     public class MessageTests
@@ -45,20 +44,6 @@ namespace Panama.Canal.Tests
         }
 
         [TestMethod]
-        public void VerifyMessageDeserialization()
-        {
-            _services.AddPanama(_configuration);
-            var provider = _services.BuildServiceProvider();
-
-            var message = new Message();
-            message.AddData(new Foo());
-            var that = message.ToInternal(provider);
-            var @this = that.GetData<Message>(provider);
-
-            Assert.AreEqual(message.Value?.To<Foo>()?.Value, @this.Value?.To<Foo>()?.Value);
-        }
-
-        [TestMethod]
         public async Task VerifyScheduledPollingPublishMessageState()
         {
             _services.AddPanama(
@@ -66,7 +51,7 @@ namespace Panama.Canal.Tests
                 setup: options => {
                     options.UseCanal(canal => {
                         canal.UseDefaultStore();
-                        canal.UseDefaultBroker();
+                        canal.UseRabbitMq();
                         canal.UseDefaultScheduler(scheduler => {
                             scheduler.RemoveJob<DelayedPublished>();
                             scheduler.RemoveJob<DeleteExpired>();
@@ -110,8 +95,8 @@ namespace Panama.Canal.Tests
                 var message = store.Published[id].GetData<Message>(provider);
 
                 Assert.IsNotNull(message);
-                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
-                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
                 Assert.AreEqual(message.GetName(), "foo.created");
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
@@ -127,7 +112,7 @@ namespace Panama.Canal.Tests
                 setup: options => {
                     options.UseCanal(canal => {
                         canal.UseDefaultStore();
-                        canal.UseDefaultBroker();
+                        canal.UseRabbitMq();
                     });
                 });
 
@@ -175,8 +160,8 @@ namespace Panama.Canal.Tests
                 var message = store.Published[id].GetData<Message>(provider);
 
                 Assert.IsNotNull(message);
-                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
-                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
                 Assert.AreEqual(message.GetName(), "foo.created");
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
             }
@@ -193,7 +178,7 @@ namespace Panama.Canal.Tests
                 setup: options => {
                     options.UseCanal(canal => {
                         canal.UseDefaultStore();
-                        canal.UseDefaultBroker();
+                        canal.UseRabbitMq();
                     });
                 });
 
@@ -242,8 +227,8 @@ namespace Panama.Canal.Tests
                 var message = store.Published[id].GetData<Message>(provider);
 
                 Assert.IsNotNull(message);
-                Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
-                Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+                Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
+                Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
                 Assert.AreEqual(message.GetName(), "foo.created");
                 Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 
@@ -266,7 +251,7 @@ namespace Panama.Canal.Tests
                 setup: options => {
                     options.UseCanal(canal => {
                         canal.UseDefaultStore();
-                        canal.UseDefaultBroker();
+                        canal.UseRabbitMq();
                         canal.UseDefaultScheduler();
                     });
                 });
@@ -300,7 +285,7 @@ namespace Panama.Canal.Tests
 
             var store = provider.GetRequiredService<Store>();
             
-            await Task.Delay(TimeSpan.FromSeconds(100));
+            await Task.Delay(TimeSpan.FromSeconds(90));
 
             Assert.IsTrue(store.Published.Count == 2);
             Assert.IsNotNull(store.Published[id]);
@@ -319,8 +304,8 @@ namespace Panama.Canal.Tests
             var message = store.Published[id].GetData<Message>(provider);
 
             Assert.IsNotNull(message);
-            Assert.AreEqual(message.GetBrokerType(), typeof(DefaultTarget));
-            Assert.AreEqual(message.GetBroker(), typeof(DefaultTarget).AssemblyQualifiedName);
+            Assert.AreEqual(message.GetBrokerType(), typeof(RabbitMQTarget));
+            Assert.AreEqual(message.GetBroker(), typeof(RabbitMQTarget).AssemblyQualifiedName);
             Assert.AreEqual(message.GetName(), "foo.created");
             Assert.AreEqual(message.GetGroup(), options.Value.DefaultGroup);
 

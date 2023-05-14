@@ -5,7 +5,6 @@ using Panama.Canal.Exceptions;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
-using Panama.Canal.Models;
 using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
@@ -69,19 +68,23 @@ namespace Panama.Canal.RabbitMQ
                     var result = message.TryGetModels(_provider);
                     var transient = result.DataGetSingle<TransientMessage>();
                     var external = result.DataGetSingle<Message>();
+                    var local = result.DataGetSingle<InternalMessage>();
 
-                    await new Context(_provider).Bus()
-                        .Id(Guid.NewGuid().ToString())
+                    //received id = published id
+                    var value = external
+                        .AddCreatedTime()
+                        .ToInternal(_provider)
+                        .SetStatus(MessageStatus.Scheduled);
+
+                    if (!result.Success)
+                        value = value
+                            .SetStatus(MessageStatus.Failed)
+                            .SetFailedExpiration(_provider, DateTime.UtcNow);
+
+                    await new Context(_provider, _cts.Token).Bus()
                         .CorrelationId(external.GetCorrelationId())
                         .Invoker(_invokers.GetInvoker())
-                        .Post(external
-                            .ResetId()
-                            .AddCreatedTime()
-                            .ToInternal(_provider)
-                            .SetStatus(result.Success
-                                ? MessageStatus.Scheduled
-                                : MessageStatus.Failed)
-                            .SetFailedExpiration(_provider, DateTime.UtcNow))
+                        .Post(value, _cts.Token)
                         .ConfigureAwait(false);
 
                     client.Commit(sender);
@@ -99,7 +102,7 @@ namespace Panama.Canal.RabbitMQ
         {
             var subscriptions = _subscriptions.GetDescriptions(typeof(RabbitMQTarget));
             var sagas = _sagas.GetDescriptions(typeof(RabbitMQTarget));
-            var descriptions = subscriptions.Concat(sagas).ToDictionary<DefaultTarget>();
+            var descriptions = subscriptions.Concat(sagas).ToDictionary<RabbitMQTarget>();
 
             foreach (var description in descriptions)
             {

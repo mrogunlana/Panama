@@ -38,7 +38,7 @@ namespace Panama.Canal
                 .AddMessageName(Context.Name)
                 .AddCorrelationId(Context.CorrelationId)
                 .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
-                .AddMessageBroker(Context.Target?.FullName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
+                .AddMessageBroker(Context.Target?.AssemblyQualifiedName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
                 .AddMessageInstance(Context.Instance)
                 .AddMessageType(Context.Data.GetType().AssemblyQualifiedName)
                 .AddCreatedTime()

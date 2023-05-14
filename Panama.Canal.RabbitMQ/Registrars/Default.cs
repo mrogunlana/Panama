@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Panama.Canal.Brokers.Interfaces;
+using Panama.Canal.Interfaces;
 using Panama.Canal.RabbitMQ.Models;
 using Panama.Interfaces;
 using RabbitModel = RabbitMQ.Client.IModel;
@@ -27,9 +28,12 @@ namespace Panama.Canal.RabbitMQ.Registrars
         {
             services.AddSingleton(new RabbitMQMarker());
 
-            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            services.AddSingleton<IPooledObjectPolicy<RabbitModel>, RabbitMQPolicy>();
+            services.AddSingleton<RabbitMQTarget>();
             services.AddSingleton<IBroker, RabbitMQBroker>();
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            services.AddSingleton<RabbitMQPolicy>();
+            services.AddSingleton<IPooledObjectPolicy<RabbitModel>, RabbitMQPolicy>(p => p.GetRequiredService<RabbitMQPolicy>());
+
             services.AddSingleton<RabbitMQFactory>();
             services.AddSingleton<IBrokerFactory, RabbitMQFactory>();
             services.AddSingleton<IBrokerProcess, RabbitMQProcess>();
@@ -47,11 +51,12 @@ namespace Panama.Canal.RabbitMQ.Registrars
                 return;
 
             services.Configure<RabbitMQOptions>(options =>
-                _builder.Configuration.GetSection(RabbitMQOptions.Section).Bind(options));
+                _builder.Configuration.GetSection("Panama:Canal:Brokers:RabbitMQ:Options").Bind(options));
 
-            services.Configure<RabbitMQOptions>((x) =>
-            {
+            services.Configure<RabbitMQOptions>((x) => {
                 _setup(x);
+            });
+            services.PostConfigure<RabbitMQOptions>((x) => {
                 services.AddSingleton<IBrokerOptions>(x);
             });
         }

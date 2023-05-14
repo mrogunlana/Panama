@@ -31,7 +31,6 @@ namespace Panama.Canal.Registrars
             services.AddSingleton<DefaultTarget>();
             services.AddSingleton<IBroker, Brokers.Broker>();
             services.AddSingleton<IBrokerClient, BrokerClient>();
-            services.AddSingleton<ITargetFactory, TargetFactory>();
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<IPooledObjectPolicy<BrokerConnection>, BrokerPolicy>();
 
