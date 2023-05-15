@@ -75,5 +75,19 @@ namespace Panama.Extensions
 
             return context;
         }
+        public static List<T> SnapshotGet<T>(this IContext context) where T : IModel
+        {
+            return context.Data.SnapshotGet<T>();
+        }
+
+        public static T SnapshotGetSingle<T>(this IContext context) where T : IModel
+        {
+            return context.Data.SnapshotGetSingle<T>();
+        }
+
+        public static void Snapshot<T>(this IContext context, T model) where T : IModel
+        {
+            context.Data.Add(new Snapshot<T>(model));
+        }
     }
 }
