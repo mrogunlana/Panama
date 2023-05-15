@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.MySQL", "Panam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Tests", "Panama.Tests\Panama.Tests.csproj", "{79D90681-9EA4-405A-B402-AFE9878AE9F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.TestApi", "Panama.TestApi\Panama.TestApi.csproj", "{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.RabbitMQ", "Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj", "{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests", "Panama.Canal.Tests\Panama.Canal.Tests.csproj", "{A6D0D087-01BC-4420-8AF0-C8B613AC8EB3}"
@@ -21,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests.MySQL", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Canal.Tests.RabbitMQ", "Panama.Canal.Tests.RabbitMQ\Panama.Canal.Tests.RabbitMQ.csproj", "{457F5084-530A-415E-966F-A057BFC100EE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{CF832FA7-007C-42DA-85C4-2DB74B52576D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{48ED27A0-7AB3-40AF-BC72-BA5940016899}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Samples.TestApi", "Samples\Panama.Samples.TestApi\Panama.Samples.TestApi.csproj", "{D5C262B2-0924-4F95-B315-DC3F307AD27E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +45,6 @@ Global
 		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79D90681-9EA4-405A-B402-AFE9878AE9F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F9C0200-C4C8-47AE-BCDC-0E84BB5E024E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,12 +61,16 @@ Global
 		{457F5084-530A-415E-966F-A057BFC100EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{457F5084-530A-415E-966F-A057BFC100EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{457F5084-530A-415E-966F-A057BFC100EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D8D42C8E-0685-4FCF-BDAF-56840E8219A1} = {CF832FA7-007C-42DA-85C4-2DB74B52576D}
+		{D5C262B2-0924-4F95-B315-DC3F307AD27E} = {48ED27A0-7AB3-40AF-BC72-BA5940016899}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB49E1E0-AFFB-438A-9309-0BEF89DAE8F0}
