@@ -1,4 +1,4 @@
-# Panama - An elegant and concise dotnet core library that provides a  fluent API for event-based domain transactions  
+# Panama - An fluent dotnet core library for event-based microservices
 
 Panama is a dotnet core library based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
 
@@ -124,5 +124,5 @@ var result = await _provider
 	.Invoke();
 ```
 
-# Panama Canal - A dotnet core framework built to develop, test, and scale distributed microservices
+# Panama Canal - A dotnet core framework to develop, test, and scale distributed microservices
 
