@@ -1,8 +1,8 @@
-# Panama - A fluent dotnet core library for event-based microservices
+# Panama - A fluent dotnet core framework for event-based microservices
 
-Panama is a dotnet core library based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
+Panama is a dotnet core framework based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
 
-The library is organized around `ICommand`, `IQuery`, `IValidate`, `IRollback` interfaces:
+The framework is organized around `ICommand`, `IQuery`, `IValidate`, `IRollback` interfaces:
 
 ## ICommand
 Commands are objects that can change the state of a domain. A chain of responsibilities in the form of multiple `ICommand` objects can be scaffolded on a handler to form a comprehensive domain event:
@@ -161,7 +161,6 @@ services.AddLogging(loggingBuilder => {
     }
   }
 }
-
 ```
 
 # Panama Canal - A transactional event bus framework for distributed microservices
