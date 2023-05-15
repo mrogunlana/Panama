@@ -1,163 +1,128 @@
-# Panama.Core - A .NET Core 3 port of Panama.NET
+# Panama - An elegant and concise dotnet core library that provides a  fluent API for event-based domain transactions  
 
-Panama is a unique design pattern, created to simplify software design and more suitable in designing systems for over 70% of medium and large scale business design projects. It's goal is to reduce complexity normally found in N-Tier application where there are multiple layers (i.e. Service Layer, DataAcces Layer) required to invoke commands (i.e. save an object to a database). With Panama, the ability to invoke commands is reduced to one object that can be called directly from the UI or other top layer that a user or service may interact with directly.
+Panama is a dotnet core library based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
 
-## Getting Started
-Panama is built around a central Handler class that uses a fluent api to wire up validators and commands and invoked using the Invoke() method. 
+The library is organized around `ICommand`, `IQuery`, `IValidate`, `IRollback` interfaces:
 
-![alt text](https://raw.githubusercontent.com/mrogunlana/Panama/master/screenshots/The-Command-Handler-Architecture-by-Diran-Ogunlana-012.jpg "The-Command-Handler-Architecture-by-Diran-Ogunlana-012.jpg")
+## ICommand
+Commands are objects that can change the state of a domain. A chain of responsibilities in the form of multiple `ICommand` objects can be scaffolded on a handler to form a comprehensive domain event:
 
-### The Handler class and IoC
-The Handler class constructor takes in a ServiceLocator that is used to find commands and validators. The project includes a sample for use with Autofac, but any IoC container could work, it would just need to be implemented behind an IServiceLocator interface. Commands implement the ICommand interface and validators implement IValidator interface. Depending on how your IoC of choice works, you would wire up your specific implementations to the interface. Or if your IoC supports auto locating classes by interface, all the classes can be wired up and instantiated. Here is a sample of how to use Autofac to locate and instantiate all classes implementing the IValidator interface as singletons.
-
-```c#
- var builder = new ContainerBuilder();
- 
-//Register all validators -- singletons
-builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies())
-       .Where(t => t.IsAssignableTo<IValidation>())
-       .Named<IValidation>(t => t.Name)
-       .AsImplementedInterfaces()
-       .SingleInstance();
 ```
-### Commands
+var result = await _provider
+	.GetRequiredService<IHandler>()
+	.Add(new User() { Email: diran.ogunlana@gmail.com })
+	.Command<SaveUser>()
+	.Command<PublishUser>()
+	.Invoke();
+```
 
-Commands must implement the ICommand interface found in the dev.Core.Commands namespace
-The ICommand interface currently specifies just one method:
-```c#
-    void Execute(List<IModel> data);
+These objects inherit from the `ICommand` interface and should only encapsulate a single business rule:
 ```
-The interface allows Command classes to act on IModel objects (IModel is explained in further section below). Sample commands are provide in the project in the dev.Business.Commands namespace. Here is the SaveUser command implementation. Commands are only run after all Validators are run.
-```
- public class SaveUser : ICommand
+public class SaveUser : ICommand
     {
-        private IQuery _query;
-        public SaveUser(IQuery query)
+		private UserDbContext _store;
+		
+		public SaveUser(UserDbContext store)
+		{
+			_store = store;
+		}
+	
+        public bool Execute(IContext context)
         {
-            _query = query;
-        }
-        public void Execute(List<IModel> data)
-        {
-            var users = data.Get<User>();
-
-            foreach (var user in users)
-                _query.Save(user, new { user.ID });
+			var user = data.GetSingle<User>();
+		
+			_store.Entry(user).State = EntityState.Modified;
+			_store.SaveChangesAsync();
         }
     }
 ```
 
-### Validators
+## IQuery
+Query objects represent readonly data store operations such as retreiving a collection of entities by a condition from a data store:
 
-Validators must implement the IValidator interface which currently specifies two methods:
 ```
-        bool IsValid(List<IModel> data);
-        string Message();
+public class GetUser : IQuery
+    {
+		private UserDbContext _store;
+		
+		public GetUser(UserDbContext store)
+		{
+			_store = store;
+		}
+	
+        public bool Execute(IContext context)
+        {
+			//get id from payload
+			var id = context.KvpGetSingle<string, string>("User.Id");
+			
+			var user = context.Users
+				.Where(s => s.Id == id)
+				.FirstOrDefault();
+			
+			//save queried user to handler context for processing down stream
+			context.Data.Add(user);
+        }
+    }
 ```
-The interface allows Validator classes to act on IModel objects (IModel is explained in further section below). Sample validators are provided in the project in the dev.Business.Validators namespace. Here is the EmailNotNullOrEmpty validator implementation. 
+
+## IValidate
+Validators are objects that perform prerequisite operations against the handler context prior to query, command, or rollback operations: 
 ```
 public class EmailNotNullOrEmpty : IValidation
     {
-        public bool IsValid(List<IModel> data)
+        public bool Execute(IContext context)
         {
-            var models = data.Get<User>();
+            var models = context.DataGet<User>();
             if (models == null)
-                return false;
+                throw new ValidationException("User(s) cannot be found.");
 
             foreach (var user in models)
                 if (string.IsNullOrEmpty(user.Email))
-                    return false;
-
-            return true;
+                    throw new ValidationException($"{user.Name} email is not valid.");
         }
-
-        public string Message() => "Email is required.";
     }
 ```
 
-
-All Validators that are set on the Handler must return true for the IsValid method before the Commands that are set on the Handler are able torun.
-
-### Models
-
-Commands and Validators act on Models, which are classes that implement the IModel interface to represent model classes that are persisted to a database, The IModel interface specifies one property that represents the primary key of this row in it's respective table:
+## IRollback
+Rollback object perform the restoration operations against the domain in the event of an exception in processing the handler context. Take note of the use of the `Snapshot` filter on the context which creates a serialized copy of the object to preserve its original state:
 ```
-public interface IModel
-{
-    int _ID { get; set; }
-}
-```
-The model framework is found in the dev.Entities project. This project implements the Dapper ORM framework for performing database actions as well as mapping table data onto objects. The project includes a sample model class called User:
-```
-public class User : IModel
-{
-        public User()
+public class RollbackUser : IRollback
+    {
+		private UserDbContext _store;
+		
+		public RollbackUser(UserDbContext store)
+		{
+			_store = store;
+		}
+	
+        public bool Execute(IContext context)
         {
-            if (Modified == DateTime.MinValue)
-                Modified = DateTime.Now;
+			//get cached snapshot of previous state from handler context
+			var existing = context.SnapshotGetSingle<User>();
+			
+			//save snapshot version e.g. prior to current changes
+			_store.Entry(user).State = EntityState.Modified;
+			
+			await _store.SaveChangesAsync();
         }
-        public int _ID { get; set; }
-        public Guid ID { get; set; }
-        public Guid UserRoleId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
-        public bool Enabled { get; set; }
-        public bool KeepAlive { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Modified { get; set; }
-}
+    }
 ```
 
-Also included is the UserMap class which uses DapperExtensions to map between table data and the User model class.
-
+Here is an example of a save domain event with validation and rollback capabilities: 
 ```
-public class UserMap : ClassMapper<User>
-{
-        public UserMap()
-        {
-            Table("User");
-
-            Map(x => x._ID).Key(KeyType.Identity);
-            Map(x => x.ConfirmPassword).Ignore();
-            Map(x => x.Created).ReadOnly();
-
-            AutoMap();
-        }
-}
+var result = await _provider
+	.GetRequiredService<IHandler>()
+	.Add(new User() { 
+		Email = "diran.ogunlana@gmail.com", 
+		FirstName = "Diran" })
+	.Validate<EmailNotNullOrEmpty>()
+	.Query<GetUserByEmail>()
+	.Command<CreateUserSnapshot>()
+	.Command<SaveUser>()
+	.Command<PublishUser>()
+	.Rollback<RollbackUser>()
+	.Invoke();
 ```
 
-### Setting up the Sample projects
-Two sample projects are included to serve as examples for configuring a Web Api application and a console application. There is a also a sql script called create.sql under the dev.Sql folder which will create the tables necessary to run the samples. These will need to be added to an existing database and configured in the config files in both projects. 
+# Panama Canal - A dotnet core framework built to develop, test, and scale distributed microservices
 
-
-### Deadlines
-We support deadlines (and timeouts) via a cancellation token. Usually, the cancellation token may be sourced from the termination of an upstream call, Grpc [deadlines and cancellation](https://docs.microsoft.com/en-us/aspnet/core/grpc/deadlines-cancellation)
-```cs
-var source = new CancellationTokenSource();
-source.CancelAfter(TimeSpan.FromSeconds(5));
-var token = source.Token;
-var handler = await new Handler(ServiceLocator.Current)
-    .Add(token)
-    .Add(new User() { 
-        ID = Guid.NewGuid(),  
-        Email = "test@test.com",
-        FirstName = "John_UPDATED",
-        LastName = "Doe"
-    })
-    .Command<UpdateCommand>()
-    .InvokeAsync();
-
-```
-
-The above code snippet processes an instruction with a deadline of 5 seconds.
-`handler.Cancelled` will be `True` if the processing timed out.
-Transactions are also not committed if upstream processing has timed out. See [sample](https://github.com/mrogunlana/Panama.Core/blob/master/Panama.MySql.Dapper/MySqlQuery.cs#L149)
-
-### More Info
-
-For more detailed info on this project please see the following:
-* [Intro to Command-Handler-Pattern](https://youtu.be/T0Nku5qsEqg) - video introduction
-* [Command-Handler-Pattern Manual](https://goo.gl/6KAr37) - pdf
