@@ -1,9 +1,0 @@
-C:\Projects\panama-core\Panama.MySql.Dapper\bin\Release\netcoreapp3.0\Panama.MySql.Dapper.deps.json
-C:\Projects\panama-core\Panama.MySql.Dapper\bin\Release\netcoreapp3.0\Panama.MySql.Dapper.dll
-C:\Projects\panama-core\Panama.MySql.Dapper\bin\Release\netcoreapp3.0\Panama.MySql.Dapper.pdb
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.csprojAssemblyReference.cache
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.csproj.CoreCompileInputs.cache
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.AssemblyInfoInputs.cache
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.AssemblyInfo.cs
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.dll
-C:\Projects\panama-core\Panama.MySql.Dapper\obj\Release\netcoreapp3.0\Panama.MySql.Dapper.pdb

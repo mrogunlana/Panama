@@ -1,163 +1,305 @@
-# Panama.Core - A .NET Core 3 port of Panama.NET
+# Panama - A fluent dotnet core framework for event-based microservices
 
-Panama is a unique design pattern, created to simplify software design and more suitable in designing systems for over 70% of medium and large scale business design projects. It's goal is to reduce complexity normally found in N-Tier application where there are multiple layers (i.e. Service Layer, DataAcces Layer) required to invoke commands (i.e. save an object to a database). With Panama, the ability to invoke commands is reduced to one object that can be called directly from the UI or other top layer that a user or service may interact with directly.
+Panama is a dotnet core framework based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
 
-## Getting Started
-Panama is built around a central Handler class that uses a fluent api to wire up validators and commands and invoked using the Invoke() method. 
+The framework is organized around `ICommand`, `IQuery`, `IValidate`, `IRollback` interfaces:
 
-![alt text](https://raw.githubusercontent.com/mrogunlana/Panama/master/screenshots/The-Command-Handler-Architecture-by-Diran-Ogunlana-012.jpg "The-Command-Handler-Architecture-by-Diran-Ogunlana-012.jpg")
+## ICommand
+Commands are objects that can change the state of a domain. A chain of responsibilities in the form of multiple `ICommand` objects can be scaffolded on a handler to form a comprehensive domain event:
 
-### The Handler class and IoC
-The Handler class constructor takes in a ServiceLocator that is used to find commands and validators. The project includes a sample for use with Autofac, but any IoC container could work, it would just need to be implemented behind an IServiceLocator interface. Commands implement the ICommand interface and validators implement IValidator interface. Depending on how your IoC of choice works, you would wire up your specific implementations to the interface. Or if your IoC supports auto locating classes by interface, all the classes can be wired up and instantiated. Here is a sample of how to use Autofac to locate and instantiate all classes implementing the IValidator interface as singletons.
-
-```c#
- var builder = new ContainerBuilder();
- 
-//Register all validators -- singletons
-builder.RegisterAssemblyTypes(AppDomain.CurrentDomain.GetAssemblies())
-       .Where(t => t.IsAssignableTo<IValidation>())
-       .Named<IValidation>(t => t.Name)
-       .AsImplementedInterfaces()
-       .SingleInstance();
 ```
-### Commands
-
-Commands must implement the ICommand interface found in the dev.Core.Commands namespace
-The ICommand interface currently specifies just one method:
-```c#
-    void Execute(List<IModel> data);
-```
-The interface allows Command classes to act on IModel objects (IModel is explained in further section below). Sample commands are provide in the project in the dev.Business.Commands namespace. Here is the SaveUser command implementation. Commands are only run after all Validators are run.
-```
- public class SaveUser : ICommand
-    {
-        private IQuery _query;
-        public SaveUser(IQuery query)
-        {
-            _query = query;
-        }
-        public void Execute(List<IModel> data)
-        {
-            var users = data.Get<User>();
-
-            foreach (var user in users)
-                _query.Save(user, new { user.ID });
-        }
-    }
+var result = await _provider
+	.GetRequiredService<IHandler>()
+	.Add(new User() { Email: diran.ogunlana@gmail.com })
+	.Command<SaveUser>()
+	.Command<PublishUser>()
+	.Invoke();
 ```
 
-### Validators
+These objects inherit from the `ICommand` interface and should only encapsulate a single business rule:
+```
+public class SaveUser : ICommand
+{
+	private UserDbContext _store;
+	
+	public SaveUser(UserDbContext store)
+	{
+		_store = store;
+	}
 
-Validators must implement the IValidator interface which currently specifies two methods:
+	public bool Execute(IContext context)
+	{
+		var user = data.GetSingle<User>();
+	
+		_store.Entry(user).State = EntityState.Modified;
+		_store.SaveChangesAsync();
+	}
+}
 ```
-        bool IsValid(List<IModel> data);
-        string Message();
+
+## IQuery
+Query objects represent readonly data store operations such as retreiving a collection of entities by a condition from a data store:
+
 ```
-The interface allows Validator classes to act on IModel objects (IModel is explained in further section below). Sample validators are provided in the project in the dev.Business.Validators namespace. Here is the EmailNotNullOrEmpty validator implementation. 
+public class GetUser : IQuery
+{
+	private UserDbContext _store;
+	
+	public GetUser(UserDbContext store)
+	{
+		_store = store;
+	}
+
+	public bool Execute(IContext context)
+	{
+		//get id from payload
+		var id = context.KvpGetSingle<string, string>("User.Id");
+		
+		var user = context.Users
+			.Where(s => s.Id == id)
+			.FirstOrDefault();
+		
+		//save queried user to handler context for processing down stream
+		context.Data.Add(user);
+	}
+}
+```
+
+## IValidate
+Validators are objects that perform prerequisite operations against the handler context prior to query, command, or rollback operations: 
 ```
 public class EmailNotNullOrEmpty : IValidation
-    {
-        public bool IsValid(List<IModel> data)
-        {
-            var models = data.Get<User>();
-            if (models == null)
-                return false;
+{
+	public bool Execute(IContext context)
+	{
+		var models = context.DataGet<User>();
+		if (models == null)
+			throw new ValidationException("User(s) cannot be found.");
 
-            foreach (var user in models)
-                if (string.IsNullOrEmpty(user.Email))
-                    return false;
+		foreach (var user in models)
+			if (string.IsNullOrEmpty(user.Email))
+				throw new ValidationException($"{user.Name} email is not valid.");
+	}
+}
+```
 
-            return true;
-        }
+## IRollback
+Rollback object perform the restoration operations against the domain in the event of an exception in processing the handler context. Take note of the use of the `Snapshot` filter on the context which creates a serialized copy of the object to preserve its original state:
+```
+public class RollbackUser : IRollback
+{
+	private UserDbContext _store;
+	
+	public RollbackUser(UserDbContext store)
+	{
+		_store = store;
+	}
 
-        public string Message() => "Email is required.";
+	public bool Execute(IContext context)
+	{
+		//get cached snapshot of previous state from handler context
+		var existing = context.SnapshotGetSingle<User>();
+		
+		//save snapshot version e.g. prior to current changes
+		_store.Entry(user).State = EntityState.Modified;
+		
+		await _store.SaveChangesAsync();
+	}
+}
+```
+
+Here is an example of a save domain event with validation and rollback capabilities: 
+```
+var result = await _provider
+	.GetRequiredService<IHandler>()
+	.Add(new User() { 
+		Email = "diran.ogunlana@gmail.com", 
+		FirstName = "Diran" })
+	.Validate<UserEmailNotNullOrEmpty>()
+	.Validate<UserFirstNameNotNullOrEmpty>()
+	.Query<GetUserByEmail>()
+	.Command<CreateUserSnapshot>()
+	.Command<SaveUser>()
+	.Command<PublishUser>()
+	.Rollback<RollbackUser>()
+	.Invoke();
+```
+
+# Getting Started
+
+Default Configuration:
+```
+services.AddPanama(configuration: builder.Configuration);
+```
+
+For native logging support, add the `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging` nuget packages with the following configuration:
+```
+services.AddLogging(loggingBuilder => {
+	
+	loggingBuilder.ClearProviders();
+	loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+	
+	// configure Logging with NLog, ex:
+	// loggingBuilder.AddNLog(_configuration);
+});
+```
+
+`appsettings.json` or environment variables can be for initial options configurations:
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
     }
-```
-
-
-All Validators that are set on the Handler must return true for the IsValid method before the Commands that are set on the Handler are able torun.
-
-### Models
-
-Commands and Validators act on Models, which are classes that implement the IModel interface to represent model classes that are persisted to a database, The IModel interface specifies one property that represents the primary key of this row in it's respective table:
-```
-public interface IModel
-{
-    int _ID { get; set; }
+  },
+  "AllowedHosts": "*",
+  "Panama": {
+    "Canal": {
+	  "Options": {
+        "Scope": [CLUSTER_NAMESPACE]
+      }
+    }
+  }
 }
 ```
-The model framework is found in the dev.Entities project. This project implements the Dapper ORM framework for performing database actions as well as mapping table data onto objects. The project includes a sample model class called User:
+
+# Panama Canal - A transactional event bus framework for distributed microservices
+
+The Canal provides a transactional messaging framework with saga support for dotnet core. The Canal integrates with native dotnet core DI, logging [(dotnet core logging)](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging) and Entity Framework [(dotnet ef core)](https://learn.microsoft.com/en-us/ef/core/). Messages can be published using polling or event stream. Multiple message brokers can be configured and scoped for auto-scaling scenarios. 
+
+## Panama Canal Architecture At A Glance: 
+
+![image](https://user-images.githubusercontent.com/11683585/223599365-5b2a1d4f-a3cc-432b-b5d0-62c1188b4cb1.png)    
+
+## Panama Canal Implementation At A Glance:
+
 ```
-public class User : IModel
+public class SaveWeatherForecast : ICommand
 {
-        public User()
-        {
-            if (Modified == DateTime.MinValue)
-                Modified = DateTime.Now;
+	private readonly IGenericChannelFactory _factory;
+	private readonly WeatherForecastDbContext _store;
+
+	public PublishWeatherForecast(
+		IGenericChannelFactory factory, 
+		WeatherForecastDbContext store)
+	{
+		_store = store;
+		_factory = factory;
+	}
+	public async Task Execute(IContext context)
+	{
+		var model = context.Data.DataGet<WeatherForecast>();
+
+		using (var channel = _factory.CreateChannel<DatabaseFacade, IDbContextTransaction>(_store.Database, context.Token))
+		{
+			_store.Entry(model).State = EntityState.Modified;
+			_store.SaveChangesAsync();
+			
+			await context.Bus()
+				.Channel(channel)
+				.Token(context.Token)
+				.Topic("forecast.created")
+				.Data(model)
+				.Post();
+
+			await channel.Commit();
+		}
+	}
+}
+```
+
+> In the above example, a `IChannel` which creates a transaction to emit the forecast message if and only if the forecast was stored successfully via the `Commit()` function. 
+
+A saga can be used for more exhaustive use cases: 
+```
+var model = context.Data.DataGet<WeatherForecast>();
+
+using (var channel = _factory.CreateChannel<DatabaseFacade, IDbContextTransaction>(_store.Database, context.Token))
+{
+	...
+	
+	await context.Saga<CreateWeatherForcastSaga>()
+		.Channel(channel)
+		.Data(model)
+		.Start();
+
+	await channel.Commit();
+}
+```
+> see [CreateWeatherForcast](Samples/Panama.Samples.TestApi/Sagas/CreateWeatherForcast) for the full implementation sample
+
+# Getting Started
+
+Default Services Configuration:
+> `UseDefaultStore` and `UseDefaultBroker` are in-memory services used in unit testing scenarios
+```
+services.AddPanama(
+	configuration: builder.Configuration,
+	setup: options => {
+		options.UseCanal(canal => {
+			canal.UseDefaultStore();
+			canal.UseDefaultBroker();
+			canal.UseDefaultScheduler();
+		});
+	});
+```
+> **NOTE:** Panama Canal must have a store and atleast one broker service configured
+
+MySql & RabbitMQ Services Configuration:
+```
+services.AddPanama(
+	configuration: builder.Configuration,
+	setup: options => {
+		options.UseCanal(canal => {
+			canal.UseMySqlStore();
+			canal.UseRabbitMq();
+			canal.UseDefaultScheduler();
+		});
+	});
+```
+
+`appsettings.json` or environment variables can be for initial options configurations:
+```
+{
+  "ConnectionStrings": {
+    "MySql": [DB_CONNECTION]
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    }
+  },
+  "AllowedHosts": "*",
+  "Panama": {
+    "Canal": {
+	  "Options": {
+        "Scope": [CLUSTER_NAMESPACE]
+      },
+      "Brokers": {
+        "RabbitMQ": {
+          "Options": {
+            "Port": [RABBIT_PORT],
+            "Host": [RABBIT_HOST],
+            "Username": [RABBIT_USERNAME],
+            "Password": [RABBIT_PASSWORD]
+          }
         }
-        public int _ID { get; set; }
-        public Guid ID { get; set; }
-        public Guid UserRoleId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
-        public bool Enabled { get; set; }
-        public bool KeepAlive { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Modified { get; set; }
-}
-```
-
-Also included is the UserMap class which uses DapperExtensions to map between table data and the User model class.
-
-```
-public class UserMap : ClassMapper<User>
-{
-        public UserMap()
-        {
-            Table("User");
-
-            Map(x => x._ID).Key(KeyType.Identity);
-            Map(x => x.ConfirmPassword).Ignore();
-            Map(x => x.Created).ReadOnly();
-
-            AutoMap();
+      },
+      "Stores": {
+        "MySql": {
+          "Options": {
+            "Port": [DB_PORT],
+            "Host": [DB_HOST],
+            "Username": [DB_USERNAME],
+            "Password": [DB_PASSWORD],
+            "Database": [DB_NAME]
+          }
         }
+      }
+    }
+  }
 }
-```
-
-### Setting up the Sample projects
-Two sample projects are included to serve as examples for configuring a Web Api application and a console application. There is a also a sql script called create.sql under the dev.Sql folder which will create the tables necessary to run the samples. These will need to be added to an existing database and configured in the config files in both projects. 
-
-
-### Deadlines
-We support deadlines (and timeouts) via a cancellation token. Usually, the cancellation token may be sourced from the termination of an upstream call, Grpc [deadlines and cancellation](https://docs.microsoft.com/en-us/aspnet/core/grpc/deadlines-cancellation)
-```cs
-var source = new CancellationTokenSource();
-source.CancelAfter(TimeSpan.FromSeconds(5));
-var token = source.Token;
-var handler = await new Handler(ServiceLocator.Current)
-    .Add(token)
-    .Add(new User() { 
-        ID = Guid.NewGuid(),  
-        Email = "test@test.com",
-        FirstName = "John_UPDATED",
-        LastName = "Doe"
-    })
-    .Command<UpdateCommand>()
-    .InvokeAsync();
 
 ```
 
-The above code snippet processes an instruction with a deadline of 5 seconds.
-`handler.Cancelled` will be `True` if the processing timed out.
-Transactions are also not committed if upstream processing has timed out. See [sample](https://github.com/mrogunlana/Panama.Core/blob/master/Panama.MySql.Dapper/MySqlQuery.cs#L149)
-
-### More Info
-
-For more detailed info on this project please see the following:
-* [Intro to Command-Handler-Pattern](https://youtu.be/T0Nku5qsEqg) - video introduction
-* [Command-Handler-Pattern Manual](https://goo.gl/6KAr37) - pdf
+For inquiries and support, contact: [Diran Ogunlana](mailto:diran.ogunlana@gmail.com)

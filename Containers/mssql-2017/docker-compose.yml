@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  db:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:  
+      - 1433:1433
+    env_file: .env
+    volumes: 
+      - sqldata:/var/opt/sqlserver/data
+      - ./setup.sql:/usr/config/setup.sql
+
+# from https://github.com/microsoft/mssql-docker/issues/668#issuecomment-812530180
+  mssqlarm64:
+    # image: mcr.microsoft.com/azure-sql-edge:latest
+    build: 
+      context: .
+      dockerfile: Dockerfilearm64
+    container_name: mssql
+    volumes:
+      - events_mssql:/var/opt/mssql
+      - ./setup.sql:/usr/config/setup.sql
+    ports:
+      - 1433:1433
+    env_file: .env
+  
+volumes:
+  events_mssql:
+  sqldata:

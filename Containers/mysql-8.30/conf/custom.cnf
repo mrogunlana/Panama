@@ -1,0 +1,14 @@
+[mysqld]
+server-id 							= 1
+character-set-server				= utf8mb4
+collation-server					= utf8mb4_unicode_ci
+binlog_format 						= row
+binlog_row_image 					= full
+binlog_expire_logs_seconds			= 604800
+gtid_mode                			= ON
+enforce_gtid_consistency 			= ON
+log_replica_updates					= TRUE
+log_bin								= ON
+
+[client]
+default-character-set				= utf8mb4

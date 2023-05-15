@@ -50,6 +50,7 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+[Dd]ata/
 
 .idea/
 .ionic/
