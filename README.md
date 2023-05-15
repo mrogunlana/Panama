@@ -125,15 +125,54 @@ var result = await _provider
 	.Invoke();
 ```
 
+# Getting Started
+
+Default Configuration:
+```
+services.AddPanama(configuration: builder.Configuration);
+```
+
+For native logging support, add the `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging` nuget packages with the following configuration:
+```
+services.AddLogging(loggingBuilder => {
+	
+	loggingBuilder.ClearProviders();
+	loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+	
+	// configure Logging with NLog, ex:
+	// loggingBuilder.AddNLog(_configuration);
+});
+```
+
+`appsettings.json` or environment variables can be for initial options configurations:
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    }
+  },
+  "AllowedHosts": "*",
+  "Panama": {
+    "Canal": {
+	  "Options": {
+        "Scope": [CLUSTER_NAMESPACE]
+      }
+    }
+  }
+}
+
+```
+
 # Panama Canal - A transactional event bus framework for distributed microservices
 
 The Canal provides a transactional messaging framework with saga support for dotnet core. The Canal integrates with native dotnet core DI, logging [(dotnet core logging)](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging) and Entity Framework [(dotnet ef core)](https://learn.microsoft.com/en-us/ef/core/). Messages can be published using polling or event stream. Multiple message brokers can be configured and scoped for auto-scaling scenarios. 
 
-## Panama Canal Services At A Glance: 
+## Panama Canal Architecture At A Glance: 
 
 ![image](https://user-images.githubusercontent.com/11683585/223599365-5b2a1d4f-a3cc-432b-b5d0-62c1188b4cb1.png)    
 
-## Panama Canal Services At A Glance:
+## Panama Canal Implementation At A Glance:
 
 ```
 public class SaveWeatherForecast : ICommand
@@ -218,18 +257,6 @@ services.AddPanama(
 			canal.UseDefaultScheduler();
 		});
 	});
-```
-
-For native logging support, add the `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging` nuget packages with the following configuration:
-```
-services.AddLogging(loggingBuilder => {
-	
-	loggingBuilder.ClearProviders();
-	loggingBuilder.SetMinimumLevel(LogLevel.Trace);
-	
-	// configure Logging with NLog, ex:
-	// loggingBuilder.AddNLog(_configuration);
-});
 ```
 
 `appsettings.json` or environment variables can be for initial options configurations:
