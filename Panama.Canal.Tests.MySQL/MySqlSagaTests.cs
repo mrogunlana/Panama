@@ -1,9 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MySqlConnector.Logging;
+using NLog.Extensions.Logging;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
+using Panama.Canal.MySQL;
 using Panama.Canal.Sagas.Extensions;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Tests.Models;
@@ -13,17 +17,11 @@ using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
-using System.Threading;
 using System;
-using MySqlConnector.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Panama.Canal.MySQL;
-using Autofac.Core;
-using System.Configuration;
-using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
 
 namespace Panama.Canal.Tests.MySQL
 {
