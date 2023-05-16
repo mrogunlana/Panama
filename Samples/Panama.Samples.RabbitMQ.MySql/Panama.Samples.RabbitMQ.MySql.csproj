@@ -14,13 +14,9 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
     <PackageReference Include="Panama.Canal" Version="6.0.4" />
-    <PackageReference Include="Panama.Canal.MySQL" Version="6.0.2" />
+    <PackageReference Include="Panama.Canal.MySQL" Version="6.0.3" />
     <PackageReference Include="Panama.Canal.RabbitMQ" Version="6.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
   <ItemGroup>
