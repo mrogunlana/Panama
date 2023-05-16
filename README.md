@@ -1,4 +1,4 @@
-# Panama - A fluent dotnet core framework for event-based microservices
+# Panama - A fluent dotnet core framework for developing event-based microservices
 
 Panama is a dotnet core framework based on the command query responsibility segregation design pattern [(CQRS overview)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs). 
 

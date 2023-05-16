@@ -67,9 +67,7 @@ namespace Panama.Canal.MySQL.Registrars
             services.Configure<MySqlOptions>(options =>
                 _builder.Configuration.GetSection("Panama:Canal:Stores:MySql:Options").Bind(options));
 
-            services.PostConfigure<MySqlOptions>(options => {
-                services.AddSingleton<IStoreOptions>(options);
-            });
+            services.AddSingleton<IStoreOptions, MySqlOptions>(p => p.GetRequiredService<IOptions<MySqlOptions>>().Value);
             services.AddSingleton<IOptions<IStoreOptions>>(p => p.GetRequiredService<IOptions<MySqlOptions>>());
 
             var settings = new MySqlSettings();

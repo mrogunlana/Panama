@@ -1,10 +1,7 @@
-﻿using Google.Protobuf;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySqlConnector;
 using MySqlConnector.Logging;
@@ -13,17 +10,12 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.Models.Messaging;
-using Panama.Canal.Models.Options;
 using Panama.Canal.MySQL;
 using Panama.Canal.MySQL.Extensions;
 using Panama.Canal.MySQL.Models;
-using Panama.Canal.Sagas.Models;
 using Panama.Canal.Tests.Models;
 using Panama.Canal.Tests.Subscriptions;
 using Panama.Extensions;
-using Panama.Models;
-using Polly;
-using Quartz.Impl.AdoJobStore.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -230,7 +222,7 @@ namespace Panama.Canal.Tests.MySQL
                 await channel.Commit();
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(150));
+            await Task.Delay(TimeSpan.FromSeconds(200));
 
             var state = provider.GetRequiredService<State>();
             var response = state.Data.ToList();

@@ -27,7 +27,7 @@ namespace Panama.Canal.Models.Descriptors
         public IReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>> GetDescriptions(Type type)
         {
             if (Entries == null)
-                throw new InvalidOperationException("Saga descriptions are not initialized.");
+                return new ReadOnlyDictionary<string, ReadOnlyCollection<IDescriptor>>(new Dictionary<string, ReadOnlyCollection<IDescriptor>>());
 
             var results = Entries[type];
             if (results == null)

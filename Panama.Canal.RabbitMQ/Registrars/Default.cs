@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Panama.Canal.Brokers.Interfaces;
 using Panama.Canal.Interfaces;
 using Panama.Canal.RabbitMQ.Models;
@@ -56,9 +57,7 @@ namespace Panama.Canal.RabbitMQ.Registrars
             services.Configure<RabbitMQOptions>((x) => {
                 _setup(x);
             });
-            services.PostConfigure<RabbitMQOptions>((x) => {
-                services.AddSingleton<IBrokerOptions>(x);
-            });
+            services.AddSingleton<IBrokerOptions, RabbitMQOptions>(p => p.GetRequiredService<IOptions<RabbitMQOptions>>().Value);
         }
     }
 }
