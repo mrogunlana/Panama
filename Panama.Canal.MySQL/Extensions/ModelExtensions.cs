@@ -20,6 +20,8 @@ namespace Panama.Canal.MySQL.Extensions
 
             if (value == null)
                 return;
+            if (value is DBNull) 
+                return;
 
             var result = Convert.ChangeType(value, type);
 

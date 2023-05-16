@@ -4,17 +4,37 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>A transactional event bus framework for distributed microservices</Title>
+    <Version>6.0.4</Version>
+    <Authors>Diran Ogunlana</Authors>
+    <Description>The Canal provides a transactional messaging framework with saga support for dotnet core. The Canal integrates with native dotnet core DI, logging and Entity Framework. Messages can be published using polling or event stream. Multiple message brokers can be configured and scoped for auto-scaling scenarios.</Description>
+    <Copyright>Copyright 2023</Copyright>
+    <PackageProjectUrl>https://github.com/mrogunlana/Panama</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/mrogunlana/Panama</RepositoryUrl>
+    <PackageTags>dotnet; events; microservice; cqrs; ddd; framework</PackageTags>
+    <PackageReleaseNotes>added type comparer to DBNull types to fix conversion exception</PackageReleaseNotes>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama\Panama.csproj" />
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Panama" Version="6.0.1" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="Quartz" Version="3.6.2" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />

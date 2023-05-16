@@ -7,14 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.16" />
+    <PackageReference Include="Panama.Canal" Version="6.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Panama.Canal.MySQL\Panama.Canal.MySQL.csproj" />
-    <ProjectReference Include="..\..\Panama.Canal\Panama.Canal.csproj" />
-    <ProjectReference Include="..\..\Panama\Panama.csproj" />
+    <None Update="LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

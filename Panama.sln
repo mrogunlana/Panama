@@ -17,11 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests", "Panam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests.MySQL", "Panama.Canal.Tests.MySQL\Panama.Canal.Tests.MySQL.csproj", "{330C336F-4057-4D30-97E2-0D4C27690D84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Canal.Tests.RabbitMQ", "Panama.Canal.Tests.RabbitMQ\Panama.Canal.Tests.RabbitMQ.csproj", "{457F5084-530A-415E-966F-A057BFC100EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Canal.Tests.RabbitMQ", "Panama.Canal.Tests.RabbitMQ\Panama.Canal.Tests.RabbitMQ.csproj", "{457F5084-530A-415E-966F-A057BFC100EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{48ED27A0-7AB3-40AF-BC72-BA5940016899}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Samples.TestApi", "Samples\Panama.Samples.TestApi\Panama.Samples.TestApi.csproj", "{D5C262B2-0924-4F95-B315-DC3F307AD27E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Samples.RabbitMQ.MySql", "Samples\Panama.Samples.RabbitMQ.MySql\Panama.Samples.RabbitMQ.MySql.csproj", "{202D45A7-C448-4154-AE59-A09ECA181EFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,15 +64,19 @@ Global
 		{457F5084-530A-415E-966F-A057BFC100EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{457F5084-530A-415E-966F-A057BFC100EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C262B2-0924-4F95-B315-DC3F307AD27E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D5C262B2-0924-4F95-B315-DC3F307AD27E} = {48ED27A0-7AB3-40AF-BC72-BA5940016899}
+		{202D45A7-C448-4154-AE59-A09ECA181EFC} = {48ED27A0-7AB3-40AF-BC72-BA5940016899}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB49E1E0-AFFB-438A-9309-0BEF89DAE8F0}

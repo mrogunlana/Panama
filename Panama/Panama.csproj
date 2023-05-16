@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Panama</PackageId>
-    <Version>6.0</Version>
+    <Version>6.0.1</Version>
     <Authors>Diran Ogunlana</Authors>
     <Company></Company>
     <TargetFramework>net6.0</TargetFramework>
@@ -10,24 +10,33 @@
 	<ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReleaseNotes>v6.0 Release</PackageReleaseNotes>
-    <Description>An unobtrusive service oriented architecture library  for .NET CORE 6 developed by Diran Ogunlana</Description>
+    <PackageReleaseNotes>Adjusted packages to dotnet 6.0</PackageReleaseNotes>
+    <Description>Panama is a dotnet core framework based on the command query responsibility segregation design pattern.</Description>
     <Copyright>Copyright 2023</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mrogunlana/Panama</RepositoryUrl>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <Title>A fluent dotnet core framework for developing event-based microservices</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>dotnet; events; microservice; cqrs; ddd; framework</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="$(PackageLicenseFile)" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
