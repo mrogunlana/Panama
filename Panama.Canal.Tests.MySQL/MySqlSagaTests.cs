@@ -1,13 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MySqlConnector.Logging;
-using NLog.Extensions.Logging;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
-using Panama.Canal.MySQL;
 using Panama.Canal.Sagas.Extensions;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Tests.Models;
@@ -20,85 +15,21 @@ using Panama.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Panama.Canal.Tests.MySQL
 {
     [TestClass]
-    public class MySqlSagaTests
+    public class MySqlSagaTests 
     {
-        private CancellationTokenSource _cts;
-        private IServiceProvider _provider;
-        private IBootstrapper _bootstrapper;
-
-        public MySqlSagaTests()
-        {
-            var services = new ServiceCollection();
-
-            services.AddOptions();
-            services.AddLogging();
-            services.AddSingleton<IServiceCollection>(_ => services);
-
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.test.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            services.AddPanama(
-                configuration: configuration,
-                setup: options => {
-                    options.UseCanal(canal => {
-                        canal.UseMySqlStore();
-                        canal.UseDefaultBroker();
-                        canal.UseDefaultScheduler();
-                    });
-                });
-
-            services.AddLogging(loggingBuilder => {
-                // configure Logging with NLog
-                loggingBuilder.ClearProviders();
-                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
-                loggingBuilder.AddNLog(configuration);
-            });
-
-            services.AddSingleton(configuration);
-            services.AddSingleton<IConfiguration>(configuration);
-            services.AddSingleton<State>();
-
-            _cts = new CancellationTokenSource();
-            _provider = services.BuildServiceProvider();
-            _bootstrapper = _provider.GetRequiredService<IBootstrapper>();
-
-            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            MySqlConnectorLogManager.Provider = new MySqlConnector.Logging.NLogLoggerProvider();
-        }
-
         [TestInitialize]
-        public async Task Init()
-        {
-            _provider.GetRequiredService<State>().Data.Clear();
-            _cts = new CancellationTokenSource();
-
-            await _bootstrapper.On(_cts.Token);
-        }
-
-        [TestCleanup]
-        public async Task Cleanup()
-        {
-            _provider.GetRequiredService<State>().Data.Clear();
-            _cts.Cancel();
-
-            await _bootstrapper.Off(_cts.Token);
-
-            _cts.Dispose();
-        }
+        public void Init() => Startup._provider!.GetRequiredService<State>().Reset();
 
         [TestMethod]
         public async Task VerifyFooSaga()
         {
-            var channels = _provider.GetRequiredService<IDefaultChannelFactory>();
-            var context = new Context(_provider);
+            var channels = Startup._provider!.GetRequiredService<IDefaultChannelFactory>();
+            var context = new Context(Startup._provider!);
 
             using (var channel = channels.CreateChannel<DefaultChannel>())
             {
@@ -111,7 +42,7 @@ namespace Panama.Canal.Tests.MySQL
 
                 await Task.Delay(TimeSpan.FromSeconds(2));
 
-                var state = _provider.GetRequiredService<State>();
+                var state = Startup._provider!.GetRequiredService<State>();
                 var response = state.Data.ToList();
 
                 Assert.IsTrue(response.KvpGet<string, string>("saga.event.name").Count == 3);

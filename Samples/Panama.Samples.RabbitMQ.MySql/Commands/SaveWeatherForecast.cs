@@ -26,7 +26,7 @@ namespace Panama.Samples.RabbitMQ.MySql.Commands
         public async Task Execute(IContext context)
         {
             var model = context.Data.DataGetSingle<WeatherForecast>();
-
+            context.Snapshot(model);
             using (var connection = new MySqlConnection(_options.GetConnectionString()))
             using (var channel = _factory.CreateChannel<IDbConnection, IDbTransaction>(connection, context.Token))
             {
