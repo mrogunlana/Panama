@@ -11,5 +11,7 @@ namespace Panama.Canal.Tests.Models
             if (Data == null)
                 Data = new ConcurrentBag<IModel>();
         }
+
+        public void Reset() => Data.Clear();
     }
 }
