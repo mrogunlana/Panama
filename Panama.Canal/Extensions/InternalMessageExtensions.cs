@@ -276,5 +276,12 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
+
+        public static InternalMessage ResetCreated(this InternalMessage message)
+        {
+            message.Created = DateTime.UtcNow;
+
+            return message;
+        }
     }
 }

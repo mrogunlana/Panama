@@ -16,7 +16,7 @@ namespace Panama.Canal.Extensions
                 return message;
 
             foreach (var header in headers)
-                message.Headers.Add(header.Key, header.Value);
+                message.Headers.TryAdd(header.Key, header.Value);
 
             return message;
         }

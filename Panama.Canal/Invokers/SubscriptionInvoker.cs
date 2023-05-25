@@ -114,14 +114,11 @@ namespace Panama.Canal.Invokers
                             .Id(Guid.NewGuid().ToString())
                             .CorrelationId(metadata.GetCorrelationId())
                             .Topic(metadata.GetReply())
+                            .Header(metadata.Headers.DefaultFilter())
                             .Group(group)
                             .Data(data)
                             .Invoker(_invokers.GetInvoker())
                             .Target(target)
-                            .State(metadata.GetSagaState())
-                            .Trigger(metadata.GetSagaTrigger())
-                            .SagaId(metadata.GetSagaId())
-                            .SagaType(metadata.GetSagaType())
                             .Post()
                             .ConfigureAwait(false);
 
@@ -145,6 +142,7 @@ namespace Panama.Canal.Invokers
                         .Instance(metadata.GetInstance())
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
+                        .Header(metadata.Headers.DefaultFilter())
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
                         .Topic(metadata.GetReply())
@@ -152,10 +150,6 @@ namespace Panama.Canal.Invokers
                         .Data(data)
                         .Invoker(_invokers.GetInvoker())
                         .Target(target)
-                        .State(metadata.GetSagaState())
-                        .Trigger(metadata.GetSagaTrigger())
-                        .SagaId(metadata.GetSagaId())
-                        .SagaType(metadata.GetSagaType())
                         .Post()
                         .ConfigureAwait(false);
 

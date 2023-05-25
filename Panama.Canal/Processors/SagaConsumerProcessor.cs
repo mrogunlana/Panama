@@ -36,10 +36,13 @@ namespace Panama.Canal.Processors
             if (message == null)
                 throw new InvalidOperationException("Message headers cannot be found.");
 
-            message.SetStatus(MessageStatus.Scheduled);
+            var metadata = message.GetData<Message>(_provider);
 
             var received = await _store.StoreReceivedMessage(
-                message: message)
+                message: metadata
+                        .ToInternal(_provider)
+                        .SetStatus(MessageStatus.Scheduled)
+                        .ResetCreated())
                 .ConfigureAwait(false);
 
             var data = received.GetData<Message>(_provider);

@@ -21,7 +21,7 @@ namespace Panama.Canal.Extensions
                 return bus;
 
             foreach (var header in headers)
-                bus.Context.Headers.Add(header.Key, header.Value);
+                bus.Context.Headers.TryAdd(header.Key, header.Value);
 
             return bus;
         }

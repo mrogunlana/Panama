@@ -34,6 +34,7 @@ namespace Panama.Canal
         public async Task<IResult> Post(CancellationToken? token = null)
         {
             var message = new Message()
+                .AddHeaders(Context.Headers)
                 .AddMessageId(Context.Id)
                 .AddMessageName(_options.Value.GetName(Context.Name))
                 .AddCorrelationId(Context.CorrelationId)
@@ -43,7 +44,6 @@ namespace Panama.Canal
                 .AddMessageType(Context.Data.GetType().AssemblyQualifiedName)
                 .AddCreatedTime()
                 .AddDelayTime(Context.Delay)
-                .AddHeaders(Context.Headers)
                 .AddData(Context.Data)
                 .AddReply(_options.Value.GetName(Context.Reply))
                 .AddSagaId(Context.SagaId)
