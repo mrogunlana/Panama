@@ -4,20 +4,23 @@ using Microsoft.Extensions.Options;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.MySQL.Models;
+using Panama.Canal.Sagas.Extensions;
+using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Samples.RabbitMQ.MySql.Models;
+using Panama.Samples.RabbitMQ.MySql.Sagas.CreateWeatherForcast;
 using Panama.Samples.RabbitMQ.MySQL.Contexts;
 
 namespace Panama.Samples.RabbitMQ.MySql.Commands
 {
-    public class SaveWeatherForecast : ICommand
+    public class SaveWeatherForecastViaSaga : ICommand
     {
         private readonly MySqlOptions _options;
         private readonly AppDbContext _context;
         private readonly IGenericChannelFactory _factory;
 
-        public SaveWeatherForecast(
+        public SaveWeatherForecastViaSaga(
             AppDbContext context,
             IOptions<MySqlOptions> options,
             IGenericChannelFactory factory)
@@ -32,18 +35,11 @@ namespace Panama.Samples.RabbitMQ.MySql.Commands
 
             using (var channel = _factory.CreateChannel<DatabaseFacade, IDbContextTransaction>(_context.Database, context.Token))
             {
-                _context.Add(model);
-
-                // save forcast to database
-                await _context.SaveChangesAsync();
-
-                // publish new model
-                await context.Bus()
+                // start saga
+                await context.Saga<CreateWeatherForcastSaga>()
                     .Channel(channel)
-                    .Token(context.Token)
-                    .Topic("forecast.created")
                     .Data(model)
-                    .Post();
+                    .Start();
 
                 // commits save transaction, then publish
                 await channel.Commit();

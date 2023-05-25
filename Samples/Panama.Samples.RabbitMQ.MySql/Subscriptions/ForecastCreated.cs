@@ -2,7 +2,6 @@
 using Panama.Canal.RabbitMQ.Attributes;
 using Panama.Extensions;
 using Panama.Interfaces;
-using Panama.Samples.RabbitMQ.MySql.Controllers;
 using Panama.Samples.RabbitMQ.MySql.Models;
 
 namespace Panama.Samples.RabbitMQ.MySql.Subscriptions
