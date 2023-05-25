@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector.Logging;
 using NLog.Extensions.Logging;
 using Panama;
@@ -5,6 +6,8 @@ using Panama.Canal;
 using Panama.Canal.MySQL;
 using Panama.Canal.RabbitMQ;
 using Panama.Samples.RabbitMQ.MySql.Models;
+using Panama.Samples.RabbitMQ.MySQL.Contexts;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,13 @@ builder.Services.AddPanama(
             canal.UseDefaultScheduler();
         });
     });
+
+builder.Services.AddDbContext<AppDbContext>(options => {
+    var connectionString = builder.Configuration.GetConnectionString("MySql");
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+        .LogTo(Console.WriteLine, LogLevel.Information)
+        .EnableDetailedErrors();
+});
 
 builder.Services.AddLogging(loggingBuilder => {
     // configure Logging with NLog

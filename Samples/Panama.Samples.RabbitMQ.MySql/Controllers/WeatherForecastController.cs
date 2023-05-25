@@ -3,7 +3,6 @@ using Panama.Canal.Models.Descriptors;
 using Panama.Interfaces;
 using Panama.Samples.RabbitMQ.MySql.Commands;
 using Panama.Samples.RabbitMQ.MySql.Models;
-using System.Collections.Concurrent;
 
 namespace Panama.Samples.RabbitMQ.MySql.Controllers
 {
@@ -43,6 +42,17 @@ namespace Panama.Samples.RabbitMQ.MySql.Controllers
             return await _provider.GetRequiredService<IHandler>()
                 .Add(forecast)
                 .Command<SaveWeatherForecast>()
+                .Invoke();
+        }
+
+        [HttpPost("/saga")]
+        public async Task<Interfaces.IResult> Saga([FromBody] WeatherForecast forecast)
+        {
+            var test = _provider.GetRequiredService<SubscriberDescriptions>();
+
+            return await _provider.GetRequiredService<IHandler>()
+                .Add(forecast)
+                .Command<SaveWeatherForecastViaSaga>()
                 .Invoke();
         }
     }
