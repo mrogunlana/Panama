@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Panama.Canal.Attributes;
 using Panama.Canal.Interfaces;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Canal.Tests.Subscriptions
+namespace Panama.Canal.Tests.Modules.Subscriptions
 {
     [DefaultTopic("foo.created")]
     public class FooCreated : ISubscribe

@@ -1,6 +1,6 @@
 ﻿using Panama.Interfaces;
 
-namespace Panama.Canal.Tests.Models
+namespace Panama.Canal.Tests.Modules.Models
 {
     public class Foo : IModel
     {

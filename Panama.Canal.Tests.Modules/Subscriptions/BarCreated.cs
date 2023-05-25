@@ -5,9 +5,9 @@ using Panama.Models;
 using Panama.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 
-namespace Panama.Canal.Tests.Subscriptions
+namespace Panama.Canal.Tests.Modules.Subscriptions
 {
     [DefaultTopic("bar.created", "test.queue")]
     public class BarCreated : ISubscribe

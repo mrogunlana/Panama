@@ -10,8 +10,8 @@ using Panama.Canal.Models.Messaging;
 using Panama.Canal.Models.Options;
 using Panama.Canal.RabbitMQ;
 using Panama.Canal.RabbitMQ.Models;
-using Panama.Canal.Tests.Models;
-using Panama.Canal.Tests.Subscriptions;
+using Panama.Canal.Tests.Modules.Models;
+using Panama.Canal.Tests.Modules.Subscriptions;
 using Panama.Extensions;
 using Panama.Models;
 

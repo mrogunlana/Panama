@@ -13,6 +13,7 @@ using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
 using Panama.Security.Resolvers;
+using Polly;
 using Stateless;
 
 namespace Panama.Canal.Sagas.Stateless
@@ -54,42 +55,96 @@ namespace Panama.Canal.Sagas.Stateless
 
         public abstract void Init(IContext context);
 
-        public virtual Task<IResult> Continue(SagaContext context)
+        public virtual async Task<IResult> Continue(SagaContext context)
         {
-            var message = context.DataGetSingle<InternalMessage>()
-                    .GetData<Message>(_provider);
+            if (context == null)
+                throw new ArgumentNullException("Context cannot be located.");
+
+            var @internal = context.DataGetSingle<InternalMessage>();
+            if (@internal == null)
+                throw new InvalidOperationException("Message cannot be located.");
+
+            var message = @internal.GetData<Message>(_provider);
+            if (message == null)
+                throw new InvalidOperationException("Message data cannot be located.");
 
             if (string.IsNullOrEmpty(message.GetSagaTrigger()))
-                return Task.FromResult(new Result().Success());
-            
-            Init(context);
+                return new Result().Success();
 
-            _machine = new StateMachine<ISagaState, ISagaTrigger>(States.Get(message.GetSagaStateType()) ?? States.First());
+            var polly = new Polly.Context("saga-continue-invocation") {
+                { "retry-count", 0}
+            };
 
-            var local = new Context(
-                token: context.Token,
-                id: Guid.NewGuid().ToString(),
-                correlationId: message.GetCorrelationId(),
-                provider: _provider)
-                .Add(message)
-                .Add(context.DataGetSingle<InternalMessage>())
-                .Add(message.GetData<IList<IModel>>())
-                .Add(new Kvp<string, string>("CorrelationId", message.GetCorrelationId()))
-                .Add(new Kvp<string, string>("SagaId", message.GetSagaId()))
-                .Add(new Kvp<string, string>("SagaType", GetType().AssemblyQualifiedName!))
-                .Add(new Kvp<string, string>("ReplyTopic", ReplyTopic))
-                .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", Triggers))
-                .Add(new Kvp<string, List<ISagaState>>("States", States));
+            try
+            {
+                var policy = await Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryAsync(
+                        _canalOptions.Value.FailedRetryCount,
+                        _ => TimeSpan.FromSeconds(_canalOptions.Value.FailedRetryInterval),
+                        (result, timespan, retryNo, context) => {
+                            _log.LogWarning($"{context.OperationKey}: Rety #{retryNo} for message: {@internal.Id} within {timespan.TotalMilliseconds}ms.");
+                            context["retry-count"] = retryNo;
+                        }
+                    ).ExecuteAndCaptureAsync(async (current, token) => {
+                        if (token.IsCancellationRequested)
+                            return new Result().Cancel();
 
-            Configure(local);
+                        Init(context);
 
-            var trigger = Triggers.Get(message.GetSagaTriggerType());
-            if (trigger == null)
-                return Task.FromResult(new Result().Success());
+                        _machine = new StateMachine<ISagaState, ISagaTrigger>(States.Get(message.GetSagaStateType()) ?? States.First());
 
-            StateMachine.Fire(trigger, local);
+                        var local = new Panama.Models.Context(
+                            token: context.Token,
+                            id: Guid.NewGuid().ToString(),
+                            correlationId: message.GetCorrelationId(),
+                            provider: _provider)
+                            .Add(message)
+                            .Add(context.DataGetSingle<InternalMessage>())
+                            .Add(message.GetData<IList<IModel>>())
+                            .Add(new Kvp<string, string>("CorrelationId", message.GetCorrelationId()))
+                            .Add(new Kvp<string, string>("SagaId", message.GetSagaId()))
+                            .Add(new Kvp<string, string>("SagaType", GetType().AssemblyQualifiedName!))
+                            .Add(new Kvp<string, string>("ReplyTopic", ReplyTopic))
+                            .Add(new Kvp<string, List<StateMachine<ISagaState, ISagaTrigger>.TriggerWithParameters<IContext>>>("Triggers", Triggers))
+                            .Add(new Kvp<string, List<ISagaState>>("States", States));
 
-            return Task.FromResult(new Result().Success());
+                        Configure(local);
+
+                        var trigger = Triggers.Get(message.GetSagaTriggerType());
+                        if (trigger == null)
+                            return new Result().Success();
+
+                        StateMachine.Fire(trigger, local);
+
+                        await _store.ChangeReceivedState(message
+                                .RemoveException()
+                                .ToInternal(_provider)
+                                .SetSucceedExpiration(_provider, DateTime.UtcNow.AddSeconds(_canalOptions.Value.SuccessfulMessageExpiredAfter)), MessageStatus.Succeeded)
+                            .ConfigureAwait(false);
+
+                        return new Result().Success();
+
+                    }, polly, context.Token)
+                    .ConfigureAwait(false);
+
+                return policy.Result;
+            }
+            catch (Exception ex)
+            {
+                var reason = $"Saga: {message.GetSagaType()} failed processing on trigger: {message.GetSagaTrigger()}. Current saga state: {message.GetSagaState()}";
+
+                _log.LogError(ex, reason);
+
+                await _store.ChangeReceivedState(message
+                        .AddException($"Exception: {ex.Message}")
+                        .ToInternal(_provider)
+                        .SetRetries((int)polly["retry-count"])
+                        .SetFailedExpiration(_provider, @internal.Created.AddSeconds(_canalOptions.Value.FailedMessageExpiredAfter)), MessageStatus.Failed)
+                    .ConfigureAwait(false);
+
+                return new Result().Fail();
+            }
         }
 
         public virtual void Configure(IContext context)

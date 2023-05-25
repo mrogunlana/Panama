@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
 using Panama.Extensions;
@@ -34,7 +34,7 @@ namespace Panama.Canal.Tests
 
             services.AddSingleton(configuration);
             services.AddSingleton<IConfiguration>(configuration);
-            services.AddSingleton<Models.State>();
+            services.AddSingleton<State>();
 
             services.AddPanama(
                 configuration: configuration,

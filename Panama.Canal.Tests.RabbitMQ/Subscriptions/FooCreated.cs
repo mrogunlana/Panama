@@ -2,7 +2,7 @@
 using Panama.Canal.Attributes;
 using Panama.Canal.Interfaces;
 using Panama.Canal.RabbitMQ.Attributes;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
