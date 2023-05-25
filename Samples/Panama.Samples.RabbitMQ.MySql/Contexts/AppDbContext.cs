@@ -13,11 +13,11 @@ namespace Panama.Samples.RabbitMQ.MySQL.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WeatherForecast>(builder => {
-                builder.ToTable("Forcast");
+                builder.ToTable("Forecast");
                 builder.HasKey(e => e._Id);
                 builder.Ignore(e => e.TemperatureF);
                 builder.Property(e => e.Id)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("char")
                     .HasMaxLength(36);
             });
         }

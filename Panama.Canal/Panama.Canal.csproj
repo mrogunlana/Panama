@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>A transactional event bus framework for distributed microservices</Title>
-    <Version>6.0.4</Version>
+    <Version>6.0.5</Version>
     <Authors>Diran Ogunlana</Authors>
     <Description>The Canal provides a transactional messaging framework with saga support for dotnet core. The Canal integrates with native dotnet core DI, logging and Entity Framework. Messages can be published using polling or event stream. Multiple message brokers can be configured and scoped for auto-scaling scenarios.</Description>
     <Copyright>Copyright 2023</Copyright>
@@ -13,7 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/mrogunlana/Panama</RepositoryUrl>
     <PackageTags>dotnet; events; microservice; cqrs; ddd; framework</PackageTags>
-    <PackageReleaseNotes>added type comparer to DBNull types to fix conversion exception</PackageReleaseNotes>
+    <PackageReleaseNotes>stateful retry of saga messages</PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>

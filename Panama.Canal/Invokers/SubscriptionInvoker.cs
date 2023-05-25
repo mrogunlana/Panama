@@ -74,7 +74,7 @@ namespace Panama.Canal.Invokers
                         _canal.FailedRetryCount,
                         _ => TimeSpan.FromSeconds(_canal.FailedRetryInterval),
                         (result, timespan, retryNo, context) => {
-                            _log.LogWarning($"{context.OperationKey}: Rety #{retryNo} for message: {message.Id} within {timespan.TotalMilliseconds}ms.");
+                            _log.LogWarning($"{context.OperationKey}: Try #{retryNo} for message: {message.Id} within {timespan.TotalMilliseconds}ms.");
                             context["retry-count"] = retryNo;
                         }
                     ).ExecuteAndCaptureAsync(async (context, token) => {

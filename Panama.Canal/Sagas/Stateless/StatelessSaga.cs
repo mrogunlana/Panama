@@ -83,7 +83,7 @@ namespace Panama.Canal.Sagas.Stateless
                         _canalOptions.Value.FailedRetryCount,
                         _ => TimeSpan.FromSeconds(_canalOptions.Value.FailedRetryInterval),
                         (result, timespan, retryNo, context) => {
-                            _log.LogWarning($"{context.OperationKey}: Rety #{retryNo} for message: {@internal.Id} within {timespan.TotalMilliseconds}ms.");
+                            _log.LogWarning($"{context.OperationKey}: Try #{retryNo} for message: {@internal.Id} within {timespan.TotalMilliseconds}ms.");
                             context["retry-count"] = retryNo;
                         }
                     ).ExecuteAndCaptureAsync(async (current, token) => {
