@@ -40,12 +40,12 @@
     <PackageReference Include="NLog.Database" Version="5.1.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
-    <PackageReference Include="Panama.Canal" Version="6.0.4" />
-    <PackageReference Include="Panama.Canal.RabbitMQ" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama.Canal.Tests\Panama.Canal.Tests.csproj" />
+    <ProjectReference Include="..\Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj" />
+    <ProjectReference Include="..\Panama.Canal.Tests.Modules\Panama.Canal.Tests.Modules.csproj" />
+    <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
 </Project>

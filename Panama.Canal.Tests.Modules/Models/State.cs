@@ -1,7 +1,7 @@
 ﻿using Panama.Interfaces;
 using System.Collections.Concurrent;
 
-namespace Panama.Canal.Tests.Models
+namespace Panama.Canal.Tests.Modules.Models
 {
     public class State : IModel
     {

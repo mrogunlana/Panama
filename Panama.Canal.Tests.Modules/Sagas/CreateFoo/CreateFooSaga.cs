@@ -2,13 +2,13 @@
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Canal.Sagas.Stateless.Models;
-using Panama.Canal.Tests.Sagas.CreateFoo.Events;
-using Panama.Canal.Tests.Sagas.CreateFoo.Exits;
+using Panama.Canal.Tests.Modules.Sagas.CreateFoo.Events;
+using Panama.Canal.Tests.Modules.Sagas.CreateFoo.Exits;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
 using Panama.Interfaces;
 
-namespace Panama.Canal.Tests.Sagas.CreateFoo
+namespace Panama.Canal.Tests.Modules.Sagas.CreateFoo
 {
     public class CreateFooSaga : StatelessSaga
     {

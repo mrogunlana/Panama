@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Canal.Tests.Sagas.CreateFoo.Events
+namespace Panama.Canal.Tests.Modules.Sagas.CreateFoo.Events
 {
     public class FooCompletedEvent : ISagaStepEvent
     {

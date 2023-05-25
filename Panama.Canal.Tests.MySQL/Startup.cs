@@ -8,7 +8,7 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Jobs;
 using Panama.Canal.MySQL;
-using Panama.Canal.Tests.Models;
+using Panama.Canal.Tests.Modules.Models;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

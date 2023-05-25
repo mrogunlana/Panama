@@ -23,7 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{48ED
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Samples.TestApi", "Samples\Panama.Samples.TestApi\Panama.Samples.TestApi.csproj", "{D5C262B2-0924-4F95-B315-DC3F307AD27E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Samples.RabbitMQ.MySql", "Samples\Panama.Samples.RabbitMQ.MySql\Panama.Samples.RabbitMQ.MySql.csproj", "{202D45A7-C448-4154-AE59-A09ECA181EFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panama.Samples.RabbitMQ.MySql", "Samples\Panama.Samples.RabbitMQ.MySql\Panama.Samples.RabbitMQ.MySql.csproj", "{202D45A7-C448-4154-AE59-A09ECA181EFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panama.Canal.Tests.Modules", "Panama.Canal.Tests.Modules\Panama.Canal.Tests.Modules.csproj", "{2552C9C1-7CFA-4733-A75D-DF86B191F1A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,10 @@ Global
 		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{202D45A7-C448-4154-AE59-A09ECA181EFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2552C9C1-7CFA-4733-A75D-DF86B191F1A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2552C9C1-7CFA-4733-A75D-DF86B191F1A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2552C9C1-7CFA-4733-A75D-DF86B191F1A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2552C9C1-7CFA-4733-A75D-DF86B191F1A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Panama.Canal.Sagas.Stateless.Extensions;
 using Panama.Canal.Sagas.Stateless.Interfaces;
+using Panama.Canal.Tests.Modules.Models;
 using Panama.Canal.Tests.Sagas.CreateFoo.States;
 using Panama.Canal.Tests.Sagas.CreateFoo.Triggers;
 using Panama.Extensions;
 using Panama.Interfaces;
 using Panama.Models;
 
-namespace Panama.Canal.Tests.Sagas.CreateFoo.Exits
+namespace Panama.Canal.Tests.Modules.Sagas.CreateFoo.Exits
 {
     public class ReviewCreateFooAnswerExit : ISagaStepExit
     {
@@ -23,7 +24,7 @@ namespace Panama.Canal.Tests.Sagas.CreateFoo.Exits
             else
                 throw new InvalidOperationException($"Unhandled state transition for: {destination} ");
 
-            var state = context.Provider.GetService<Models.State>();
+            var state = context.Provider.GetService<State>();
             if (state == null)
                 return Task.FromResult(new Result().Success());
 

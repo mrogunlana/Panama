@@ -35,9 +35,12 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="MySqlCdc" Version="3.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.2.6" />
-    <PackageReference Include="Panama.Canal" Version="6.0.4" />
     <PackageReference Include="Quartz" Version="3.6.2" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
 </Project>

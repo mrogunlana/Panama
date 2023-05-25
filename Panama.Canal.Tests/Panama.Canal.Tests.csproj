@@ -34,7 +34,11 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
-    <PackageReference Include="Panama.Canal" Version="6.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Panama.Canal.Tests.Modules\Panama.Canal.Tests.Modules.csproj" />
+    <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
 </Project>
