@@ -5,14 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>Panama Canal MySql Service</Title>
-    <Version>6.0.3</Version>
+    <Version>6.0.4</Version>
     <Authors>Diran Ogunlana</Authors>
     <Description>A MySql store implementation for the Panama Canal transactional messaging framework</Description>
     <Copyright>Copyright 2023</Copyright>
     <PackageProjectUrl>https://github.com/mrogunlana/Panama</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/mrogunlana/Panama</RepositoryUrl>
-    <PackageReleaseNotes>fix for DBNull conversion bug</PackageReleaseNotes>
+    <PackageReleaseNotes>adjusting project/package references</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>

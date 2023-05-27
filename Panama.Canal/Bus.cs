@@ -34,20 +34,15 @@ namespace Panama.Canal
         public async Task<IResult> Post(CancellationToken? token = null)
         {
             var message = new Message()
-                .AddMessageId(Context.Id)
-                .AddMessageName(_options.Value.GetName(Context.Name))
-                .AddCorrelationId(Context.CorrelationId)
-                .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
-                .AddMessageBroker(Context.Target?.AssemblyQualifiedName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
-                .AddMessageInstance(Context.Instance)
-                .AddMessageType(Context.Data.GetType().AssemblyQualifiedName)
-                .AddCreatedTime()
-                .AddDelayTime(Context.Delay)
                 .AddHeaders(Context.Headers)
+                .AddMessageId(Context.Id)
+                .AddCorrelationId(Context.CorrelationId)
+                .AddReply(_options.Value.GetName(Context.Headers.GetReply()))
+                .AddGroup(Context.Headers.GetGroup() ?? _options.Value.DefaultGroup)
+                .AddBroker(Context.Headers.GetBroker() ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
+                .AddType(Context.Data.GetType().AssemblyQualifiedName)
+                .AddCreatedTime()
                 .AddData(Context.Data)
-                .AddReply(_options.Value.GetName(Context.Reply))
-                .AddSagaId(Context.SagaId)
-                .AddSagaType(Context.SagaType)
                 .ToInternal(Context.Provider);
 
             return await Post(message, token);

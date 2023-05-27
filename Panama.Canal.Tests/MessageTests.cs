@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLog.Extensions.Logging;
 using Panama.Canal.Channels;
 using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
@@ -32,6 +34,8 @@ namespace Panama.Canal.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
+            NLog.Extensions.Logging.ConfigSettingLayoutRenderer.DefaultConfiguration = _configuration;
+
             Init();
         }
 
@@ -42,6 +46,13 @@ namespace Panama.Canal.Tests
             _services.AddSingleton<IServiceCollection>(_ => _services);
             _services.AddSingleton(_configuration);
             _services.AddSingleton<IConfiguration>(_configuration);
+
+            _services.AddLogging(loggingBuilder => {
+                // configure Logging with NLog
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+                loggingBuilder.AddNLog(_configuration);
+            });
         }
 
         [TestMethod]

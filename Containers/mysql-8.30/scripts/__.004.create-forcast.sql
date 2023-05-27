@@ -1,12 +1,11 @@
-use `devdb`;
+use `devdb`; 
 
-create table if not exists `User` (
+create table if not exists `Forecast` (
     _ID int auto_increment,
     ID char(36) not null,
-    FirstName varchar(25) null,
-    LastName varchar(25) null,
-    Email varchar(100) null,
-    `Password` varchar(100) null,
+    `Date` datetime null,
+    TemperatureC int null,
+    Summary varchar(200) null,
     Created datetime not null,
     PRIMARY KEY (_ID)
 ) engine=innodb;

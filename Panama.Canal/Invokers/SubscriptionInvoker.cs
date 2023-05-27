@@ -74,7 +74,7 @@ namespace Panama.Canal.Invokers
                         _canal.FailedRetryCount,
                         _ => TimeSpan.FromSeconds(_canal.FailedRetryInterval),
                         (result, timespan, retryNo, context) => {
-                            _log.LogWarning($"{context.OperationKey}: Rety #{retryNo} for message: {message.Id} within {timespan.TotalMilliseconds}ms.");
+                            _log.LogWarning($"{context.OperationKey}: Try #{retryNo} for message: {message.Id} within {timespan.TotalMilliseconds}ms.");
                             context["retry-count"] = retryNo;
                         }
                     ).ExecuteAndCaptureAsync(async (context, token) => {
@@ -109,19 +109,14 @@ namespace Panama.Canal.Invokers
 
                 if (metadata.HasReply())
                     await new Panama.Models.Context(_provider, context.Token).Bus()
-                            .Instance(metadata.GetInstance())
+                            .Data(data)
                             .Token(context.Token)
+                            .Header(metadata.Headers.DefaultFilter())
+                            .Type(data.GetType().AssemblyQualifiedName)
                             .Id(Guid.NewGuid().ToString())
                             .CorrelationId(metadata.GetCorrelationId())
                             .Topic(metadata.GetReply())
-                            .Group(group)
-                            .Data(data)
                             .Invoker(_invokers.GetInvoker())
-                            .Target(target)
-                            .State(metadata.GetSagaState())
-                            .Trigger(metadata.GetSagaTrigger())
-                            .SagaId(metadata.GetSagaId())
-                            .SagaType(metadata.GetSagaType())
                             .Post()
                             .ConfigureAwait(false);
 
@@ -142,20 +137,15 @@ namespace Panama.Canal.Invokers
 
                 if (metadata.HasReply())
                     await new Panama.Models.Context(_provider, context.Token).Bus()
-                        .Instance(metadata.GetInstance())
+                        .Data(data)
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
+                        .Header(metadata.Headers.DefaultFilter())
+                        .Type(data.GetType().AssemblyQualifiedName)
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
                         .Topic(metadata.GetReply())
-                        .Group(group)
-                        .Data(data)
                         .Invoker(_invokers.GetInvoker())
-                        .Target(target)
-                        .State(metadata.GetSagaState())
-                        .Trigger(metadata.GetSagaTrigger())
-                        .SagaId(metadata.GetSagaId())
-                        .SagaType(metadata.GetSagaType())
                         .Post()
                         .ConfigureAwait(false);
 
