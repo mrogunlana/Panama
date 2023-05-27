@@ -27,7 +27,7 @@ namespace Panama.Canal.Extensions
         public static SchedulerOptions ClearJobs(this SchedulerOptions options)
         {
             foreach (var item in options.Current)
-                options.Removed.Add(item.GetType());
+                options.Removed.Add(item.Type);
 
             return options;
         }
