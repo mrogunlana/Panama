@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
+    <ProjectReference Include="..\..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
 </Project>

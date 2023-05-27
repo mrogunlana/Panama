@@ -43,9 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\Panama.Canal.RabbitMQ\Panama.Canal.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\Panama.Canal\Panama.Canal.csproj" />
     <ProjectReference Include="..\Panama.Canal.Tests.Modules\Panama.Canal.Tests.Modules.csproj" />
-    <ProjectReference Include="..\Panama.Canal\Panama.Canal.csproj" />
   </ItemGroup>
 
 </Project>
