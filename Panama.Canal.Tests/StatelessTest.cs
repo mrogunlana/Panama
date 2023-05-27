@@ -40,6 +40,7 @@ namespace Panama.Canal.Tests
                 configuration: configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler();

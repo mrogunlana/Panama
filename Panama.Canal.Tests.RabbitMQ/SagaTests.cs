@@ -59,6 +59,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 configuration: configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseRabbitMq();
                         canal.UseDefaultScheduler();

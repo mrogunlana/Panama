@@ -62,6 +62,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseRabbitMq();
                         canal.UseDefaultScheduler(scheduler => {
@@ -123,6 +124,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseRabbitMq();
                     });
@@ -189,6 +191,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseRabbitMq();
                     });
@@ -262,6 +265,7 @@ namespace Panama.Canal.Tests.RabbitMQ
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseRabbitMq();
                         canal.UseDefaultScheduler();

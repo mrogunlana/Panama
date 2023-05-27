@@ -51,6 +51,7 @@ namespace Panama.Canal.Tests.MySQL
                     options.UseCanal(canal => {
                         canal.UseMySqlStore();
                         canal.UseDefaultBroker();
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultScheduler((scheduler) => {
                             scheduler.RemoveJob<DelayedPublished>();
                             scheduler.AddJob<DelayedPublished>("* * * * * ?");

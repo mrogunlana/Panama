@@ -76,6 +76,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler(scheduler => {
@@ -137,6 +138,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
                     });
@@ -203,6 +205,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
                     });
@@ -276,6 +279,7 @@ namespace Panama.Canal.Tests
                 configuration: _configuration,
                 setup: options => {
                     options.UseCanal(canal => {
+                        canal.UseDefaultDispatcher();
                         canal.UseDefaultStore();
                         canal.UseDefaultBroker();
                         canal.UseDefaultScheduler();

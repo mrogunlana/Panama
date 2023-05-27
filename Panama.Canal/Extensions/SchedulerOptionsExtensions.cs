@@ -24,6 +24,14 @@ namespace Panama.Canal.Extensions
             return options;
         }
 
+        public static SchedulerOptions ClearJobs(this SchedulerOptions options)
+        {
+            foreach (var item in options.Current)
+                options.Removed.Add(item.GetType());
+
+            return options;
+        }
+
         public static IEnumerable<Job> GetJobs(this SchedulerOptions options)
         {
             var results = options.Current.ToList();

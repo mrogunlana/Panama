@@ -14,9 +14,6 @@ namespace Panama.Canal
                     setup(options);
                 }));
 
-            options.Register(new Registrars.Dispatcher(
-                builder: options.Builder));
-
             return options;
         }
 
@@ -52,6 +49,18 @@ namespace Panama.Canal
                     if (setup == null) return;
                     setup(options);
                 }));
+
+            return options;
+        }
+
+        public static CanalOptions UseDefaultDispatcher(this CanalOptions options, Action<DispatcherOptions>? setup = null)
+        {
+            options.Register(new Registrars.Dispatcher(
+               builder: options.Builder,
+               setup: (options) => {
+                   if (setup == null) return;
+                   setup(options);
+               }));
 
             return options;
         }
