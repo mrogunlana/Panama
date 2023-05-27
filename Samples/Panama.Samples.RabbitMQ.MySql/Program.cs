@@ -27,6 +27,7 @@ builder.Services.AddPanama(
     configuration: builder.Configuration,
     setup: options => {
         options.UseCanal(canal => {
+            canal.UseDefaultDispatcher();
             canal.UseMySqlStore();
             canal.UseRabbitMq();
             canal.UseDefaultScheduler();
