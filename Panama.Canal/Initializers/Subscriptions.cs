@@ -8,7 +8,6 @@ using Panama.Canal.Extensions;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Models.Descriptors;
 using Panama.Canal.Models.Options;
-using Panama.Canal.Sagas.Interfaces;
 
 namespace Panama.Canal.Initializers
 {

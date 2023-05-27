@@ -12,12 +12,9 @@ namespace Panama.Canal.Extensions
             var filters = new List<string> {
                 Headers.Id,
                 Headers.CorrelationId,
-                Headers.Instance,
                 Headers.Name,
-                Headers.Group,
                 Headers.Type,
                 Headers.Reply,
-                Headers.Broker,
                 Headers.Exception,
                 Headers.Created,
                 Headers.Sent,

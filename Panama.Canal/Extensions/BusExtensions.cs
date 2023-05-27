@@ -1,20 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using Panama.Canal.Interfaces;
 using Panama.Canal.Invokers;
 using Panama.Canal.Models.Messaging;
+using Panama.Canal.Models.Options;
 using Panama.Canal.Sagas.Stateless.Interfaces;
 using Panama.Interfaces;
+using Quartz.Util;
 
 namespace Panama.Canal.Extensions
 {
     public static class BusExtensions
     {
-        public static IBus Origin(this IBus bus, IContext origin)
-        {
-            bus.Context.Origin = origin;
-
-            return bus;
-        }
         public static IBus Header(this IBus bus, IDictionary<string, string?>? headers = null)
         {
             if (headers == null)
@@ -36,7 +34,29 @@ namespace Panama.Canal.Extensions
         }
         public static IBus Topic(this IBus bus, string topic)
         {
-            bus.Context.Name = topic;
+            if (bus.Context.Provider == null)
+                throw new ArgumentNullException(nameof(bus.Context.Provider));
+
+            var options = bus.Context.Provider.GetRequiredService<IOptions<CanalOptions>>().Value;
+
+            var result = options.GetName(topic);
+
+            if (bus.Context.Headers.TryGetValue(Headers.Name, out _))
+                bus.Context.Headers.Remove(Headers.Name);
+
+            bus.Context.Headers.TryAdd(Headers.Name, result);
+
+            return bus;
+        }
+        public static IBus Type(this IBus bus, string? value = null)
+        {
+            if (string.IsNullOrEmpty(value))
+                return bus;
+
+            if (bus.Context.Headers.ContainsKey(Headers.Type))
+                bus.Context.Headers.Remove(Headers.Type);
+
+            bus.Context.Headers.Add(Headers.Type, value);
 
             return bus;
         }
@@ -45,7 +65,10 @@ namespace Panama.Canal.Extensions
             if (ack == null)
                 return bus;
 
-            bus.Context.Reply = ack;
+            if (bus.Context.Headers.TryGetValue(Headers.Reply, out _))
+                bus.Context.Headers.Remove(Headers.Reply);
+
+            bus.Context.Headers.TryAdd(Headers.Reply, ack);
 
             return bus;
         }
@@ -79,7 +102,10 @@ namespace Panama.Canal.Extensions
         public static IBus Target<T>(this IBus bus)
             where T : ITarget
         {
-            bus.Context.Target = typeof(T);
+            if (bus.Context.Headers.TryGetValue(Headers.Broker, out _))
+                bus.Context.Headers.Remove(Headers.Broker);
+
+            bus.Context.Headers.TryAdd(Headers.Broker, typeof(T).AssemblyQualifiedName);
 
             return bus;
         }
@@ -88,7 +114,10 @@ namespace Panama.Canal.Extensions
             if (type == null)
                 return bus;
 
-            bus.Context.Target = type;
+            if (bus.Context.Headers.TryGetValue(Headers.Broker, out _))
+                bus.Context.Headers.Remove(Headers.Broker);
+
+            bus.Context.Headers.TryAdd(Headers.Broker, type.AssemblyQualifiedName);
 
             return bus;
         }
@@ -99,9 +128,14 @@ namespace Panama.Canal.Extensions
 
             var result = value ?? DateTime.UtcNow;
 
-            bus.Context.Delay = result.Kind == DateTimeKind.Utc
+            var delay = result.Kind == DateTimeKind.Utc
                 ? result
                 : result.ToUniversalTime();
+
+            if (bus.Context.Headers.ContainsKey(Headers.Delay))
+                bus.Context.Headers.Remove(Headers.Delay);
+
+            bus.Context.Headers.Add(Headers.Delay, delay.ToString());
 
             return bus;
         }
@@ -110,7 +144,10 @@ namespace Panama.Canal.Extensions
             if (delay == null)
                 return bus;
 
-            bus.Context.Delay = DateTime.UtcNow.Add(delay.Value);
+            if (bus.Context.Headers.ContainsKey(Headers.Delay))
+                bus.Context.Headers.Remove(Headers.Delay);
+
+            bus.Context.Headers.Add(Headers.Delay, DateTime.UtcNow.Add(delay.Value).ToString());
 
             return bus;
         }
@@ -129,7 +166,10 @@ namespace Panama.Canal.Extensions
             if (group == null)
                 return bus;
 
-            bus.Context.Group = group;
+            if (bus.Context.Headers.TryGetValue(Headers.Group, out _))
+                bus.Context.Headers.Remove(Headers.Group);
+
+            bus.Context.Headers.TryAdd(Headers.Group, group);
 
             return bus;
         }
@@ -174,7 +214,10 @@ namespace Panama.Canal.Extensions
             if (instance == null)
                 return bus;
 
-            bus.Context.Instance = instance;
+            if (bus.Context.Headers.TryGetValue(Headers.Instance, out _))
+                bus.Context.Headers.Remove(Headers.Instance);
+
+            bus.Context.Headers.TryAdd(Headers.Instance, instance);
 
             return bus;
         }
@@ -223,7 +266,10 @@ namespace Panama.Canal.Extensions
             if (id == null)
                 return bus;
 
-            bus.Context.SagaId = id;
+            if (bus.Context.Headers.TryGetValue(Headers.SagaId, out _))
+                bus.Context.Headers.Remove(Headers.SagaId);
+
+            bus.Context.Headers.TryAdd(Headers.SagaId, id);
 
             return bus;
         }
@@ -232,7 +278,10 @@ namespace Panama.Canal.Extensions
             if (type == null)
                 return bus;
 
-            bus.Context.SagaType = type;
+            if (bus.Context.Headers.TryGetValue(Headers.SagaType, out _))
+                bus.Context.Headers.Remove(Headers.SagaType);
+
+            bus.Context.Headers.TryAdd(Headers.SagaType, type);
 
             return bus;
         }

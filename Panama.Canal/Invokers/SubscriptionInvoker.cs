@@ -109,16 +109,14 @@ namespace Panama.Canal.Invokers
 
                 if (metadata.HasReply())
                     await new Panama.Models.Context(_provider, context.Token).Bus()
-                            .Instance(metadata.GetInstance())
+                            .Data(data)
                             .Token(context.Token)
+                            .Header(metadata.Headers.DefaultFilter())
+                            .Type(data.GetType().AssemblyQualifiedName)
                             .Id(Guid.NewGuid().ToString())
                             .CorrelationId(metadata.GetCorrelationId())
                             .Topic(metadata.GetReply())
-                            .Header(metadata.Headers.DefaultFilter())
-                            .Group(group)
-                            .Data(data)
                             .Invoker(_invokers.GetInvoker())
-                            .Target(target)
                             .Post()
                             .ConfigureAwait(false);
 
@@ -139,17 +137,15 @@ namespace Panama.Canal.Invokers
 
                 if (metadata.HasReply())
                     await new Panama.Models.Context(_provider, context.Token).Bus()
-                        .Instance(metadata.GetInstance())
+                        .Data(data)
                         .Token(context.Token)
                         .Header(Headers.Exception, ex.Message)
                         .Header(metadata.Headers.DefaultFilter())
+                        .Type(data.GetType().AssemblyQualifiedName)
                         .Id(Guid.NewGuid().ToString())
                         .CorrelationId(metadata.GetCorrelationId())
                         .Topic(metadata.GetReply())
-                        .Group(group)
-                        .Data(data)
                         .Invoker(_invokers.GetInvoker())
-                        .Target(target)
                         .Post()
                         .ConfigureAwait(false);
 

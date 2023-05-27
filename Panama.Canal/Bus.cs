@@ -36,18 +36,13 @@ namespace Panama.Canal
             var message = new Message()
                 .AddHeaders(Context.Headers)
                 .AddMessageId(Context.Id)
-                .AddMessageName(_options.Value.GetName(Context.Name))
                 .AddCorrelationId(Context.CorrelationId)
-                .AddMessageGroup(Context.Group ?? _options.Value.DefaultGroup)
-                .AddMessageBroker(Context.Target?.AssemblyQualifiedName ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
-                .AddMessageInstance(Context.Instance)
-                .AddMessageType(Context.Data.GetType().AssemblyQualifiedName)
+                .AddReply(_options.Value.GetName(Context.Headers.GetReply()))
+                .AddGroup(Context.Headers.GetGroup() ?? _options.Value.DefaultGroup)
+                .AddBroker(Context.Headers.GetBroker() ?? _targets.GetDefaultTarget().GetType().AssemblyQualifiedName)
+                .AddType(Context.Data.GetType().AssemblyQualifiedName)
                 .AddCreatedTime()
-                .AddDelayTime(Context.Delay)
                 .AddData(Context.Data)
-                .AddReply(_options.Value.GetName(Context.Reply))
-                .AddSagaId(Context.SagaId)
-                .AddSagaType(Context.SagaType)
                 .ToInternal(Context.Provider);
 
             return await Post(message, token);

@@ -82,17 +82,17 @@ namespace Panama.Canal.Tests
             var message = new Message()
                 .AddCorrelationId(Guid.NewGuid().ToString())
                 .AddCreatedTime()
-                .AddMessageGroup("test.group")
+                .AddGroup("test.group")
                 .AddMessageTopic("test.topic")
                 .AddMessageId(Guid.NewGuid().ToString())
-                .AddMessageType(GetType().AssemblyQualifiedName)
+                .AddType(GetType().AssemblyQualifiedName)
                 .AddReply("test.reply")
                 .AddSentTime(DateTime.UtcNow.AddSeconds(1))
                 .AddDelayTime(DateTime.UtcNow.AddSeconds(5));
-
+            
             var result = message.Headers.DefaultFilter();
 
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(1, result.Count);
         }
     }
 }

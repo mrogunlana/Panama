@@ -8,24 +8,13 @@ namespace Panama.Canal.Models
 {
     public class BusContext : Context
     {
-        public string Reply { get; set; } = String.Empty;
-        public string Name { get; set; } = String.Empty;
-        public string? Group { get; set; }
-        public string Instance { get; set; } = String.Empty;
-        public string SagaType { get; set; } = String.Empty;
-        public string SagaId { get; set; } = String.Empty;
-        public IContext? Origin { get; set; }
-        public DateTime Delay { get; set; }
-        public Type? Target { get; set; }
-        public IDictionary<string, string?> Headers { get; set; }
         public IInvoke Invoker { get; set; }
         public IChannel? Channel { get; set; }
+        public IDictionary<string, string?> Headers { get; set; }
         public BusContext(
-            IServiceProvider provider,
-            IContext? origin = null)
+            IServiceProvider provider)
             : base(provider)
         {
-            Origin = origin;
             Headers = new Dictionary<string, string?>();
             Invoker = provider.GetRequiredService<PublishedInvokerFactory>().GetInvoker();
         }

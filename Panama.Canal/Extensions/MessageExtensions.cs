@@ -45,19 +45,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageName(this Message message, string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return message;
-
-            if (message.Headers.ContainsKey(Headers.Name))
-                message.Headers.Remove(Headers.Name);
-
-            message.Headers.Add(Headers.Name, value);
-
-            return message;
-        }
-        public static Message AddMessageGroup(this Message message, string? value)
+        public static Message AddGroup(this Message message, string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
@@ -69,7 +57,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageBroker(this Message message, string? value = null)
+        public static Message AddBroker(this Message message, string? value = null)
         {
             var text = value?.ToString() ?? string.Empty;
 
@@ -84,18 +72,6 @@ namespace Panama.Canal.Extensions
             return message;
         }
 
-        public static Message AddMessageInstance(this Message message, string? value = null)
-        {
-            if (string.IsNullOrEmpty(value))
-                return message;
-
-            if (message.Headers.ContainsKey(Headers.Instance))
-                message.Headers.Remove(Headers.Instance);
-
-            message.Headers.Add(Headers.Instance, value);
-
-            return message;
-        }
         public static Message AddMessageTopic(this Message message, string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -108,7 +84,7 @@ namespace Panama.Canal.Extensions
 
             return message;
         }
-        public static Message AddMessageType(this Message message, string? value = null)
+        public static Message AddType(this Message message, string? value = null)
         {
             if (string.IsNullOrEmpty(value))
                 return message;
@@ -251,14 +227,14 @@ namespace Panama.Canal.Extensions
             return default;
         }
 
-        public static string GetGroup(this Message message)
+        public static string? GetGroup(this Message message)
         {
             if (message.Headers == null)
-                throw new InvalidOperationException("Message headers cannot be found.");
+                return null;
 
             var result = message.Headers[Headers.Group];
             if (result == null)
-                throw new InvalidOperationException($"Header: {Headers.Group} cannot be found.");
+                return null;
 
             return result;
         }

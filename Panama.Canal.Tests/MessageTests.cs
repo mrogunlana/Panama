@@ -234,7 +234,7 @@ namespace Panama.Canal.Tests
                 var store = provider.GetRequiredService<Store>();
 
                 await channel.Commit();
-                await Task.Delay(TimeSpan.FromHours(2));
+                await Task.Delay(TimeSpan.FromSeconds(2));
 
                 Assert.IsTrue(store.Published.Count == 2);
                 Assert.IsNotNull(store.Published[id]);
