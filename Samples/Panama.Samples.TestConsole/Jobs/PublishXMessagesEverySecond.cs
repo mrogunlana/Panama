@@ -34,6 +34,7 @@ namespace Panama.Samples.TestConsole.Jobs
                 var configuration = _provider.GetRequiredService<IConfiguration>();
                 var host = Environment.GetEnvironmentVariable("HOST") ?? configuration.GetValue<string>("HOST");
                 var interval = Convert.ToInt32(Environment.GetEnvironmentVariable("POST_COUNT") ?? configuration.GetValue<string>("POST_COUNT") ?? "10");
+                var url = $"{host}/WeatherForecast/";
 
                 for (int i = 0; i < interval; i++)
                 {
@@ -51,7 +52,9 @@ namespace Panama.Samples.TestConsole.Jobs
 
                         client.DefaultRequestHeaders.Add("User-Agent", "Panama.Samples.TestConsole");
 
-                        await client.PostAsync(host, content);
+                        _log.LogDebug($"Publishing forecast to: {url}.");
+
+                        await client.PostAsync(url, content);
                     }
                 }
             }
