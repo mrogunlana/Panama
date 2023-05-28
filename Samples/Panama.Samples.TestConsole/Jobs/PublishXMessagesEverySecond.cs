@@ -32,9 +32,9 @@ namespace Panama.Samples.TestConsole.Jobs
              * 
              */
                 var configuration = _provider.GetRequiredService<IConfiguration>();
-                var host = Environment.GetEnvironmentVariable("HOST") ?? configuration.GetValue<string>("HOST");
+                var host = Environment.GetEnvironmentVariable("SERVICE_HOST") ?? configuration.GetValue<string>("HOST");
                 var interval = Convert.ToInt32(Environment.GetEnvironmentVariable("POST_COUNT") ?? configuration.GetValue<string>("POST_COUNT") ?? "10");
-                var url = $"{host}/WeatherForecast/";
+                var url = $"http://{host}/WeatherForecast/";
 
                 for (int i = 0; i < interval; i++)
                 {

@@ -49,6 +49,7 @@ services:
         dockerfile: Samples/Panama.Samples.TestConsole/Dockerfile
       environment:
         POST_COUNT: ${POST_COUNT}
+        SERVICE_HOST: ${SERVICE_HOST}
       depends_on:
         service:
           condition: service_healthy
@@ -76,13 +77,6 @@ services:
           condition: service_healthy
         rabbitmq:
           condition: service_healthy
-
-#  start_dependencies:
-#      image: dadarek/wait-for-dependencies
-#      depends_on:
-#        - db
-#        - rabbitmq
-#      command: db:3309 rabbitmq:15672
 
 volumes:
   dbdata:
