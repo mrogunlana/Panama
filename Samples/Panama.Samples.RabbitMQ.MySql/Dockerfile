@@ -14,6 +14,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
 
-EXPOSE 5296/tcp
+RUN apt-get update 
+RUN apt-get --yes install curl
+
+EXPOSE 5296
 
 ENTRYPOINT ["dotnet", "Panama.Samples.RabbitMQ.MySql.dll"]

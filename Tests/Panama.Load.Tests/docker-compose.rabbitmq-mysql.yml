@@ -70,6 +70,7 @@ services:
         BROKER_HOST: ${BROKER_HOST}
         ConnectionStrings__MySql: ${ConnectionStrings__MySql}
         ConnectionStrings__MySqlLogs: ${ConnectionStrings__MySqlLogs}
+        ASPNETCORE_URLS: ${SERVICE_PORTS}
       depends_on:
         db:
           condition: service_healthy
