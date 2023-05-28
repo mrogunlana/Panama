@@ -12,6 +12,11 @@ services:
         - '5672:5672'
         # HTTP management UI
         - '15672:15672'
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   db:
       container_name: db
       build: 
@@ -32,7 +37,11 @@ services:
         MYSQL_USER: ${DB_USERNAME}
         MYSQL_DATABASE: ${DB_DATABASE}
         MYSQL_PASSWORD: ${DB_PASSWORD}
-        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} 
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      healthcheck:
+        test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$DB_ROOT_PASSWORD' ]
+        timeout: 20s
+        retries: 10        
   client:
       container_name: client
       build: 
@@ -42,7 +51,7 @@ services:
         HOST: service
       depends_on:
         service:
-          condition: service_completed_successfully
+          condition: service_healthy
   service:
       container_name: service
       build: 
@@ -50,12 +59,24 @@ services:
         dockerfile: Samples/Panama.Samples.RabbitMQ.MySql/Dockerfile
       ports: 
         - "5296:5296"
+      healthcheck:
+        test: curl --fail http://localhost:5296/health || exit 1
+        interval: 30s
+        timeout: 30s
+        retries: 3
       depends_on:
-        rabbitmq:
-          condition: service_started
         db:
-          condition: service_completed_successfully
-     
+          condition: service_healthy
+        rabbitmq:
+          condition: service_healthy
+
+#  start_dependencies:
+#      image: dadarek/wait-for-dependencies
+#      depends_on:
+#        - db
+#        - rabbitmq
+#      command: db:3309 rabbitmq:15672
+
 volumes:
   dbdata:
     driver: local      

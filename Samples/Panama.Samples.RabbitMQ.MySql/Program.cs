@@ -7,7 +7,6 @@ using Panama.Canal.MySQL;
 using Panama.Canal.RabbitMQ;
 using Panama.Samples.RabbitMQ.MySql.Models;
 using Panama.Samples.RabbitMQ.MySQL.Contexts;
-using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +20,9 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Health checks
+builder.Services.AddHealthChecks();
 
 // Add Panama Canal Services: MySql, RabbitMq, Default Quartz Scheduler
 builder.Services.AddPanama(
@@ -65,5 +67,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();
