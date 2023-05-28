@@ -48,7 +48,7 @@ services:
         context: ../../.
         dockerfile: Samples/Panama.Samples.TestConsole/Dockerfile
       environment:
-        HOST: service
+        POST_COUNT: ${POST_COUNT}
       depends_on:
         service:
           condition: service_healthy
@@ -64,6 +64,12 @@ services:
         interval: 30s
         timeout: 30s
         retries: 3
+      environment:
+        DB_HOST: ${DB_HOST}
+        DB_PORT: ${DB_PORT}
+        BROKER_HOST: ${BROKER_HOST}
+        ConnectionStrings__MySql: ${ConnectionStrings__MySql}
+        ConnectionStrings__MySqlLogs: ${ConnectionStrings__MySqlLogs}
       depends_on:
         db:
           condition: service_healthy

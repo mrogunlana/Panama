@@ -4,7 +4,9 @@ using NLog.Extensions.Logging;
 using Panama;
 using Panama.Canal;
 using Panama.Canal.MySQL;
+using Panama.Canal.MySQL.Models;
 using Panama.Canal.RabbitMQ;
+using Panama.Canal.RabbitMQ.Models;
 using Panama.Samples.RabbitMQ.MySql.Models;
 using Panama.Samples.RabbitMQ.MySQL.Contexts;
 
@@ -52,6 +54,20 @@ builder.Services.AddLogging(loggingBuilder => {
 
 // For testing purposes -- state object
 builder.Services.AddSingleton<State>();
+
+builder.Services.Configure<MySqlOptions>(options => {
+    var host = Environment.GetEnvironmentVariable("DB_HOST");
+    var port = Environment.GetEnvironmentVariable("DB_PORT");
+    options.Host = host ?? options.Host;
+    options.Port = string.IsNullOrEmpty(port)
+        ? options.Port
+        : Convert.ToInt32(port);
+});
+
+builder.Services.Configure<RabbitMQOptions>(options => {
+    var host = Environment.GetEnvironmentVariable("BROKER_HOST");
+    options.Host = host ?? options.Host;
+});
 
 var app = builder.Build();
 
