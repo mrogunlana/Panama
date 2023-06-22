@@ -43,7 +43,7 @@ namespace Panama.Samples.TestConsole
                             options.UseCanal(canal => {
                                 canal.UseDefaultScheduler((scheduler) => {
                                     scheduler.ClearJobs();
-                                    scheduler.AddJob<PublishXMessagesEverySecond>("* * * * * ?");
+                                    scheduler.AddJob<PublishXMessagesEverySecond>("0/5 * * * * ?");
                                 });
                             });
                         });

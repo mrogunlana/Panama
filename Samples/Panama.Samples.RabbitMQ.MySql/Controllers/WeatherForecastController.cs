@@ -35,12 +35,12 @@ namespace Panama.Samples.RabbitMQ.MySql.Controllers
         }
 
         [HttpPost]
-        public async Task<Interfaces.IResult> Post([FromBody]WeatherForecast forecast)
+        public async Task<Interfaces.IResult> Post([FromBody]List<WeatherForecast> forecasts)
         {
             var test = _provider.GetRequiredService<SubscriberDescriptions>();
 
             return await _provider.GetRequiredService<IHandler>()
-                .Add(forecast)
+                .Add(forecasts)
                 .Command<SaveWeatherForecast>()
                 .Invoke();
         }

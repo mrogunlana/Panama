@@ -1,0 +1,11 @@
+version: '3.7'
+
+services: 
+  client:
+      container_name: client
+      build: 
+        context: ../../.
+        dockerfile: Samples/Panama.Samples.TestConsole/Dockerfile
+      environment:
+        POST_COUNT: ${POST_COUNT}
+        SERVICE_HOST: ${SERVICE_HOST}

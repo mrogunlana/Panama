@@ -28,21 +28,24 @@ namespace Panama.Samples.RabbitMQ.MySql.Commands
         }
         public async Task Execute(IContext context)
         {
-            var model = context.Data.DataGetSingle<WeatherForecast>();
+            var models = context.Data.DataGet<WeatherForecast>();
 
             using (var channel = _factory.CreateChannel<DatabaseFacade, IDbContextTransaction>(_context.Database, context.Token))
             {
-                _context.Add(model);
+                foreach (var model in models)
+                {
+                    _context.Add(model);
 
-                // save forcast to database
-                await _context.SaveChangesAsync();
+                    // save forcast to database
+                    await _context.SaveChangesAsync();
+                }
 
                 // publish new model
                 await context.Bus()
                     .Channel(channel)
                     .Token(context.Token)
                     .Topic("forecast.created")
-                    .Data(model)
+                    .Data(models)
                     .Post();
 
                 // commits save transaction, then publish

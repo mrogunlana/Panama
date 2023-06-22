@@ -31,6 +31,7 @@ namespace Panama.Canal.RabbitMQ
 
         private IConnection GetConnection()
         {
+            _log.LogInformation($"Broker Connection String: Host:{_options.Host}:{_options.Port}, VHost: {_options.VHost}");
             var factory = new ConnectionFactory() {
                 Port = _options.Port,
                 HostName = _options.Host.Contains(",") ? null : _options.Host,

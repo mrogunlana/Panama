@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+    service:
+      container_name: service
+      build: 
+        context: ../../.
+        dockerfile: Samples/Panama.Samples.RabbitMQ.MySql/Dockerfile
+      ports: 
+        - "5296:5296"
+      healthcheck:
+        test: curl --fail http://localhost:5296/health || exit 1
+        interval: 30s
+        timeout: 30s
+        retries: 3
+      environment:
+        DB_HOST: ${DB_HOST}
+        DB_PORT: ${DB_PORT}
+        BROKER_HOST: ${BROKER_HOST}
+        ConnectionStrings__MySql: ${ConnectionStrings__MySql}
+        ConnectionStrings__MySqlLogs: ${ConnectionStrings__MySqlLogs}
+        ASPNETCORE_URLS: ${SERVICE_PORTS}
